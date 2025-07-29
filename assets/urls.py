@@ -5,6 +5,7 @@ app_name = 'assets'
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('library/', views.my_library, name='my_library'),
     path('assets/', views.asset_list, name='asset_list'),
     path('assets/<int:asset_id>/', views.asset_detail, name='asset_detail'),
     path('assets/download/<int:asset_id>/', views.download_asset, name='download_asset'),
@@ -15,5 +16,6 @@ urlpatterns = [
     path('accounts/login/', views.user_login, name='login'),
     path('accounts/logout/', views.user_logout, name='logout'),
     path('api/chatbot/', views.chatbot_api, name='chatbot_api'),
+    path('profile/', views.profile, name='profile'),
 ]
 

@@ -17,7 +17,9 @@ class Category(models.Model):
 # Extends the built-in User model to add a verification status
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+
     is_verified = models.BooleanField(default=False, help_text="Designates whether the user is verified to upload assets.")
+    library = models.ManyToManyField('Asset', related_name='in_libraries', blank=True, help_text="Assets added to the user's library.")
 
     def __str__(self):
         return self.user.username

@@ -3,95 +3,91 @@
 {% block title %}Upload Asset - GameAsset Store{% endblock %}
 
 {% block content %}
-<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 3rem 2rem; text-align: center;">
+<div class="upload-hero">
     <div class="container">
         <h1><i class="fas fa-upload"></i> Upload Your Asset</h1>
-        <p style="font-size: 1.1rem; opacity: 0.9;">Share your creation with the game development community</p>
+        <p class="upload-hero-desc">Share your creation with the game development community</p>
     </div>
 </div>
 
-<div style="padding: 2rem;">
+<div class="upload-content">
     <div class="container">
-        <div style="max-width: 600px; margin: 0 auto;">
-            <div style="background: white; padding: 3rem; border-radius: 20px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);">
-                <form method="post" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 2rem;">
+        <div class="upload-form-wrapper">
+            <div class="upload-form-card">
+                <form method="post" enctype="multipart/form-data" class="upload-form">
                     {% csrf_token %}
                     
+
                     <div>
-                        <label for="{{ form.title.id_for_label }}" style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600;">
+                        <label for="{{ form.title.id_for_label }}" class="upload-label">
                             <i class="fas fa-heading"></i> Asset Title *
                         </label>
                         {{ form.title }}
                         {% if form.title.errors %}
-                            <div style="color: #dc2626; font-size: 0.8rem; margin-top: 0.25rem;">
-                                {{ form.title.errors.0 }}
-                            </div>
+                            <div class="upload-error">{{ form.title.errors.0 }}</div>
                         {% endif %}
-                        <small style="color: #666; font-size: 0.8rem;">Give your asset a clear, descriptive title</small>
+                        <small class="upload-help">Give your asset a clear, descriptive title</small>
                     </div>
 
+
                     <div>
-                        <label for="{{ form.description.id_for_label }}" style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600;">
+                        <label for="{{ form.description.id_for_label }}" class="upload-label">
                             <i class="fas fa-align-left"></i> Description *
                         </label>
                         {{ form.description }}
                         {% if form.description.errors %}
-                            <div style="color: #dc2626; font-size: 0.8rem; margin-top: 0.25rem;">
-                                {{ form.description.errors.0 }}
-                            </div>
+                            <div class="upload-error">{{ form.description.errors.0 }}</div>
                         {% endif %}
-                        <small style="color: #666; font-size: 0.8rem;">Describe what your asset is and how it can be used</small>
+                        <small class="upload-help">Describe what your asset is and how it can be used</small>
                     </div>
 
+
                     <div>
-                        <label for="{{ form.category.id_for_label }}" style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600;">
+                        <label for="{{ form.category.id_for_label }}" class="upload-label">
                             <i class="fas fa-tags"></i> Category *
                         </label>
                         {{ form.category }}
                         {% if form.category.errors %}
-                            <div style="color: #dc2626; font-size: 0.8rem; margin-top: 0.25rem;">
-                                {{ form.category.errors.0 }}
-                            </div>
+                            <div class="upload-error">{{ form.category.errors.0 }}</div>
                         {% endif %}
-                        <small style="color: #666; font-size: 0.8rem;">Choose the most appropriate category for your asset</small>
+                        <small class="upload-help">Choose the most appropriate category for your asset</small>
                     </div>
 
+
                     <div>
-                        <label for="{{ form.thumbnail.id_for_label }}" style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600;">
+                        <label for="{{ form.thumbnail.id_for_label }}" class="upload-label">
                             <i class="fas fa-image"></i> Preview Image *
                         </label>
-                        <div style="position: relative;">
+                        <div class="upload-thumbnail-wrapper">
                             {{ form.thumbnail }}
-                            <div id="thumbnail-preview" style="margin-top: 1rem; display: none;">
-                                <img id="thumbnail-img" style="max-width: 200px; max-height: 200px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);">
+                            <div id="thumbnail-preview" class="upload-thumbnail-preview">
+                                <img id="thumbnail-img" class="upload-thumbnail-img">
                             </div>
                         </div>
                         {% if form.thumbnail.errors %}
-                            <div style="color: #dc2626; font-size: 0.8rem; margin-top: 0.25rem;">
-                                {{ form.thumbnail.errors.0 }}
-                            </div>
+                            <div class="upload-error">{{ form.thumbnail.errors.0 }}</div>
                         {% endif %}
-                        <small style="color: #666; font-size: 0.8rem;">{{ form.thumbnail.help_text }}</small>
+                        <small class="upload-help">{{ form.thumbnail.help_text }}</small>
                     </div>
 
+
                     <div>
-                        <label for="{{ form.asset_file.id_for_label }}" style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600;">
+                        <label for="{{ form.asset_file.id_for_label }}" class="upload-label">
                             <i class="fas fa-file-archive"></i> Asset File *
                         </label>
                         {{ form.asset_file }}
                         {% if form.asset_file.errors %}
-                            <div style="color: #dc2626; font-size: 0.8rem; margin-top: 0.25rem;">
-                                {{ form.asset_file.errors.0 }}
-                            </div>
+                            <div class="upload-error">{{ form.asset_file.errors.0 }}</div>
                         {% endif %}
-                        <small style="color: #666; font-size: 0.8rem;">{{ form.asset_file.help_text }}</small>
+                        <small class="upload-help">{{ form.asset_file.help_text }}</small>
                     </div>
 
-                    <div style="background: rgba(34, 197, 94, 0.1); padding: 1.5rem; border-radius: 10px; border-left: 4px solid #22c55e;">
-                        <h4 style="margin: 0 0 0.5rem 0; color: #16a34a;">
+
+                    <div class="upload-guidelines-box">
+                        <h4 class="upload-guidelines-title">
                             <i class="fas fa-info-circle"></i> Upload Guidelines
                         </h4>
-                        <ul style="margin: 0; padding-left: 1.5rem; color: #16a34a; font-size: 0.9rem;">
+                        <ul class="upload-guidelines-list">
                             <li>Ensure your asset is original or you have permission to share it</li>
                             <li>Provide a clear, high-quality preview image</li>
                             <li>Include detailed descriptions and usage instructions</li>
@@ -99,11 +95,11 @@
                         </ul>
                     </div>
 
-                    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
-                        <button type="submit" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem;">
+                    <div class="upload-btn-row">
+                        <button type="submit" class="btn btn-primary upload-btn-submit">
                             <i class="fas fa-upload"></i> Upload Asset
                         </button>
-                        <a href="{% url 'assets:home' %}" class="btn btn-secondary" style="padding: 1rem 2rem; font-size: 1.1rem;">
+                        <a href="{% url 'assets:home' %}" class="btn btn-secondary upload-btn-cancel">
                             <i class="fas fa-times"></i> Cancel
                         </a>
                     </div>
@@ -131,35 +127,113 @@ document.getElementById('{{ form.thumbnail.id_for_label }}').addEventListener('c
 </script>
 
 <style>
-.form-control {
-    width: 100% !important;
-    padding: 1rem !important;
-    border: 2px solid #e0e0e0 !important;
-    border-radius: 10px !important;
-    font-size: 1rem !important;
-    transition: border-color 0.3s ease !important;
-    outline: none !important;
-    box-sizing: border-box !important;
-    font-family: inherit !important;
+.upload-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 3rem 2rem;
+    text-align: center;
 }
-
-.form-control:focus {
-    border-color: #667eea !important;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+.upload-hero-desc {
+    font-size: 1.1rem;
+    opacity: 0.9;
 }
-
-textarea.form-control {
-    resize: vertical !important;
-    min-height: 120px !important;
+.upload-content {
+    padding: 2rem;
 }
-
-select.form-control {
-    cursor: pointer !important;
+.upload-form-wrapper {
+    max-width: 600px;
+    margin: 0 auto;
 }
-
-input[type="file"].form-control {
-    padding: 0.75rem !important;
-    cursor: pointer !important;
+.upload-form-card {
+    background: white;
+    padding: 3rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+.upload-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+.upload-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 600;
+}
+.form-control, .upload-form input, .upload-form textarea, .upload-form select {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+    outline: none;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+.form-control:focus, .upload-form input:focus, .upload-form textarea:focus, .upload-form select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+}
+.upload-error {
+    color: #dc2626;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+.upload-help {
+    color: #666;
+    font-size: 0.8rem;
+}
+.upload-thumbnail-wrapper {
+    position: relative;
+}
+.upload-thumbnail-preview {
+    margin-top: 1rem;
+    display: none;
+}
+.upload-thumbnail-img {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+.upload-guidelines-box {
+    background: rgba(34, 197, 94, 0.1);
+    padding: 1.5rem;
+    border-radius: 10px;
+    border-left: 4px solid #22c55e;
+}
+.upload-guidelines-title {
+    margin: 0 0 0.5rem 0;
+    color: #16a34a;
+}
+.upload-guidelines-list {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: #16a34a;
+    font-size: 0.9rem;
+}
+.upload-btn-row {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+.upload-btn-submit, .upload-btn-cancel {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+}
+textarea.form-control, .upload-form textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+select.form-control, .upload-form select {
+    cursor: pointer;
+}
+input[type="file"].form-control, .upload-form input[type="file"] {
+    padding: 0.75rem;
+    cursor: pointer;
 }
 </style>
 {% endblock %}

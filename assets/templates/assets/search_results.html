@@ -3,15 +3,15 @@
 {% block title %}{% if query %}Search: {{ query }}{% else %}Search Assets{% endif %} - GameAsset Store{% endblock %}
 
 {% block content %}
-<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 3rem 2rem; text-align: center;">
+
+<div class="search-hero">
     <div class="container">
         <h1><i class="fas fa-search"></i> Search Results</h1>
         {% if query %}
-            <p style="font-size: 1.1rem; opacity: 0.9;">Results for "{{ query }}"</p>
+            <p class="search-hero-desc">Results for "{{ query }}"</p>
         {% else %}
-            <p style="font-size: 1.1rem; opacity: 0.9;">Search our asset library</p>
+            <p class="search-hero-desc">Search our asset library</p>
         {% endif %}
-        
         <div class="search-container">
             <form method="GET" action="{% url 'assets:search_assets' %}">
                 <input type="text" name="q" class="search-bar" placeholder="Search assets..." value="{{ query }}">
@@ -23,11 +23,11 @@
     </div>
 </div>
 
-<div style="padding: 2rem;">
+<div class="search-content">
     <div class="container">
         {% if query %}
-            <div style="margin-bottom: 2rem; padding: 1rem; background: rgba(102, 126, 234, 0.1); border-radius: 10px; text-align: center;">
-                <p style="margin: 0; color: #667eea; font-weight: 500;">
+            <div class="search-results-info">
+                <p class="search-results-info-text">
                     {% if assets %}
                         Found {{ page_obj.paginator.count }} result{{ page_obj.paginator.count|pluralize }} for "{{ query }}"
                     {% else %}
@@ -44,8 +44,8 @@
                     {% if asset.thumbnail %}
                         <img src="{{ asset.thumbnail.url }}" alt="{{ asset.title }}" class="asset-image">
                     {% else %}
-                        <div class="asset-image" style="display: flex; align-items: center; justify-content: center; color: #999;">
-                            <i class="fas fa-image" style="font-size: 3rem;"></i>
+                        <div class="asset-image asset-image-empty">
+                            <i class="fas fa-image asset-image-icon-medium"></i>
                         </div>
                     {% endif %}
                     <div class="asset-info">
@@ -54,10 +54,10 @@
                         {% if asset.category %}
                             <span class="asset-category">{{ asset.category.name }}</span>
                         {% endif %}
-                        <p style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">
+                        <p class="asset-desc-short">
                             {{ asset.description|truncatewords:15 }}
                         </p>
-                        <div style="margin-top: 1rem; font-size: 0.8rem; color: #999;">
+                        <div class="asset-date-short">
                             <i class="fas fa-calendar"></i> {{ asset.created_at|date:"M d, Y" }}
                         </div>
                     </div>
@@ -67,7 +67,7 @@
 
             <!-- Pagination -->
             {% if page_obj.has_other_pages %}
-            <div style="display: flex; justify-content: center; align-items: center; margin-top: 3rem; gap: 1rem;">
+            <div class="search-pagination">
                 {% if page_obj.has_previous %}
                     <a href="?q={{ query }}&page=1" class="btn btn-secondary">
                         <i class="fas fa-angle-double-left"></i> First
@@ -77,7 +77,7 @@
                     </a>
                 {% endif %}
 
-                <span style="padding: 0.75rem 1.5rem; background: rgba(102, 126, 234, 0.1); border-radius: 8px; color: #667eea; font-weight: 500;">
+                <span class="search-pagination-info">
                     Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
                 </span>
 
@@ -92,12 +92,12 @@
             </div>
             {% endif %}
         {% else %}
-            <div style="text-align: center; padding: 4rem 2rem; color: #666;">
+            <div class="search-empty">
                 {% if query %}
-                    <i class="fas fa-search" style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <i class="fas fa-search search-empty-icon"></i>
                     <h2>No Results Found</h2>
-                    <p style="margin-bottom: 2rem;">Try different keywords or browse our categories</p>
-                    <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                    <p class="search-empty-desc">Try different keywords or browse our categories</p>
+                    <div class="search-empty-btns">
                         <a href="{% url 'assets:asset_list' %}" class="btn btn-secondary">
                             <i class="fas fa-th-large"></i> Browse All Assets
                         </a>
@@ -106,9 +106,9 @@
                         </a>
                     </div>
                 {% else %}
-                    <i class="fas fa-search" style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <i class="fas fa-search search-empty-icon"></i>
                     <h2>Search Our Asset Library</h2>
-                    <p style="margin-bottom: 2rem;">Enter keywords to find the perfect assets for your project</p>
+                    <p class="search-empty-desc">Enter keywords to find the perfect assets for your project</p>
                     <a href="{% url 'assets:asset_list' %}" class="btn btn-primary">
                         <i class="fas fa-th-large"></i> Browse All Assets
                     </a>
@@ -116,6 +116,86 @@
             </div>
         {% endif %}
     </div>
+    </div>
 </div>
+<style>
+.search-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 3rem 2rem;
+    text-align: center;
+}
+.search-hero-desc {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+.search-content {
+    padding: 2rem;
+}
+.search-results-info {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 10px;
+    text-align: center;
+}
+.search-results-info-text {
+    margin: 0;
+    color: #667eea;
+    font-weight: 500;
+}
+.asset-image-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+}
+.asset-image-icon-medium {
+    font-size: 3rem;
+}
+.asset-desc-short {
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+.asset-date-short {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: #999;
+}
+.search-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 3rem;
+    gap: 1rem;
+}
+.search-pagination-info {
+    padding: 0.75rem 1.5rem;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 8px;
+    color: #667eea;
+    font-weight: 500;
+}
+.search-empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #666;
+}
+.search-empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+.search-empty-desc {
+    margin-bottom: 2rem;
+}
+.search-empty-btns {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+</style>
 {% endblock %}
 

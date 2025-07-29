@@ -3,35 +3,33 @@
 {% block title %}{{ asset.title }} - GameAsset Store{% endblock %}
 
 {% block content %}
-<div style="padding: 2rem;">
+
+<div class="asset-detail-page">
     <div class="container">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-bottom: 3rem;">
+        <div class="asset-detail-grid">
             <!-- Asset Image -->
             <div>
                 {% if asset.thumbnail %}
-                    <img src="{{ asset.thumbnail.url }}" alt="{{ asset.title }}" style="width: 100%; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);">
+                    <img src="{{ asset.thumbnail.url }}" alt="{{ asset.title }}" class="asset-image asset-image-detail">
                 {% else %}
-                    <div style="width: 100%; height: 400px; background: linear-gradient(45deg, #f0f0f0, #e0e0e0); border-radius: 15px; display: flex; align-items: center; justify-content: center; color: #999;">
-                        <i class="fas fa-image" style="font-size: 4rem;"></i>
+                    <div class="asset-image asset-image-detail asset-image-empty">
+                        <i class="fas fa-image asset-image-icon"></i>
                     </div>
                 {% endif %}
             </div>
 
-            <!-- Asset Info -->
             <div>
-                <h1 style="font-size: 2.5rem; margin-bottom: 1rem; color: #333;">{{ asset.title }}</h1>
-                
-                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="fas fa-user" style="color: #667eea;"></i>
-                        <span style="font-weight: 500;">{{ asset.creator.get_full_name|default:asset.creator.username }}</span>
+                <h1 class="asset-title asset-title-detail">{{ asset.title }}</h1>
+                <div class="asset-meta-row">
+                    <div class="asset-meta-user">
+                        <i class="fas fa-user asset-meta-user-icon"></i>
+                        <span class="asset-meta-username">{{ asset.creator.get_full_name|default:asset.creator.username }}</span>
                     </div>
                     {% if asset.category %}
                         <span class="asset-category">{{ asset.category.name }}</span>
                     {% endif %}
                 </div>
-
-                <div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem; color: #666; font-size: 0.9rem;">
+                <div class="asset-meta-dates">
                     <div>
                         <i class="fas fa-calendar"></i>
                         {{ asset.created_at|date:"M d, Y" }}
@@ -41,31 +39,23 @@
                         {{ asset.updated_at|date:"M d, Y" }}
                     </div>
                 </div>
-
-                <div style="background: rgba(102, 126, 234, 0.05); padding: 1.5rem; border-radius: 15px; margin-bottom: 2rem;">
-                    <h3 style="margin-bottom: 1rem; color: #333;">Description</h3>
-                    <p style="line-height: 1.8; color: #666;">{{ asset.description|linebreaks }}</p>
+                <div class="alert-info asset-description-box">
+                    <h3 class="asset-description-title">Description</h3>
+                    <p class="asset-description-text">{{ asset.description|linebreaks }}</p>
                 </div>
-
                 <!-- Download Button -->
-                <div style="display: flex; gap: 1rem;">
+                <div class="asset-download-row">
                     {% if user.is_authenticated %}
-                        <a href="{% url 'assets:download_asset' asset.id %}" class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;">
-                            <i class="fas fa-download"></i> Download Free
-                        </a>
+                        <a href="{% url 'assets:download_asset' asset.id %}" class="btn btn-primary asset-download-btn">Download</a>
                     {% else %}
-                        <a href="{% url 'assets:login' %}?next={% url 'assets:asset_detail' asset.id %}" class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;">
-                            <i class="fas fa-sign-in-alt"></i> Login to Download
-                        </a>
+                        <a href="{% url 'assets:login' %}?next={% url 'assets:asset_detail' asset.id %}" class="btn btn-primary asset-download-btn">Login to Download</a>
                     {% endif %}
-                    
-                    <button onclick="navigator.share ? navigator.share({title: '{{ asset.title }}', url: window.location.href}) : copyToClipboard(window.location.href)" class="btn btn-secondary">
+                    <button onclick="navigator.share ? navigator.share({title: '{{ asset.title }}', url: window.location.href}) : copyToClipboard(window.location.href)" class="btn btn-secondary asset-share-btn">
                         <i class="fas fa-share"></i> Share
                     </button>
                 </div>
-
-                <div style="margin-top: 2rem; padding: 1rem; background: rgba(34, 197, 94, 0.1); border-radius: 10px; border-left: 4px solid #22c55e;">
-                    <p style="margin: 0; color: #16a34a; font-size: 0.9rem;">
+                <div class="alert-success asset-edu-box">
+                    <p class="asset-edu-text">
                         <i class="fas fa-graduation-cap"></i>
                         <strong>Educational Use:</strong> This asset is free for educational and learning purposes.
                     </p>
@@ -75,22 +65,22 @@
 
         <!-- Related Assets -->
         {% if related_assets %}
-        <div style="margin-top: 4rem;">
-            <h2 style="text-align: center; margin-bottom: 2rem; color: #333;">Related Assets</h2>
+        <div class="related-assets-section">
+            <h2 class="related-assets-title">Related Assets</h2>
             <div class="asset-grid">
                 {% for related_asset in related_assets %}
                 <div class="asset-card" onclick="window.location.href='{% url 'assets:asset_detail' related_asset.id %}'">
                     {% if related_asset.thumbnail %}
                         <img src="{{ related_asset.thumbnail.url }}" alt="{{ related_asset.title }}" class="asset-image">
                     {% else %}
-                        <div class="asset-image" style="display: flex; align-items: center; justify-content: center; color: #999;">
-                            <i class="fas fa-image" style="font-size: 2rem;"></i>
+                        <div class="asset-image asset-image-empty">
+                            <i class="fas fa-image asset-image-icon-small"></i>
                         </div>
                     {% endif %}
                     <div class="asset-info">
                         <h3 class="asset-title">{{ related_asset.title }}</h3>
                         <p class="asset-creator">by {{ related_asset.creator.get_full_name|default:related_asset.creator.username }}</p>
-                        <p style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">
+                        <p class="asset-related-desc">
                             {{ related_asset.description|truncatewords:10 }}
                         </p>
                     </div>
@@ -111,8 +101,107 @@ function copyToClipboard(text) {
 </script>
 
 <style>
+.asset-detail-page {
+    padding: 2rem;
+}
+.asset-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-bottom: 3rem;
+}
+.asset-image-detail {
+    width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    height: 400px;
+    object-fit: cover;
+}
+.asset-image-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    background: linear-gradient(45deg, #23395d, #2563eb);
+}
+.asset-image-icon {
+    font-size: 4rem;
+}
+.asset-title-detail {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+.asset-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+.asset-meta-user {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.asset-meta-user-icon {
+    color: #2563eb;
+}
+.asset-meta-username {
+    font-weight: 500;
+}
+.asset-meta-dates {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    color: #2563eb;
+    font-size: 0.9rem;
+}
+.asset-description-box {
+    padding: 1.5rem;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+}
+.asset-description-title {
+    margin-bottom: 1rem;
+}
+.asset-description-text {
+    line-height: 1.8;
+}
+.asset-download-row {
+    display: flex;
+    gap: 1rem;
+}
+.asset-download-btn {
+    font-size: 1.1rem;
+    padding: 1rem 2rem;
+}
+.asset-share-btn {
+    font-size: 1.1rem;
+    padding: 1rem 2rem;
+}
+.asset-edu-box {
+    margin-top: 2rem;
+}
+.asset-edu-text {
+    margin: 0;
+}
+.related-assets-section {
+    margin-top: 4rem;
+}
+.related-assets-title {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+.asset-related-desc {
+    color: #e0e7ef;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+.asset-image-icon-small {
+    font-size: 2rem;
+}
 @media (max-width: 768px) {
-    div[style*="grid-template-columns: 1fr 1fr"] {
+    .asset-detail-grid {
         grid-template-columns: 1fr !important;
         gap: 2rem !important;
     }

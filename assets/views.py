@@ -1,6 +1,36 @@
+
+from django.contrib.auth.decorators import login_required
+
+# ...existing code...
+
+@login_required
+def profile(request):
+    """Show the user's profile page"""
+    user_profile = request.user.userprofile
+    return render(request, 'assets/profile.html', {'user_profile': user_profile})
+
+# ...existing imports...
+
+from django.contrib.auth.decorators import login_required
+
+# ...existing code...
+
+@login_required
+def my_library(request):
+    """Show assets added to the user's library"""
+    user_profile = request.user.userprofile
+    assets = user_profile.library.select_related('creator', 'category').order_by('-created_at')
+    paginator = Paginator(assets, 12)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'page_obj': page_obj,
+        'assets': page_obj,
+    }
+    return render(request, 'assets/my_library.html', context)
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse, Http404
@@ -11,6 +41,7 @@ from .models import Asset, Category, UserProfile
 from .forms import AssetUploadForm, UserRegistrationForm
 import json
 import os
+from django.contrib.auth.decorators import login_required
 
 def home(request):
     """Home page with categories and recent assets"""
