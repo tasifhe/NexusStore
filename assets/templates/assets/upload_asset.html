@@ -1,0 +1,166 @@
+{% extends 'assets/base.html' %}
+
+{% block title %}Upload Asset - GameAsset Store{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 3rem 2rem; text-align: center;">
+    <div class="container">
+        <h1><i class="fas fa-upload"></i> Upload Your Asset</h1>
+        <p style="font-size: 1.1rem; opacity: 0.9;">Share your creation with the game development community</p>
+    </div>
+</div>
+
+<div style="padding: 2rem;">
+    <div class="container">
+        <div style="max-width: 600px; margin: 0 auto;">
+            <div style="background: white; padding: 3rem; border-radius: 20px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);">
+                <form method="post" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 2rem;">
+                    {% csrf_token %}
+                    
+                    <div>
+                        <label for="{{ form.title.id_for_label }}" style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600;">
+                            <i class="fas fa-heading"></i> Asset Title *
+                        </label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            <div style="color: #dc2626; font-size: 0.8rem; margin-top: 0.25rem;">
+                                {{ form.title.errors.0 }}
+                            </div>
+                        {% endif %}
+                        <small style="color: #666; font-size: 0.8rem;">Give your asset a clear, descriptive title</small>
+                    </div>
+
+                    <div>
+                        <label for="{{ form.description.id_for_label }}" style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600;">
+                            <i class="fas fa-align-left"></i> Description *
+                        </label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div style="color: #dc2626; font-size: 0.8rem; margin-top: 0.25rem;">
+                                {{ form.description.errors.0 }}
+                            </div>
+                        {% endif %}
+                        <small style="color: #666; font-size: 0.8rem;">Describe what your asset is and how it can be used</small>
+                    </div>
+
+                    <div>
+                        <label for="{{ form.category.id_for_label }}" style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600;">
+                            <i class="fas fa-tags"></i> Category *
+                        </label>
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                            <div style="color: #dc2626; font-size: 0.8rem; margin-top: 0.25rem;">
+                                {{ form.category.errors.0 }}
+                            </div>
+                        {% endif %}
+                        <small style="color: #666; font-size: 0.8rem;">Choose the most appropriate category for your asset</small>
+                    </div>
+
+                    <div>
+                        <label for="{{ form.thumbnail.id_for_label }}" style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600;">
+                            <i class="fas fa-image"></i> Preview Image *
+                        </label>
+                        <div style="position: relative;">
+                            {{ form.thumbnail }}
+                            <div id="thumbnail-preview" style="margin-top: 1rem; display: none;">
+                                <img id="thumbnail-img" style="max-width: 200px; max-height: 200px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);">
+                            </div>
+                        </div>
+                        {% if form.thumbnail.errors %}
+                            <div style="color: #dc2626; font-size: 0.8rem; margin-top: 0.25rem;">
+                                {{ form.thumbnail.errors.0 }}
+                            </div>
+                        {% endif %}
+                        <small style="color: #666; font-size: 0.8rem;">{{ form.thumbnail.help_text }}</small>
+                    </div>
+
+                    <div>
+                        <label for="{{ form.asset_file.id_for_label }}" style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600;">
+                            <i class="fas fa-file-archive"></i> Asset File *
+                        </label>
+                        {{ form.asset_file }}
+                        {% if form.asset_file.errors %}
+                            <div style="color: #dc2626; font-size: 0.8rem; margin-top: 0.25rem;">
+                                {{ form.asset_file.errors.0 }}
+                            </div>
+                        {% endif %}
+                        <small style="color: #666; font-size: 0.8rem;">{{ form.asset_file.help_text }}</small>
+                    </div>
+
+                    <div style="background: rgba(34, 197, 94, 0.1); padding: 1.5rem; border-radius: 10px; border-left: 4px solid #22c55e;">
+                        <h4 style="margin: 0 0 0.5rem 0; color: #16a34a;">
+                            <i class="fas fa-info-circle"></i> Upload Guidelines
+                        </h4>
+                        <ul style="margin: 0; padding-left: 1.5rem; color: #16a34a; font-size: 0.9rem;">
+                            <li>Ensure your asset is original or you have permission to share it</li>
+                            <li>Provide a clear, high-quality preview image</li>
+                            <li>Include detailed descriptions and usage instructions</li>
+                            <li>Assets will be available for free educational use</li>
+                        </ul>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
+                        <button type="submit" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem;">
+                            <i class="fas fa-upload"></i> Upload Asset
+                        </button>
+                        <a href="{% url 'assets:home' %}" class="btn btn-secondary" style="padding: 1rem 2rem; font-size: 1.1rem;">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Preview thumbnail image
+document.getElementById('{{ form.thumbnail.id_for_label }}').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('thumbnail-preview');
+            const img = document.getElementById('thumbnail-img');
+            img.src = e.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+});
+</script>
+
+<style>
+.form-control {
+    width: 100% !important;
+    padding: 1rem !important;
+    border: 2px solid #e0e0e0 !important;
+    border-radius: 10px !important;
+    font-size: 1rem !important;
+    transition: border-color 0.3s ease !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+    font-family: inherit !important;
+}
+
+.form-control:focus {
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+}
+
+textarea.form-control {
+    resize: vertical !important;
+    min-height: 120px !important;
+}
+
+select.form-control {
+    cursor: pointer !important;
+}
+
+input[type="file"].form-control {
+    padding: 0.75rem !important;
+    cursor: pointer !important;
+}
+</style>
+{% endblock %}
+

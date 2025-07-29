@@ -1,0 +1,93 @@
+{% extends 'assets/base.html' %}
+
+{% block title %}Browse Assets - GameAsset Store{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 3rem 2rem; text-align: center;">
+    <div class="container">
+        <h1><i class="fas fa-th-large"></i> Browse All Assets</h1>
+        <p style="font-size: 1.1rem; opacity: 0.9;">Discover thousands of free game development assets</p>
+        
+        <div class="search-container">
+            <form method="GET" action="{% url 'assets:search_assets' %}">
+                <input type="text" name="q" class="search-bar" placeholder="Search assets..." value="{{ request.GET.q }}">
+                <button type="submit" class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div style="padding: 2rem;">
+    <div class="container">
+        {% if assets %}
+            <div class="asset-grid">
+                {% for asset in assets %}
+                <div class="asset-card" onclick="window.location.href='{% url 'assets:asset_detail' asset.id %}'">
+                    {% if asset.thumbnail %}
+                        <img src="{{ asset.thumbnail.url }}" alt="{{ asset.title }}" class="asset-image">
+                    {% else %}
+                        <div class="asset-image" style="display: flex; align-items: center; justify-content: center; color: #999;">
+                            <i class="fas fa-image" style="font-size: 3rem;"></i>
+                        </div>
+                    {% endif %}
+                    <div class="asset-info">
+                        <h3 class="asset-title">{{ asset.title }}</h3>
+                        <p class="asset-creator">by {{ asset.creator.get_full_name|default:asset.creator.username }}</p>
+                        {% if asset.category %}
+                            <span class="asset-category">{{ asset.category.name }}</span>
+                        {% endif %}
+                        <p style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">
+                            {{ asset.description|truncatewords:15 }}
+                        </p>
+                        <div style="margin-top: 1rem; font-size: 0.8rem; color: #999;">
+                            <i class="fas fa-calendar"></i> {{ asset.created_at|date:"M d, Y" }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <div style="display: flex; justify-content: center; align-items: center; margin-top: 3rem; gap: 1rem;">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1" class="btn btn-secondary">
+                        <i class="fas fa-angle-double-left"></i> First
+                    </a>
+                    <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">
+                        <i class="fas fa-angle-left"></i> Previous
+                    </a>
+                {% endif %}
+
+                <span style="padding: 0.75rem 1.5rem; background: rgba(102, 126, 234, 0.1); border-radius: 8px; color: #667eea; font-weight: 500;">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">
+                        Next <i class="fas fa-angle-right"></i>
+                    </a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-secondary">
+                        Last <i class="fas fa-angle-double-right"></i>
+                    </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        {% else %}
+            <div style="text-align: center; padding: 4rem 2rem; color: #666;">
+                <i class="fas fa-folder-open" style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                <h2>No Assets Found</h2>
+                <p style="margin-bottom: 2rem;">Be the first to upload an asset to our community!</p>
+                {% if user.is_authenticated and user.userprofile.is_verified %}
+                    <a href="{% url 'assets:upload_asset' %}" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> Upload Asset
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

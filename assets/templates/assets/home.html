@@ -1,0 +1,97 @@
+{% extends 'assets/base.html' %}
+
+{% block content %}
+<div class="hero">
+    <div class="container">
+        <h1><i class="fas fa-gamepad"></i> GameAsset Store</h1>
+        <p>Discover thousands of free game development assets for your next project</p>
+        
+        <div class="search-container">
+            <form method="GET" action="{% url 'assets:search_assets' %}">
+                <input type="text" name="q" class="search-bar" placeholder="Search for 3D models, textures, audio, scripts..." value="{{ request.GET.q }}">
+                <button type="submit" class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="categories">
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: 2rem; color: #333;">Browse by Category</h2>
+        <div class="category-grid">
+            {% for category in categories %}
+            <a href="{% url 'assets:category_assets' category.slug %}" class="category-card">
+                <i class="fas fa-{% if category.name == '2D Art' %}paint-brush{% elif category.name == '3D Models' %}cube{% elif category.name == 'Audio' %}music{% elif category.name == 'Textures' %}image{% elif category.name == 'Scripts' %}code{% elif category.name == 'Animations' %}play{% elif category.name == 'UI Elements' %}window-maximize{% else %}folder{% endif %}"></i>
+                <h3>{{ category.name }}</h3>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% if recent_assets %}
+<div style="padding: 2rem;">
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: 2rem; color: #333;">Recent Assets</h2>
+        <div class="asset-grid">
+            {% for asset in recent_assets %}
+            <div class="asset-card" onclick="window.location.href='{% url 'assets:asset_detail' asset.id %}'">
+                {% if asset.thumbnail %}
+                    <img src="{{ asset.thumbnail.url }}" alt="{{ asset.title }}" class="asset-image">
+                {% else %}
+                    <div class="asset-image" style="display: flex; align-items: center; justify-content: center; color: #999;">
+                        <i class="fas fa-image" style="font-size: 3rem;"></i>
+                    </div>
+                {% endif %}
+                <div class="asset-info">
+                    <h3 class="asset-title">{{ asset.title }}</h3>
+                    <p class="asset-creator">by {{ asset.creator.get_full_name|default:asset.creator.username }}</p>
+                    {% if asset.category %}
+                        <span class="asset-category">{{ asset.category.name }}</span>
+                    {% endif %}
+                    <p style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">
+                        {{ asset.description|truncatewords:15 }}
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="{% url 'assets:asset_list' %}" class="btn btn-primary">
+                <i class="fas fa-arrow-right"></i> View All Assets
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4rem 2rem; text-align: center;">
+    <div class="container">
+        <h2 style="margin-bottom: 1rem;">Join Our Community</h2>
+        <p style="font-size: 1.1rem; margin-bottom: 2rem; opacity: 0.9;">
+            Share your creations with fellow game developers and download assets for free educational use.
+        </p>
+        {% if not user.is_authenticated %}
+            <a href="{% url 'assets:register' %}" class="btn" style="background: white; color: #667eea; margin-right: 1rem;">
+                <i class="fas fa-user-plus"></i> Join Now
+            </a>
+            <a href="{% url 'assets:login' %}" class="btn btn-secondary" style="border-color: white; color: white;">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </a>
+        {% elif not user.userprofile.is_verified %}
+            <p style="background: rgba(255, 255, 255, 0.2); padding: 1rem; border-radius: 10px; display: inline-block;">
+                <i class="fas fa-info-circle"></i> 
+                Contact admin to get verified and start uploading your assets!
+            </p>
+        {% else %}
+            <a href="{% url 'assets:upload_asset' %}" class="btn" style="background: white; color: #667eea;">
+                <i class="fas fa-upload"></i> Upload Your Asset
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

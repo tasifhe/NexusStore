@@ -1,0 +1,67 @@
+{% extends 'assets/base.html' %}
+
+{% block title %}Login - GameAsset Store{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: center; align-items: center; min-height: 60vh; padding: 2rem;">
+    <div style="background: white; padding: 3rem; border-radius: 20px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); width: 100%; max-width: 400px;">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <i class="fas fa-sign-in-alt" style="font-size: 3rem; color: #667eea; margin-bottom: 1rem;"></i>
+            <h2 style="color: #333; margin-bottom: 0.5rem;">Welcome Back</h2>
+            <p style="color: #666;">Sign in to your account</p>
+        </div>
+
+        <form method="post" style="display: flex; flex-direction: column; gap: 1.5rem;">
+            {% csrf_token %}
+            
+            <div>
+                <label for="username" style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 500;">
+                    <i class="fas fa-user"></i> Username
+                </label>
+                <input type="text" id="username" name="username" required
+                       style="width: 100%; padding: 1rem; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1rem; transition: border-color 0.3s ease; outline: none;"
+                       onfocus="this.style.borderColor='#667eea'"
+                       onblur="this.style.borderColor='#e0e0e0'"
+                       placeholder="Enter your username">
+            </div>
+
+            <div>
+                <label for="password" style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 500;">
+                    <i class="fas fa-lock"></i> Password
+                </label>
+                <input type="password" id="password" name="password" required
+                       style="width: 100%; padding: 1rem; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1rem; transition: border-color 0.3s ease; outline: none;"
+                       onfocus="this.style.borderColor='#667eea'"
+                       onblur="this.style.borderColor='#e0e0e0'"
+                       placeholder="Enter your password">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem; margin-top: 1rem;">
+                <i class="fas fa-sign-in-alt"></i> Sign In
+            </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e0e0e0;">
+            <p style="color: #666; margin-bottom: 1rem;">Don't have an account?</p>
+            <a href="{% url 'assets:register' %}" class="btn btn-secondary" style="width: 100%; padding: 1rem;">
+                <i class="fas fa-user-plus"></i> Create Account
+            </a>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem; padding: 1rem; background: rgba(102, 126, 234, 0.05); border-radius: 10px;">
+            <p style="margin: 0; color: #667eea; font-size: 0.9rem;">
+                <i class="fas fa-info-circle"></i>
+                Demo accounts: admin/admin123, artist1/password123, developer1/password123
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control:focus {
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+}
+</style>
+{% endblock %}
+
