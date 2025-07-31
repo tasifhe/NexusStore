@@ -4,59 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}GameAsset Store - Free Game Development Assets{% endblock %}</title>
+    <title>{% block title %}Nexus Store - Free Game Development Assets{% endblock %}</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'assets/main.css' %}">
-    <style>
-        :root {
-            --bg-primary: #f8fafc;
-            --bg-secondary: #fff;
-            --text-primary: #0f172a;
-            --text-secondary: #334155;
-            --border-color: #e2e8f0;
-        }
-        [data-theme="dark"] {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
-            --border-color: #334155;
-        }
-        * {
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-        }
-        body, html {
-            background: var(--bg-primary);
-            color: var(--text-primary);
-        }
-        header, footer, .container, .content-wrapper {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-        }
-        .alert, .dropdown-menu, .chatbot-window {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            border-color: var(--border-color);
-        }
-        @media (prefers-color-scheme: dark) {
-            :root {
-                color-scheme: dark;
-            }
-        }
-    </style>
+    
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Dark Mode Toggle -->
-    <button id="dark-mode-toggle" style="position: fixed; top: 20px; right: 20px; z-index: 2000; background: #23272f; color: #fff; border: none; border-radius: 50%; width: 44px; height: 44px; font-size: 1.3rem; box-shadow: 0 2px 8px rgba(30,41,59,0.12); cursor: pointer; display: flex; align-items: center; justify-content: center;">
-        <i class="fas fa-moon"></i>
-    </button>
+
     <header>
         <nav class="container">
             <div style="display: flex; align-items: center; width: 100%; justify-content: space-between; min-height: 78px;">
                 <a href="{% url 'assets:home' %}" class="logo" style="margin-right:2.5rem;">
                     <i class="fas fa-gamepad"></i>
-                    GameAsset Store
+                    Nexus Store
                 </a>
                 <ul class="nav-links" style="flex:1; gap:1.5rem;">
                     <li>
@@ -85,8 +46,6 @@
                         <div class="profile-dropdown" tabindex="0">
                             <a href="#" class="profile-btn" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-user-circle" style="font-size:1.3rem;"></i>
-                                <span style="margin-left:0.5rem; font-weight:600;">{{ user.username }}</span>
-                                <i class="fas fa-chevron-down" style="margin-left:0.3rem; font-size:0.8rem;"></i>
                             </a>
                             <ul class="dropdown-menu" role="menu">
                                 <li><a href="{% url 'assets:profile' %}"><i class="fas fa-user"></i> Profile</a></li>
@@ -115,6 +74,7 @@
             {% endif %}
 
             <div class="content-wrapper">
+                <!-- Category pills removed as requested -->
                 {% block content %}{% endblock %}
             </div>
         </div>
@@ -150,30 +110,6 @@
     </div>
 
     <script>
-        // Dark mode toggle logic with CSS custom properties
-        const darkToggle = document.getElementById('dark-mode-toggle');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        function setDarkMode(on) {
-            if (on) {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                localStorage.setItem('darkMode', 'on');
-                darkToggle.innerHTML = '<i class="fas fa-sun"></i>';
-            } else {
-                document.documentElement.removeAttribute('data-theme');
-                localStorage.setItem('darkMode', 'off');
-                darkToggle.innerHTML = '<i class="fas fa-moon"></i>';
-            }
-        }
-        // Initial mode
-        if (localStorage.getItem('darkMode') === 'on' || (localStorage.getItem('darkMode') === null && prefersDark)) {
-            setDarkMode(true);
-        } else {
-            setDarkMode(false);
-        }
-        darkToggle.onclick = function() {
-            setDarkMode(!document.documentElement.hasAttribute('data-theme'));
-        };
-
         function toggleChatbot() {
             const window = document.getElementById('chatbot-window');
             window.style.display = window.style.display === 'flex' ? 'none' : 'flex';

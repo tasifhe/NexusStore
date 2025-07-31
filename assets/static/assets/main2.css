@@ -1,0 +1,297 @@
+/*  ---------------------------------------------------------
+    1.  DESIGN SYSTEM TOKENS
+        (Inspired by Fab.com & Unreal Engine 5)
+---------------------------------------------------------- */
+:root{
+    /* Dark-mode first */
+    --bg-900:#0a0a0b;
+    --bg-800:#111215;
+    --bg-700:#191c20;
+    --bg-600:#25282e;
+    --bg-500:#30343d;
+
+    --text-100:#ffffff;
+    --text-200:#e6e8ec;
+    --text-300:#b7bcc8;
+    --text-400:#8b92a1;
+
+    --accent-cyan:#00f5ff;
+    --accent-purple:#8c52ff;
+    --accent-orange:#ff5e3a;
+    --accent-green:#33ffa1;
+    --accent-yellow:#ffeb3b;
+
+    --glow-cyan:0 0 8px var(--accent-cyan);
+    --glow-purple:0 0 8px var(--accent-purple);
+
+    /* Shadows */
+    --shadow-sm:0 2px 4px 0 rgba(0,0,0,.25);
+    --shadow-md:0 6px 12px 0 rgba(0,0,0,.35);
+    --shadow-lg:0 12px 24px 0 rgba(0,0,0,.45);
+    --shadow-glow:0 0 20px -5px var(--accent-cyan);
+
+    /* Radius */
+    --r-xs:4px;
+    --r-sm:8px;
+    --r-md:12px;
+    --r-lg:16px;
+    --r-xl:24px;
+    --r-full:9999px;
+
+    /* Typography */
+    --font-sans:"Inter",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    --font-display:"Poppins",system-ui,sans-serif;
+}
+
+/*  ---------------------------------------------------------
+    2.  GLOBAL RESET + BASE
+---------------------------------------------------------- */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+    font-family:var(--font-sans);
+    background:var(--bg-900);
+    color:var(--text-200);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+}
+
+/*  ---------------------------------------------------------
+    3.  TYPOGRAPHY
+---------------------------------------------------------- */
+h1,h2,h3,h4,h5,h6{
+    font-family:var(--font-display);
+    font-weight:700;
+    line-height:1.2;
+    color:var(--text-100);
+}
+h1{font-size:clamp(2rem,4vw,3.5rem)}
+h2{font-size:clamp(1.5rem,3vw,2.5rem)}
+h3{font-size:1.5rem}
+p{margin-bottom:1rem;color:var(--text-300)}
+
+/*  ---------------------------------------------------------
+    4.  LAYOUT
+---------------------------------------------------------- */
+.container{
+    max-width:1280px;
+    margin:0 auto;
+    padding:0 1.5rem;
+}
+
+/*  ---------------------------------------------------------
+    5.  BUTTONS
+---------------------------------------------------------- */
+.btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:.5rem;
+    padding:.875rem 1.75rem;
+    border:none;
+    border-radius:var(--r-full);
+    font-weight:600;
+    font-size:.95rem;
+    cursor:pointer;
+    transition:all .2s ease;
+    text-decoration:none;
+}
+
+.btn-primary{
+    background:linear-gradient(135deg,var(--accent-cyan),var(--accent-purple));
+    color:#000;
+    box-shadow:var(--shadow-md),var(--glow-cyan);
+}
+.btn-primary:hover{transform:translateY(-2px) scale(1.03);box-shadow:var(--shadow-lg),var(--glow-cyan)}
+
+.btn-secondary{
+    background:rgba(255,255,255,.08);
+    color:var(--text-200);
+    backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,.12);
+}
+.btn-secondary:hover{background:rgba(255,255,255,.15);transform:translateY(-2px)}
+
+/*  ---------------------------------------------------------
+    6.  HEADER & NAV
+---------------------------------------------------------- */
+header{
+    position:sticky;
+    top:0;
+    z-index:1000;
+    background:rgba(10,10,11,.7);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+.nav-container{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    height:72px;
+}
+.logo{
+    font-family:var(--font-display);
+    font-size:1.5rem;
+    font-weight:800;
+    color:var(--text-100);
+    text-decoration:none;
+    display:flex;
+    align-items:center;
+    gap:.5rem;
+}
+.logo i{color:var(--accent-cyan)}
+.nav-links{
+    display:flex;
+    gap:2rem;
+}
+.nav-links a{
+    color:var(--text-300);
+    font-weight:600;
+    text-decoration:none;
+    transition:color .2s;
+}
+.nav-links a:hover,
+.nav-links a.active{color:var(--accent-cyan)}
+
+/*  ---------------------------------------------------------
+    7.  HERO
+---------------------------------------------------------- */
+.hero{
+    padding:6rem 0;
+    background:radial-gradient(circle at 30% 70%,rgba(0,245,255,.12) 0%,transparent 50%),
+               radial-gradient(circle at 70% 30%,rgba(140,82,255,.12) 0%,transparent 50%),
+               var(--bg-800);
+    text-align:center;
+}
+.hero-title{
+    background:linear-gradient(90deg,var(--text-100) 30%,var(--accent-cyan) 60%,var(--accent-purple) 100%);
+    background-size:200% auto;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:shine 3s linear infinite;
+}
+@keyframes shine{to{background-position:200% center}}
+
+/*  ---------------------------------------------------------
+    8.  SEARCH BAR
+---------------------------------------------------------- */
+.search-container{position:relative;max-width:600px;margin:2rem auto 0}
+.search-bar{
+    width:100%;
+    padding:1.1rem 1.4rem;
+    border-radius:var(--r-lg);
+    border:none;
+    background:rgba(255,255,255,.08);
+    color:var(--text-100);
+    font-size:1rem;
+    backdrop-filter:blur(6px);
+    box-shadow:var(--shadow-sm);
+}
+.search-bar:focus{outline:none;box-shadow:0 0 0 2px var(--accent-cyan)}
+.search-btn{
+    position:absolute;
+    right:.5rem;
+    top:50%;
+    transform:translateY(-50%);
+    background:var(--accent-cyan);
+    color:#000;
+    border:none;
+    border-radius:var(--r-full);
+    width:44px;height:44px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+}
+
+/*  ---------------------------------------------------------
+    9.  ASSET GRID & CARDS
+---------------------------------------------------------- */
+.asset-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    gap:2rem;
+}
+.asset-card{
+    background:rgba(37,40,46,.6);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:var(--r-lg);
+    overflow:hidden;
+    transition:all .3s ease;
+    cursor:pointer;
+    backdrop-filter:blur(6px);
+}
+.asset-card:hover{
+    transform:translateY(-8px);
+    border-color:var(--accent-cyan);
+    box-shadow:var(--shadow-lg),var(--glow-cyan);
+}
+.asset-image{
+    width:100%;
+    height:200px;
+    object-fit:cover;
+    background:var(--bg-700);
+}
+.asset-info{padding:1.5rem}
+.asset-title{font-size:1.25rem;margin-bottom:.5rem}
+.asset-creator{color:var(--text-400);font-size:.875rem;margin-bottom:.75rem}
+.asset-category{
+    display:inline-block;
+    padding:.25rem .75rem;
+    background:linear-gradient(135deg,var(--accent-purple),var(--accent-cyan));
+    color:#000;
+    border-radius:var(--r-full);
+    font-size:.75rem;
+    font-weight:700;
+    text-transform:uppercase;
+}
+
+/*  ---------------------------------------------------------
+    10.  ASSET DETAIL PAGE
+---------------------------------------------------------- */
+.asset-detail-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:3rem;
+    align-items:start;
+}
+.asset-image-detail{
+    width:100%;
+    aspect-ratio:1/1;
+    border-radius:var(--r-lg);
+    box-shadow:var(--shadow-lg);
+    object-fit:cover;
+}
+@media(max-width:768px){
+    .asset-detail-grid{grid-template-columns:1fr}
+}
+
+/*  ---------------------------------------------------------
+    11.  EMPTY STATES
+---------------------------------------------------------- */
+.empty-state{
+    text-align:center;
+    padding:4rem 1.5rem;
+}
+.empty-icon{
+    font-size:4rem;
+    color:var(--text-400);
+    margin-bottom:1.5rem;
+}
+
+/*  ---------------------------------------------------------
+    12.  FOOTER
+---------------------------------------------------------- */
+footer{
+    margin-top:4rem;
+    padding:2.5rem 0;
+    background:var(--bg-800);
+    text-align:center;
+    color:var(--text-400);
+    border-top:1px solid rgba(255,255,255,.08);
+}
+
+/*  ---------------------------------------------------------
+    13.  RESPONSIVE
+---------------------------------------------------------- */
+@media(max-width:768px){
+    .nav-links{display:none}
+}
