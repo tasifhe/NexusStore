@@ -1,10 +1,10 @@
-/* footer.css: Footer Styles */
+/* footer.css: Footer Styles - Dark Theme */
 footer {
     margin-top: 0;
     padding: 2rem 1rem 1rem;
-    background: var(--bg-800);
+    background: var(--gray-100);
     text-align: center;
-    color: var(--text-secondary);
-    border-top: 1px solid rgba(255,255,255,.08);
+    color: var(--gray-600);
+    border-top: 1px solid var(--gray-300);
     font-size: 0.85rem;
 }

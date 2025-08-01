@@ -1,30 +1,30 @@
-/* base.css: CSS Variables, Reset, Typography */
+/* base.css: CSS Variables, Reset, Typography - Dark Blue Theme */
 :root {
-    /* Modern Design System Variables */
-    --primary-color: #6366f1;
-    --primary-hover: #4f46e5;
+    /* Dark Blue Theme Variables */
+    --primary-color: #3b82f6;
+    --primary-hover: #2563eb;
     --secondary-color: #64748b;
-    --background-color: #f8fafc;
-    --dark-bg: #0f172a;
+    --background-color: #0f172a;
+    --dark-bg: #020617;
     --white: #ffffff;
     --gray-50: #f8fafc;
-    --gray-100: #f1f5f9;
-    --gray-200: #e2e8f0;
-    --gray-300: #cbd5e1;
-    --gray-400: #94a3b8;
-    --gray-500: #64748b;
-    --gray-600: #475569;
-    --gray-700: #334155;
-    --gray-800: #1e293b;
-    --gray-900: #0f172a;
+    --gray-100: #1e293b;
+    --gray-200: #334155;
+    --gray-300: #475569;
+    --gray-400: #64748b;
+    --gray-500: #94a3b8;
+    --gray-600: #cbd5e1;
+    --gray-700: #e2e8f0;
+    --gray-800: #f1f5f9;
+    --gray-900: #f8fafc;
     
-    /* Legacy variables for backward compatibility */
+    /* Legacy variables for backward compatibility - Updated for Dark Theme */
     --bg-primary: var(--background-color);
-    --bg-secondary: var(--gray-800);
+    --bg-secondary: var(--gray-200);
     --text-primary: var(--gray-900);
-    --text-secondary: var(--gray-600);
-    --text-100: var(--gray-100);
-    --text-300: var(--gray-300);
+    --text-secondary: var(--gray-700);
+    --text-100: var(--gray-800);
+    --text-300: var(--gray-600);
     --border-color: var(--gray-300);
     --accent-cyan: var(--primary-color);
     --accent-purple: var(--primary-hover);
@@ -65,7 +65,7 @@ html{scroll-behavior:smooth}
 body{
     font-family:var(--font-sans);
     background: var(--background-color);
-    color: var(--gray-800);
+    color: var(--gray-700);
     line-height:1.6;
     -webkit-font-smoothing:antialiased;
 }
@@ -73,7 +73,7 @@ h1,h2,h3,h4,h5,h6{
     font-family:var(--font-display);
     font-weight:700;
     line-height:1.2;
-    color: var(--gray-900);
+    color: var(--gray-800);
 }
 h1{font-size:clamp(2rem,4vw,3.5rem)}
 h2{font-size:clamp(1.5rem,3vw,2.5rem)}

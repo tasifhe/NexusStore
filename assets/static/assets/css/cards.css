@@ -1,4 +1,4 @@
-/* cards.css: Asset Cards, Category Cards, Grids */
+/* cards.css: Asset Cards, Category Cards, Grids - Dark Blue Theme */
 .asset-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
@@ -6,8 +6,8 @@
     margin: 0;
 }
 .asset-card {
-    background: rgba(37,40,46,.6);
-    border: 1px solid rgba(255,255,255,.08);
+    background: var(--gray-200);
+    border: 1px solid var(--gray-300);
     border-radius: var(--r-lg);
     overflow: hidden;
     transition: all .3s ease;
@@ -16,23 +16,31 @@
 }
 .asset-card:hover {
     transform: translateY(-8px);
-    border-color: var(--accent-cyan);
-    box-shadow: var(--shadow-lg),var(--glow-cyan);
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-lg), 0 0 20px rgba(59, 130, 246, 0.3);
 }
 .asset-image {
     width: 100%;
     height: 200px;
     object-fit: cover;
-    background: var(--bg-700);
+    background: var(--gray-300);
 }
 .asset-info { padding: 1.5rem; }
-.asset-title { font-size: 1.25rem; margin-bottom: .5rem; }
-.asset-creator { color: var(--text-secondary); font-size: .875rem; margin-bottom: .75rem; }
+.asset-title { 
+    font-size: 1.25rem; 
+    margin-bottom: .5rem; 
+    color: var(--gray-800);
+}
+.asset-creator { 
+    color: var(--gray-600); 
+    font-size: .875rem; 
+    margin-bottom: .75rem; 
+}
 .asset-category {
     display: inline-block;
     padding: .25rem .75rem;
-    background: linear-gradient(135deg,var(--accent-purple),var(--accent-cyan));
-    color: #000;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: var(--white);
     border-radius: var(--r-full);
     font-size: .75rem;
     font-weight: 700;

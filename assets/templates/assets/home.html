@@ -3,52 +3,6 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'assets/css/home.css' %}">
-<style>
-/* Override base template constraints for home page */
-main .container {
-    max-width: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
-main .content-wrapper {
-    max-width: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
-/* Ensure full width for home sections */
-.hero,
-.featured-content,
-.categories,
-.recent-assets,
-.newsletter {
-    width: 100vw;
-    margin-left: calc(-50vw + 50%);
-    margin-right: calc(-50vw + 50%);
-}
-
-/* Restore proper container behavior within sections */
-.hero .container,
-.featured-content .container,
-.categories .container,
-.recent-assets .container,
-.newsletter .container {
-    max-width: 1720px;
-    margin: 0 auto;
-    padding: 0 2rem;
-}
-
-@media (max-width: 768px) {
-    .hero .container,
-    .featured-content .container,
-    .categories .container,
-    .recent-assets .container,
-    .newsletter .container {
-        padding: 0 1rem;
-    }
-}
-</style>
 {% endblock %}
 
 {% block content %}
@@ -58,7 +12,7 @@ main .content-wrapper {
     <div class="hero-slideshow">
         <!-- Slide 1: Featured Content -->
         <div class="hero-slide active" data-slide="featured">
-            <div class="hero-background" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="hero-background hero-bg-1">
                 <div class="hero-overlay"></div>
             </div>
             <div class="container">
@@ -86,7 +40,7 @@ main .content-wrapper {
 
         <!-- Slide 2: Categories -->
         <div class="hero-slide" data-slide="categories">
-            <div class="hero-background" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <div class="hero-background hero-bg-2">
                 <div class="hero-overlay"></div>
             </div>
             <div class="container">
@@ -124,7 +78,7 @@ main .content-wrapper {
 
         <!-- Slide 3: New Assets -->
         <div class="hero-slide" data-slide="new">
-            <div class="hero-background" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+            <div class="hero-background hero-bg-3">
                 <div class="hero-overlay"></div>
             </div>
             <div class="container">
@@ -184,7 +138,7 @@ main .content-wrapper {
 
         <!-- Slide 4: Free Content -->
         <div class="hero-slide" data-slide="free">
-            <div class="hero-background" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+            <div class="hero-background hero-bg-4">
                 <div class="hero-overlay"></div>
             </div>
             <div class="container">
@@ -443,127 +397,6 @@ main .content-wrapper {
 {% endblock %}
 
 {% block extra_js %}
-<script>
-// Hero Slideshow Variables
-let currentSlideIndex = 0;
-let slideInterval;
-const slideAutoAdvanceDelay = 8000; // 8 seconds
-const slideTransitionDuration = 800; // 0.8 seconds
-
-// Initialize slideshow when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    initializeHeroSlideshow();
-});
-
-// Hero Slideshow Functions
-function initializeHeroSlideshow() {
-    const slides = document.querySelectorAll('.hero-slide');
-    const indicators = document.querySelectorAll('.indicator');
-    
-    if (slides.length === 0) return;
-    
-    // Set up initial state
-    updateSlideVisibility();
-    
-    // Start auto-advance
-    startSlideshow();
-    
-    // Pause slideshow on hover
-    const heroSection = document.querySelector('.hero');
-    if (heroSection) {
-        heroSection.addEventListener('mouseenter', pauseSlideshow);
-        heroSection.addEventListener('mouseleave', startSlideshow);
-    }
-}
-
-function updateSlideVisibility() {
-    const slides = document.querySelectorAll('.hero-slide');
-    const indicators = document.querySelectorAll('.indicator');
-    
-    slides.forEach((slide, index) => {
-        slide.classList.remove('active', 'prev');
-        if (index === currentSlideIndex) {
-            slide.classList.add('active');
-        } else if (index === currentSlideIndex - 1 || (currentSlideIndex === 0 && index === slides.length - 1)) {
-            slide.classList.add('prev');
-        }
-    });
-    
-    // Update indicators
-    indicators.forEach((indicator, index) => {
-        indicator.classList.toggle('active', index === currentSlideIndex);
-    });
-    
-    // Update progress bar
-    updateProgressBar();
-}
-
-function updateProgressBar() {
-    const progressBar = document.querySelector('.progress-bar');
-    if (progressBar) {
-        const progress = ((currentSlideIndex + 1) / document.querySelectorAll('.hero-slide').length) * 100;
-        progressBar.style.width = progress + '%';
-    }
-}
-
-function startSlideshow() {
-    clearInterval(slideInterval);
-    slideInterval = setInterval(() => {
-        nextSlide();
-    }, slideAutoAdvanceDelay);
-}
-
-function pauseSlideshow() {
-    clearInterval(slideInterval);
-}
-
-function nextSlide() {
-    const slides = document.querySelectorAll('.hero-slide');
-    currentSlideIndex = (currentSlideIndex + 1) % slides.length;
-    updateSlideVisibility();
-}
-
-function prevSlide() {
-    const slides = document.querySelectorAll('.hero-slide');
-    currentSlideIndex = (currentSlideIndex - 1 + slides.length) % slides.length;
-    updateSlideVisibility();
-}
-
-function changeSlide(direction) {
-    if (direction === 1) {
-        nextSlide();
-    } else {
-        prevSlide();
-    }
-    // Restart auto-advance
-    startSlideshow();
-}
-
-function currentSlide(index) {
-    currentSlideIndex = index - 1;
-    updateSlideVisibility();
-    // Restart auto-advance
-    startSlideshow();
-}
-
-// Tab functionality for featured content
-document.addEventListener('DOMContentLoaded', function() {
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    
-    tabButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            // Remove active class from all buttons
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            
-            // Add active class to clicked button
-            this.classList.add('active');
-            
-            // Here you can add logic to load different content based on the tab
-            const tabType = this.getAttribute('data-tab');
-            console.log('Loading content for:', tabType);
-        });
-    });
-});
-</script>
+<script src="{% static 'assets/js/slideshow.js' %}"></script>
 {% endblock %}
 
