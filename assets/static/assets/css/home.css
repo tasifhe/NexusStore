@@ -1,11 +1,14 @@
 /* Professional Home Page Styles - Based on Index.html Design */
 
-/* Hero Section with Professional Slideshow */
+/* Hero Section with Professional Slideshow - Full Width */
 .hero {
     position: relative;
     overflow: hidden;
     margin-bottom: 0;
     background: var(--gray-900);
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
 }
 
 .hero-slideshow {
@@ -13,6 +16,7 @@
     height: 70vh;
     min-height: 600px;
     overflow: hidden;
+    width: 100%;
 }
 
 .hero-slide {
@@ -1557,5 +1561,41 @@
     
     .category-showcase {
         grid-template-columns: 1fr;
+    }
+}
+
+/* Full Width Section Overrides for Home Page */
+.featured-content,
+.categories,
+.recent-assets,
+.newsletter {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+}
+
+/* Ensure proper container behavior within full-width sections */
+.featured-content .container,
+.categories .container,
+.recent-assets .container,
+.newsletter .container {
+    max-width: 1720px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* Hero stats section full width */
+.hero-stats-section {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+}
+
+@media (max-width: 768px) {
+    .featured-content .container,
+    .categories .container,
+    .recent-assets .container,
+    .newsletter .container {
+        padding: 0 1rem;
     }
 }

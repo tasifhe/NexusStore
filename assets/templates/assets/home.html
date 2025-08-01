@@ -3,6 +3,52 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'assets/css/home.css' %}">
+<style>
+/* Override base template constraints for home page */
+main .container {
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+main .content-wrapper {
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Ensure full width for home sections */
+.hero,
+.featured-content,
+.categories,
+.recent-assets,
+.newsletter {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+}
+
+/* Restore proper container behavior within sections */
+.hero .container,
+.featured-content .container,
+.categories .container,
+.recent-assets .container,
+.newsletter .container {
+    max-width: 1720px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+@media (max-width: 768px) {
+    .hero .container,
+    .featured-content .container,
+    .categories .container,
+    .recent-assets .container,
+    .newsletter .container {
+        padding: 0 1rem;
+    }
+}
+</style>
 {% endblock %}
 
 {% block content %}

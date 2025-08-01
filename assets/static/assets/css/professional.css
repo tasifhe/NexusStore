@@ -128,16 +128,58 @@ a:hover {
     color: var(--primary-hover);
 }
 
-/* Container */
+/* Container System */
 .container {
-    max-width: 1200px;
+    max-width: 1720px; /* Optimized for 1920px screens - uses ~90% of width */
+    margin: 0 auto;
+    padding: 0 var(--space-5);
+}
+
+/* Full-width container for sections that need to span the entire viewport */
+.container-fluid {
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 var(--space-5);
+}
+
+/* Ultra-wide container for large screens */
+.container-wide {
+    max-width: 1800px; /* Nearly full width on 1920px screens */
+    margin: 0 auto;
+    padding: 0 var(--space-5);
+}
+
+/* Narrow container for content-focused sections */
+.container-narrow {
+    max-width: 1200px; /* Good for reading content */
     margin: 0 auto;
     padding: 0 var(--space-5);
 }
 
 @media (min-width: 1280px) {
-    .container {
+    .container,
+    .container-fluid,
+    .container-wide,
+    .container-narrow {
         padding: 0 var(--space-6);
+    }
+}
+
+@media (min-width: 1920px) {
+    .container {
+        max-width: 1720px; /* Perfect for 1920px screens */
+    }
+    .container-wide {
+        max-width: 1800px; /* Nearly edge-to-edge */
+    }
+}
+
+@media (min-width: 2560px) {
+    .container {
+        max-width: 2200px; /* For 4K and ultrawide monitors */
+    }
+    .container-wide {
+        max-width: 2400px;
     }
 }
 

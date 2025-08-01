@@ -11,7 +11,7 @@
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1720px; /* Optimized for 1920px screens */
     margin: 0 auto;
     padding: 0 20px;
 }
