@@ -1,0 +1,513 @@
+{% load static %}
+<!D    <link rel="stylesheet" href="{% static 'assets/css/browse-enhanced.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/asset-detail-enhanced.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/library-enhanced.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/category.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/chatbot.css' %}">"PE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Nexus Store - Free Game Development Assets{% endblock %}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap 5 CSS (CDN) for modern homepage and components -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <!-- Professional CSS System -->
+    <link rel="stylesheet" href="{% static 'assets/css/professional.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/layout.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/header.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/navbar-enhanced.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/footer.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/buttons.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/utilities.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/forms.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/cards.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/browse-enhanced.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/asset-detail-enhanced.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/category.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/chatbot.css' %}">
+    
+    <!-- Inline Footer Fix for Dark Theme -->
+    <style>
+        footer.professional-footer {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #1a202c 75%, #0f172a 100%) !important;
+            color: #e2e8f0 !important;
+            margin-top: 4rem !important;
+            border-top: 1px solid rgba(59, 130, 246, 0.3) !important;
+        }
+        footer.professional-footer .footer-content {
+            padding: 4rem 0 2rem !important;
+        }
+        footer.professional-footer .footer-brand-title {
+            color: #ffffff !important;
+            font-size: 1.8rem !important;
+        }
+        footer.professional-footer .footer-brand-description,
+        footer.professional-footer .newsletter-description {
+            color: #94a3b8 !important;
+        }
+        footer.professional-footer .footer-title {
+            color: #ffffff !important;
+        }
+        footer.professional-footer .footer-links a {
+            color: #94a3b8 !important;
+        }
+        footer.professional-footer .footer-links a:hover {
+            color: #3b82f6 !important;
+        }
+        footer.professional-footer .stat-number {
+            color: #3b82f6 !important;
+        }
+        footer.professional-footer .stat-label {
+            color: #64748b !important;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Header Component -->
+    <header id="main-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="{% url 'assets:home' %}" style="text-decoration: none;">
+                        <h1><span class="logo-icon">🎮</span>Nexus Store</h1>
+                    </a>
+                </div>
+                
+                <!-- Mobile menu toggle -->
+                <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle mobile menu">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+                
+                <!-- Center section with navigation and search -->
+                <div class="nav-search-section">
+                    <nav class="main-nav" id="main-nav">
+                        <ul>
+                            <li><a href="{% url 'assets:asset_list' %}" class="nav-link">Discover</a></li>
+                            <li><a href="#" class="nav-link">Categories</a></li>
+                            <!-- Free Assets and Sell buttons removed as requested -->
+                        </ul>
+                    </nav>
+                    
+                    <form class="search-bar" role="search" onsubmit="return false;">
+                        <label for="search-input" class="visually-hidden">Search assets</label>
+                        <input type="text" placeholder="Search for assets, textures, models..." id="search-input" aria-label="Search assets">
+                        <button type="button" class="search-btn" aria-label="Search">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="user-actions">
+                        {% if user.is_authenticated %}
+                            <div class="profile-dropdown-container">
+                                <button class="profile-btn" id="profileBtn" type="button" aria-label="Profile menu">
+                                    <i class="fas fa-user-circle"></i>
+                                </button>
+                                <div class="profile-dropdown-menu" id="profileDropdown">
+                                    <div class="dropdown-header">
+                                        <div class="user-info">
+                                            <i class="fas fa-user-circle user-avatar"></i>
+                                            <div class="user-details">
+                                                <span class="user-name">{{ user.username }}</span>
+                                                <span class="user-email">{{ user.email }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="dropdown-items">
+                                        <a class="dropdown-item" href="{% url 'assets:profile' %}">
+                                            <i class="fas fa-user"></i>
+                                            <span>Profile</span>
+                                        </a>
+                                        <a class="dropdown-item" href="{% url 'assets:my_library' %}">
+                                            <i class="fas fa-book"></i>
+                                            <span>My Library</span>
+                                        </a>
+                                        {% if user.userprofile.is_verified %}
+                                            <a class="dropdown-item" href="{% url 'assets:upload_asset' %}">
+                                                <i class="fas fa-upload"></i>
+                                                <span>Publish Asset</span>
+                                            </a>
+                                        {% endif %}
+                                        <div class="dropdown-separator"></div>
+                                        <a class="dropdown-item logout-item" href="{% url 'assets:logout' %}">
+                                            <i class="fas fa-sign-out-alt"></i>
+                                            <span>Logout</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <button class="btn btn-outline" onclick="window.location.href='{% url 'assets:login' %}'">Sign In</button>
+                            <button class="btn btn-primary" onclick="window.location.href='{% url 'assets:register' %}'">Sign Up</button>
+                        {% endif %}
+                        <div class="cart-icon">🛒</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Breadcrumb Navigation -->
+    {% block breadcrumb %}
+    {% if not request.resolver_match.url_name == 'home' %}
+    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{% url 'assets:home' %}">
+                        <i class="fas fa-home"></i> Home
+                    </a>
+                </li>
+                {% if request.resolver_match.url_name == 'asset_list' %}
+                    <li class="breadcrumb-item active" aria-current="page">Browse Assets</li>
+                {% elif request.resolver_match.url_name == 'my_library' %}
+                    <li class="breadcrumb-item active" aria-current="page">My Library</li>
+                {% elif request.resolver_match.url_name == 'upload_asset' %}
+                    <li class="breadcrumb-item active" aria-current="page">Upload Asset</li>
+                {% elif request.resolver_match.url_name == 'profile' %}
+                    <li class="breadcrumb-item active" aria-current="page">Profile</li>
+                {% elif request.resolver_match.url_name == 'search_assets' %}
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'assets:asset_list' %}">Browse</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Search Results</li>
+                {% else %}
+                    <li class="breadcrumb-item active" aria-current="page">{{ request.resolver_match.url_name|title }}</li>
+                {% endif %}
+            </ol>
+        </div>
+    </nav>
+    {% endif %}
+    {% endblock %}
+
+    <script>
+        // New Profile Dropdown Implementation
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileBtn = document.getElementById('profileBtn');
+            const profileDropdown = document.getElementById('profileDropdown');
+            
+            if (profileBtn && profileDropdown) {
+                // Toggle dropdown on button click
+                profileBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const isOpen = profileDropdown.classList.contains('show');
+                    
+                    // Close if open, open if closed
+                    if (isOpen) {
+                        profileDropdown.classList.remove('show');
+                        profileBtn.classList.remove('active');
+                    } else {
+                        profileDropdown.classList.add('show');
+                        profileBtn.classList.add('active');
+                    }
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+                        profileDropdown.classList.remove('show');
+                        profileBtn.classList.remove('active');
+                    }
+                });
+                
+                // Close dropdown on escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        profileDropdown.classList.remove('show');
+                        profileBtn.classList.remove('active');
+                    }
+                });
+            }
+        });
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const nav = document.getElementById('main-nav');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (nav && toggle) {
+                nav.classList.toggle('mobile-open');
+                toggle.classList.toggle('active');
+            }
+        }
+
+        // Active page highlighting and initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            // Add active class to current page
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPath || (currentPath.includes(href) && href !== '/' && href !== '#')) {
+                    link.classList.add('active');
+                }
+            });
+
+            // Search functionality
+            const searchBtn = document.querySelector('.search-btn');
+            const searchInput = document.getElementById('search-input');
+            
+            function performSearch() {
+                const query = searchInput.value.trim();
+                if (query) {
+                    window.location.href = `{% url 'assets:search_assets' %}?q=${encodeURIComponent(query)}`;
+                }
+            }
+            
+            if (searchBtn) {
+                searchBtn.addEventListener('click', performSearch);
+            }
+            
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        performSearch();
+                    }
+                });
+            }
+        });
+    </script>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Hero Section removed: now only in home.html -->
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <div class="content-wrapper">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="professional-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section footer-brand">
+                    <h3 class="footer-brand-title">
+                        <i class="fas fa-cube"></i>
+                        Nexus Store
+                    </h3>
+                    <p class="footer-brand-description">
+                        Empowering game developers with high-quality, free educational assets. 
+                        Build amazing games with our curated collection of professional resources.
+                    </p>
+                    <div class="footer-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">10K+</span>
+                            <span class="stat-label">Assets</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">5K+</span>
+                            <span class="stat-label">Creators</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">50K+</span>
+                            <span class="stat-label">Downloads</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h6 class="footer-title">Platform</h6>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'assets:asset_list' %}"><i class="fas fa-search"></i>Browse Assets</a></li>
+                        <li><a href="#"><i class="fas fa-th-large"></i>Categories</a></li>
+                        <li><a href="#"><i class="fas fa-upload"></i>Become Publisher</a></li>
+                        <li><a href="#"><i class="fas fa-star"></i>Featured</a></li>
+                        <li><a href="#"><i class="fas fa-clock"></i>Recent</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h6 class="footer-title">Resources</h6>
+                    <ul class="footer-links">
+                        <li><a href="#"><i class="fas fa-book"></i>Documentation</a></li>
+                        <li><a href="#"><i class="fas fa-graduation-cap"></i>Tutorials</a></li>
+                        <li><a href="#"><i class="fas fa-users"></i>Community</a></li>
+                        <li><a href="#"><i class="fas fa-blog"></i>Blog</a></li>
+                        <li><a href="#"><i class="fas fa-code"></i>API</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h6 class="footer-title">Support</h6>
+                    <ul class="footer-links">
+                        <li><a href="#"><i class="fas fa-info-circle"></i>About Us</a></li>
+                        <li><a href="#"><i class="fas fa-envelope"></i>Contact</a></li>
+                        <li><a href="#"><i class="fas fa-question-circle"></i>FAQ</a></li>
+                        <li><a href="#"><i class="fas fa-life-ring"></i>Help Center</a></li>
+                        <li><a href="#"><i class="fas fa-shield-alt"></i>Privacy</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section footer-newsletter">
+                    <h6 class="footer-title">Stay Updated</h6>
+                    <p class="newsletter-description">
+                        Get notified about new assets, features, and community highlights.
+                    </p>
+                    <form class="newsletter-form">
+                        <div class="newsletter-input-group">
+                            <input type="email" placeholder="Enter your email" class="newsletter-input">
+                            <button type="submit" class="newsletter-btn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <div class="social-links">
+                        <a href="#" class="social-link" title="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="social-link" title="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-link" title="Discord">
+                            <i class="fab fa-discord"></i>
+                        </a>
+                        <a href="#" class="social-link" title="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="#" class="social-link" title="YouTube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <div class="footer-copyright">
+                        <p>&copy; 2025 Nexus Store. All rights reserved.</p>
+                        <p class="footer-subtitle">Made with <i class="fas fa-heart"></i> for the game development community</p>
+                    </div>
+                    <div class="footer-legal">
+                        <a href="#">Terms of Service</a>
+                        <span class="divider">•</span>
+                        <a href="#">Privacy Policy</a>
+                        <span class="divider">•</span>
+                        <a href="#">Cookie Policy</a>
+                        <span class="divider">•</span>
+                        <a href="#">Licenses</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chatbot -->
+    <div class="chatbot-container">
+        <button class="chatbot-toggle" onclick="toggleChatbot()">
+            <i class="fas fa-comments"></i>
+        </button>
+        <div class="chatbot-window" id="chatbot-window">
+            <div class="chatbot-header">
+                <i class="fas fa-robot"></i> Asset Assistant
+            </div>
+            <div class="chatbot-messages" id="chatbot-messages">
+                <div class="message bot">
+                    Hi! I'm your asset assistant. I can help you find the perfect assets for your game development project. What are you looking for?
+                </div>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" id="chatbot-input" placeholder="Ask me about assets..." onkeypress="handleChatbotKeypress(event)">
+                <button onclick="sendChatbotMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleChatbot() {
+            const window = document.getElementById('chatbot-window');
+            window.style.display = window.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        // This duplicate profile dropdown handler has been removed to prevent conflicts
+        // The main profile dropdown functionality is handled by toggleProfileDropdown() above
+
+        function handleChatbotKeypress(event) {
+            if (event.key === 'Enter') {
+                sendChatbotMessage();
+            }
+        }
+
+        async function sendChatbotMessage() {
+            const input = document.getElementById('chatbot-input');
+            const messages = document.getElementById('chatbot-messages');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            // Add user message
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message user';
+            userMessage.textContent = message;
+            messages.appendChild(userMessage);
+
+            // Clear input
+            input.value = '';
+
+            // Scroll to bottom
+            messages.scrollTop = messages.scrollHeight;
+
+            // Send to backend
+            try {
+                const response = await fetch('{% url "assets:chatbot_api" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+
+                // Add bot response
+                const botMessage = document.createElement('div');
+                botMessage.className = 'message bot';
+                botMessage.textContent = data.response;
+                messages.appendChild(botMessage);
+
+                // Scroll to bottom
+                messages.scrollTop = messages.scrollHeight;
+            } catch (error) {
+                console.error('Error:', error);
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'message bot';
+                errorMessage.textContent = 'Sorry, I encountered an error. Please try again.';
+                messages.appendChild(errorMessage);
+                messages.scrollTop = messages.scrollHeight;
+            }
+        }
+    </script>
+
+    <!-- Bootstrap JS (CDN for homepage/carousel functionality) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+

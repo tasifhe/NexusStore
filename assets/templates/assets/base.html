@@ -1,5 +1,9 @@
 {% load static %}
-<!DOCTYPE html>
+<!D    <link rel="stylesheet" href="{% static 'assets/css/browse-enhanced.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/asset-detail-enhanced.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/library-enhanced.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/category.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/chatbot.css' %}">
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -20,8 +24,46 @@
     <link rel="stylesheet" href="{% static 'assets/css/utilities.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/forms.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/cards.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/browse-enhanced.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/asset-detail-enhanced.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/category.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/chatbot.css' %}">
+    
+    <!-- Inline Footer Fix for Dark Theme -->
+    <style>
+        footer.professional-footer {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #1a202c 75%, #0f172a 100%) !important;
+            color: #e2e8f0 !important;
+            margin-top: 4rem !important;
+            border-top: 1px solid rgba(59, 130, 246, 0.3) !important;
+        }
+        footer.professional-footer .footer-content {
+            padding: 4rem 0 2rem !important;
+        }
+        footer.professional-footer .footer-brand-title {
+            color: #ffffff !important;
+            font-size: 1.8rem !important;
+        }
+        footer.professional-footer .footer-brand-description,
+        footer.professional-footer .newsletter-description {
+            color: #94a3b8 !important;
+        }
+        footer.professional-footer .footer-title {
+            color: #ffffff !important;
+        }
+        footer.professional-footer .footer-links a {
+            color: #94a3b8 !important;
+        }
+        footer.professional-footer .footer-links a:hover {
+            color: #3b82f6 !important;
+        }
+        footer.professional-footer .stat-number {
+            color: #3b82f6 !important;
+        }
+        footer.professional-footer .stat-label {
+            color: #64748b !important;
+        }
+    </style>
     
     {% block extra_css %}{% endblock %}
 </head>
@@ -67,8 +109,6 @@
                             <div class="profile-dropdown-container">
                                 <button class="profile-btn" id="profileBtn" type="button" aria-label="Profile menu">
                                     <i class="fas fa-user-circle"></i>
-                                    <span class="username">{{ user.username }}</span>
-                                    <i class="fas fa-chevron-down dropdown-arrow"></i>
                                 </button>
                                 <div class="profile-dropdown-menu" id="profileDropdown">
                                     <div class="dropdown-header">
@@ -470,4 +510,3 @@
     {% block extra_js %}{% endblock %}
 </body>
 </html>
-

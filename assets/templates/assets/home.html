@@ -3,6 +3,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'assets/css/home.css' %}">
+<link rel="stylesheet" href="{% static 'assets/css/home-enhancements.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -306,55 +307,197 @@
 <section class="section recent-assets" id="recent-assets">
     <div class="container">
         <div class="section-header">
-            <h2 class="section-title">Recent Assets</h2>
-            <p class="section-subtitle">Latest additions from our creator community</p>
+            <div class="section-header-content">
+                <h2 class="section-title">Recent Assets</h2>
+                <p class="section-subtitle">Latest additions from our creator community</p>
+            </div>
+            <div class="section-controls">
+                <div class="view-toggle">
+                    <button class="view-btn active" data-view="grid" title="Grid View">
+                        <i class="fas fa-th"></i>
+                    </button>
+                    <button class="view-btn" data-view="list" title="List View">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+                <div class="filter-dropdown">
+                    <button class="filter-btn" id="assetFilter">
+                        <i class="fas fa-filter"></i> Filter
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="filter-menu">
+                        <div class="filter-group">
+                            <label>Sort by:</label>
+                            <select class="filter-select" data-filter="sort">
+                                <option value="newest">Newest First</option>
+                                <option value="oldest">Oldest First</option>
+                                <option value="rating">Highest Rated</option>
+                                <option value="title">Alphabetical</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Category:</label>
+                            <select class="filter-select" data-filter="category">
+                                <option value="">All Categories</option>
+                                {% for category in categories %}
+                                <option value="{{ category.slug }}">{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Type:</label>
+                            <div class="filter-checkboxes">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" data-filter="free" value="true">
+                                    <span>Free Assets</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" data-filter="new" value="true">
+                                    <span>New Assets</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="asset-grid">
+        
+        <!-- Loading State -->
+        <div class="asset-grid-loading" id="assetGridLoading" style="display: none;">
+            {% for i in "123456" %}
+            <div class="asset-card-skeleton">
+                <div class="skeleton-image"></div>
+                <div class="skeleton-content">
+                    <div class="skeleton-title"></div>
+                    <div class="skeleton-text"></div>
+                    <div class="skeleton-text short"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Assets Grid -->
+        <div class="asset-grid" id="recentAssetsGrid">
             {% for asset in recent_assets %}
-            <div class="asset-card" onclick="window.location.href='{% url 'assets:asset_detail' asset.id %}'">
+            <div class="asset-card enhanced" 
+                 data-id="{{ asset.id }}"
+                 data-category="{{ asset.category.slug|default:'' }}" 
+                 data-free="{{ asset.is_free|yesno:'true,false' }}" 
+                 data-new="{{ asset.is_new|yesno:'true,false' }}"
+                 data-rating="{{ asset.rating|default:0 }}"
+                 data-date="{{ asset.created_at|date:'Y-m-d' }}"
+                 data-title="{{ asset.title|lower }}"
+                 onclick="window.location.href='{% url 'assets:asset_detail' asset.id %}'">
+                
                 <div class="asset-image-wrapper">
                     {% if asset.thumbnail %}
-                        <img src="{{ asset.thumbnail.url }}" alt="{{ asset.title }}" class="asset-image">
+                        <img data-src="{{ asset.thumbnail.url }}" alt="{{ asset.title }}" class="asset-image" loading="lazy">
+                        <noscript>
+                            <img src="{{ asset.thumbnail.url }}" alt="{{ asset.title }}" class="asset-image">
+                        </noscript>
                     {% else %}
                         <div class="asset-image-placeholder">
                             <i class="fas fa-image"></i>
                         </div>
                     {% endif %}
+                    
+                    <div class="asset-overlay">
+                        <div class="overlay-content">
+                            <button class="quick-view-btn" onclick="event.stopPropagation(); openQuickView({{ asset.id }})" title="Quick View (Q)" aria-label="Quick view of {{ asset.title }}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="wishlist-btn" onclick="event.stopPropagation(); toggleWishlist({{ asset.id }})" title="Add to Wishlist (W)" aria-label="Add {{ asset.title }} to wishlist">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
                     <div class="asset-badges">
                         {% if asset.is_new %}
-                            <span class="badge badge-new">NEW</span>
+                            <span class="badge badge-new" title="New asset">
+                                <i class="fas fa-star"></i> NEW
+                            </span>
                         {% endif %}
                         {% if asset.is_free %}
-                            <span class="badge badge-free">FREE</span>
+                            <span class="badge badge-free" title="Free asset">
+                                <i class="fas fa-gift"></i> FREE
+                            </span>
+                        {% endif %}
+                        {% if asset.is_featured %}
+                            <span class="badge badge-featured" title="Featured asset">
+                                <i class="fas fa-crown"></i> FEATURED
+                            </span>
                         {% endif %}
                     </div>
                 </div>
+                
                 <div class="asset-card-info">
-                    <h3 class="asset-card-title">{{ asset.title }}</h3>
-                    <p class="asset-card-creator">by {{ asset.creator.get_full_name|default:asset.creator.username }}</p>
+                    <div class="asset-header">
+                        <h3 class="asset-card-title">{{ asset.title }}</h3>
+                        {% if asset.category %}
+                            <span class="asset-category-tag" title="Category: {{ asset.category.name }}">{{ asset.category.name }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <p class="asset-card-creator">
+                        <i class="fas fa-user" aria-hidden="true"></i>
+                        by <span class="creator-name">{{ asset.creator.get_full_name|default:asset.creator.username }}</span>
+                    </p>
+                    
                     {% if asset.rating %}
-                        <div class="asset-rating">
-                            {% for i in "12345" %}
-                                {% if forloop.counter <= asset.rating|floatformat:0 %}
-                                    <i class="fas fa-star"></i>
-                                {% elif forloop.counter == asset.rating|floatformat:0|add:'1' and asset.rating|floatformat:1|stringformat:'s'|slice:'-1' == '5' %}
-                                    <i class="fas fa-star-half-alt"></i>
-                                {% else %}
-                                    <i class="far fa-star"></i>
-                                {% endif %}
-                            {% endfor %}
+                        <div class="asset-rating" title="Rating: {{ asset.rating|floatformat:1 }} out of 5">
+                            <div class="stars" aria-label="{{ asset.rating|floatformat:1 }} star rating">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= asset.rating|floatformat:0 %}
+                                        <i class="fas fa-star" aria-hidden="true"></i>
+                                    {% elif forloop.counter == asset.rating|floatformat:0|add:'1' and asset.rating|floatformat:1|stringformat:'s'|slice:'-1' == '5' %}
+                                        <i class="fas fa-star-half-alt" aria-hidden="true"></i>
+                                    {% else %}
+                                        <i class="far fa-star" aria-hidden="true"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
                             <span class="rating-value">{{ asset.rating|floatformat:1 }}</span>
+                            <span class="rating-count">({{ asset.rating_count|default:0 }})</span>
                         </div>
                     {% endif %}
-                    {% if asset.category %}
-                        <span class="asset-category-tag">{{ asset.category.name }}</span>
-                    {% endif %}
+                    
                     <p class="asset-card-description">
-                        {{ asset.description|truncatewords:15 }}
+                        {{ asset.description|truncatewords:12 }}
                     </p>
+                    
+                    <div class="asset-meta">
+                        <div class="asset-stats">
+                            <span class="stat" title="Download count">
+                                <i class="fas fa-download" aria-hidden="true"></i>
+                                {{ asset.download_count|default:0 }}
+                            </span>
+                            <span class="stat" title="Created {{ asset.created_at|timesince }} ago">
+                                <i class="fas fa-clock" aria-hidden="true"></i>
+                                {{ asset.created_at|timesince }} ago
+                            </span>
+                        </div>
+                        {% if asset.price and asset.price > 0 %}
+                            <div class="asset-price">
+                                <span class="current-price" title="Price: ${{ asset.price }}">${{ asset.price }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
             {% endfor %}
+        </div>
+        
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="empty-icon">
+                <i class="fas fa-search"></i>
+            </div>
+            <h3>No assets found</h3>
+            <p>Try adjusting your filters or browse all assets.</p>
+            <a href="{% url 'assets:asset_list' %}" class="btn btn-primary">
+                <i class="fas fa-arrow-right"></i> Browse All Assets
+            </a>
         </div>
         
         <div class="view-all-section">
@@ -398,5 +541,6 @@
 
 {% block extra_js %}
 <script src="{% static 'assets/js/slideshow.js' %}"></script>
+<script src="{% static 'assets/js/recent-assets.js' %}"></script>
 {% endblock %}
 

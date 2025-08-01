@@ -1,0 +1,368 @@
+/* Home Page Enhancements - Dark Theme Polishing */
+
+/* Advanced Card Animations */
+.asset-card.enhanced {
+    animation: none;
+    will-change: transform, box-shadow;
+}
+
+.asset-card.enhanced.fade-in {
+    animation: fadeInUpEnhanced 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes fadeInUpEnhanced {
+    0% {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+    }
+    50% {
+        opacity: 0.7;
+        transform: translateY(20px) scale(0.98);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Enhanced Hover Glow Effects */
+.asset-card.enhanced:hover {
+    animation: cardGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes cardGlow {
+    0% {
+        box-shadow: 
+            0 25px 50px rgba(0, 0, 0, 0.4),
+            0 0 0 1px rgba(59, 130, 246, 0.3),
+            0 0 30px rgba(59, 130, 246, 0.2);
+    }
+    100% {
+        box-shadow: 
+            0 30px 60px rgba(0, 0, 0, 0.5),
+            0 0 0 1px rgba(139, 92, 246, 0.4),
+            0 0 40px rgba(139, 92, 246, 0.3);
+    }
+}
+
+/* Parallax Background for Recent Assets */
+.recent-assets {
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.recent-assets::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(ellipse at top left, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at bottom right, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at center, rgba(16, 185, 129, 0.05) 0%, transparent 70%);
+    animation: gradientShift 20s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 1;
+}
+
+@keyframes gradientShift {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05) rotate(1deg);
+    }
+}
+
+/* Enhanced Badge Animations */
+.badge {
+    position: relative;
+    overflow: hidden;
+}
+
+.badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+.asset-card.enhanced:hover .badge::before {
+    left: 100%;
+}
+
+/* Interactive Star Rating */
+.stars {
+    position: relative;
+}
+
+.stars::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.3) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.asset-card.enhanced:hover .stars::after {
+    opacity: 1;
+}
+
+/* Smooth Category Tag Transitions */
+.asset-category-tag {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.asset-category-tag::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+}
+
+.asset-card.enhanced:hover .asset-category-tag::before {
+    transform: translateX(100%);
+}
+
+/* Enhanced Price Glow */
+.current-price,
+.free-price {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.current-price::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle, rgba(96, 165, 250, 0.2) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.free-price::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle, rgba(52, 211, 153, 0.2) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.asset-card.enhanced:hover .current-price::after,
+.asset-card.enhanced:hover .free-price::after {
+    opacity: 1;
+}
+
+/* Advanced Filter Dropdown Animation */
+.filter-dropdown.active .filter-menu {
+    animation: dropdownSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes dropdownSlide {
+    0% {
+        opacity: 0;
+        transform: translateY(-15px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Section Header Enhancements */
+.section-header-content h2 {
+    position: relative;
+    animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+    0% {
+        text-shadow: 0 0 30px rgba(96, 165, 250, 0.3);
+    }
+    100% {
+        text-shadow: 0 0 40px rgba(167, 139, 250, 0.4);
+    }
+}
+
+/* Quick Action Button Ripple Effect */
+.quick-view-btn,
+.wishlist-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.quick-view-btn::before,
+.wishlist-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease, height 0.3s ease;
+}
+
+.quick-view-btn:hover::before,
+.wishlist-btn:hover::before {
+    width: 100px;
+    height: 100px;
+}
+
+/* Enhanced Grid Layout with Stagger Animation */
+.asset-grid .asset-card.enhanced:nth-child(1) { animation-delay: 0.1s; }
+.asset-grid .asset-card.enhanced:nth-child(2) { animation-delay: 0.2s; }
+.asset-grid .asset-card.enhanced:nth-child(3) { animation-delay: 0.3s; }
+.asset-grid .asset-card.enhanced:nth-child(4) { animation-delay: 0.4s; }
+.asset-grid .asset-card.enhanced:nth-child(5) { animation-delay: 0.5s; }
+.asset-grid .asset-card.enhanced:nth-child(6) { animation-delay: 0.6s; }
+
+/* Loading State with Pulse Effect */
+.asset-grid-loading .asset-card-skeleton {
+    animation: skeletonPulse 2s ease-in-out infinite;
+}
+
+@keyframes skeletonPulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.02);
+    }
+}
+
+/* Improved Shimmer Animation */
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        background-position: 200% 0;
+        opacity: 0.8;
+    }
+}
+
+/* View Toggle Enhanced States */
+.view-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.view-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+}
+
+.view-btn:hover::before {
+    transform: translateX(100%);
+}
+
+/* Enhanced Mobile Responsiveness */
+@media (max-width: 768px) {
+    .asset-card.enhanced:hover {
+        transform: translateY(-8px) scale(1.01);
+    }
+    
+    .quick-view-btn,
+    .wishlist-btn {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .overlay-content {
+        gap: 0.75rem;
+    }
+}
+
+/* Accessibility Enhancements */
+@media (prefers-reduced-motion: reduce) {
+    .asset-card.enhanced,
+    .badge,
+    .quick-view-btn,
+    .wishlist-btn,
+    .stars {
+        animation: none !important;
+        transition: opacity 0.2s ease, transform 0.2s ease !important;
+    }
+    
+    .asset-card.enhanced:hover {
+        transform: translateY(-4px) !important;
+    }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    .asset-card.enhanced {
+        border: 2px solid var(--primary-color);
+    }
+    
+    .badge {
+        border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+    
+    .filter-btn,
+    .view-btn {
+        border: 2px solid var(--gray-400);
+    }
+}
+
+/* Print Styles */
+@media print {
+    .asset-overlay,
+    .quick-view-btn,
+    .wishlist-btn,
+    .view-toggle,
+    .filter-dropdown {
+        display: none !important;
+    }
+    
+    .asset-card.enhanced {
+        break-inside: avoid;
+        border: 1px solid #000;
+        box-shadow: none;
+    }
+}

@@ -1,0 +1,48 @@
+/* cards.css: Asset Cards, Category Cards, Grids - Dark Blue Theme */
+.asset-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
+    gap: 2rem;
+    margin: 0;
+}
+.asset-card {
+    background: var(--gray-200);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    transition: all .3s ease;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+}
+.asset-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-lg), 0 0 20px rgba(59, 130, 246, 0.3);
+}
+.asset-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    background: var(--gray-300);
+}
+.asset-info { padding: 1.5rem; }
+.asset-title { 
+    font-size: 1.25rem; 
+    margin-bottom: .5rem; 
+    color: var(--gray-800);
+}
+.asset-creator { 
+    color: var(--gray-600); 
+    font-size: .875rem; 
+    margin-bottom: .75rem; 
+}
+.asset-category {
+    display: inline-block;
+    padding: .25rem .75rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: var(--white);
+    border-radius: var(--r-full);
+    font-size: .75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}

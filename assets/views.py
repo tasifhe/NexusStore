@@ -17,15 +17,26 @@ from django.contrib.auth.decorators import login_required
 
 @login_required
 def my_library(request):
-    """Show assets added to the user's library"""
+    """Show assets added to the user's library with enhanced features"""
     user_profile = request.user.userprofile
     assets = user_profile.library.select_related('creator', 'category').order_by('-created_at')
+    
+    # Calculate additional stats
+    total_size = "0 MB"  # Placeholder for now
+    categories_count = assets.values('category').distinct().count() if assets.exists() else 0
+    total_downloads = sum(asset.downloads for asset in assets if hasattr(asset, 'downloads'))
+    
+    # Pagination
     paginator = Paginator(assets, 12)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+    
     context = {
         'page_obj': page_obj,
         'assets': page_obj,
+        'total_size': total_size,
+        'categories_count': categories_count,
+        'total_downloads': total_downloads,
     }
     return render(request, 'assets/my_library.html', context)
 
@@ -46,37 +57,94 @@ from django.contrib.auth.decorators import login_required
 def home(request):
     """Home page with categories and recent assets"""
     categories = Category.objects.all()
-    recent_assets = Asset.objects.select_related('creator', 'category').order_by('-created_at')[:6]
+    recent_assets = Asset.objects.select_related('creator', 'category').order_by('-created_at')[:12]
+    
+    # Get featured asset (first featured asset or most recent if none)
+    featured_asset = Asset.objects.filter(is_featured=True).select_related('creator', 'category').first()
+    if not featured_asset:
+        featured_asset = Asset.objects.select_related('creator', 'category').order_by('-created_at').first()
     
     context = {
         'categories': categories,
         'recent_assets': recent_assets,
+        'featured_asset': featured_asset,
     }
     return render(request, 'assets/home.html', context)
 
 def asset_list(request):
-    """List all assets with pagination"""
+    """Enhanced list all assets with pagination and stats"""
     assets = Asset.objects.select_related('creator', 'category').order_by('-created_at')
+    
+    # Get filter and sort parameters
+    filter_type = request.GET.get('filter', 'all')
+    sort_by = request.GET.get('sort', 'recent')
+    
+    # Apply filters
+    if filter_type == 'featured':
+        assets = assets.filter(is_featured=True)
+    elif filter_type == 'recent':
+        from datetime import datetime, timedelta
+        recent_date = datetime.now() - timedelta(days=30)
+        assets = assets.filter(created_at__gte=recent_date)
+    elif filter_type == 'free':
+        assets = assets.filter(price=0)
+    elif filter_type == 'popular':
+        # Assuming you have a download_count field, otherwise use created_at
+        assets = assets.order_by('-created_at')  # Placeholder for popularity
+    
+    # Apply sorting
+    if sort_by == 'name':
+        assets = assets.order_by('title')
+    elif sort_by == 'category':
+        assets = assets.order_by('category__name', 'title')
+    elif sort_by == 'popular':
+        assets = assets.order_by('-created_at')  # Placeholder for popularity
+    else:  # 'recent' or default
+        assets = assets.order_by('-created_at')
     
     # Pagination
     paginator = Paginator(assets, 12)  # Show 12 assets per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
+    # Get stats for the header
+    from django.db.models import Count
+    total_assets = Asset.objects.count()
+    total_categories = Asset.objects.values('category').distinct().count()
+    total_creators = Asset.objects.values('creator').distinct().count()
+    
     context = {
         'page_obj': page_obj,
         'assets': page_obj,
+        'total_assets': total_assets,
+        'total_categories': total_categories,
+        'total_creators': total_creators,
+        'current_filter': filter_type,
+        'current_sort': sort_by,
     }
     return render(request, 'assets/asset_list.html', context)
 
 def asset_detail(request, asset_id):
-    """Asset detail page"""
+    """Enhanced asset detail page with additional context"""
     asset = get_object_or_404(Asset, id=asset_id)
     related_assets = Asset.objects.filter(category=asset.category).exclude(id=asset.id)[:4]
     
+    # Check if asset is in user's library
+    is_in_library = False
+    if request.user.is_authenticated:
+        try:
+            user_profile = request.user.userprofile
+            is_in_library = asset in user_profile.library.all()
+        except:
+            is_in_library = False
+    
+    # Get additional context
     context = {
         'asset': asset,
         'related_assets': related_assets,
+        'asset_creator_total': asset.creator.assets.count(),
+        'similar_assets_count': Asset.objects.filter(category=asset.category).count() - 1,
+        'is_in_library': is_in_library,
     }
     return render(request, 'assets/asset_detail.html', context)
 
@@ -296,4 +364,62 @@ def generate_chatbot_response(message):
             asset_list = ', '.join([asset.title for asset in recent_assets])
             return f"Here are some of our latest assets: {asset_list}. What type of assets are you looking for? I can help you find 3D models, 2D art, audio, textures, and more!"
         return "Welcome to GameAsset Store! I can help you find the perfect assets for your game. What are you working on? Try asking about 3D models, 2D art, audio, or any other type of asset!"
+
+
+# Enhanced Library Management Views
+
+@login_required
+def add_to_library(request, asset_id):
+    """Add an asset to user's library"""
+    if request.method == 'POST':
+        try:
+            asset = get_object_or_404(Asset, id=asset_id)
+            user_profile = request.user.userprofile
+            
+            if asset not in user_profile.library.all():
+                user_profile.library.add(asset)
+                return JsonResponse({
+                    'success': True,
+                    'message': f'{asset.title} added to your library!'
+                })
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Asset is already in your library.'
+                })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': 'Failed to add asset to library.'
+            })
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request method.'})
+
+
+@login_required
+def remove_from_library(request, asset_id):
+    """Remove an asset from user's library"""
+    if request.method == 'POST':
+        try:
+            asset = get_object_or_404(Asset, id=asset_id)
+            user_profile = request.user.userprofile
+            
+            if asset in user_profile.library.all():
+                user_profile.library.remove(asset)
+                return JsonResponse({
+                    'success': True,
+                    'message': f'{asset.title} removed from your library!'
+                })
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Asset is not in your library.'
+                })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': 'Failed to remove asset from library.'
+            })
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request method.'})
 

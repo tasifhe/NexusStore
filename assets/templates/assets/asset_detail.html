@@ -1,106 +1,571 @@
 {% extends 'assets/base.html' %}
 
-{% block title %}{{ asset.title }} - GameAsset Store{% endblock %}
+{% block title %}{{ asset.title }} - Nexus Store{% endblock %}
 
 {% block content %}
-
+{% csrf_token %}
+<!-- Enhanced Asset Detail Page -->
 <div class="asset-detail-page">
-    <div class="container">
-        <div class="asset-detail-grid">
-            <!-- Asset Image -->
-            <div>
-                {% if asset.thumbnail %}
-                    <img src="{{ asset.thumbnail.url }}" alt="{{ asset.title }}" class="asset-image asset-image-detail">
-                {% else %}
-                    <div class="asset-image asset-image-detail asset-image-empty">
-                        <i class="fas fa-image asset-image-icon"></i>
+    <!-- Hero Section -->
+    <div class="asset-hero-section">
+        <div class="container">
+            <div class="asset-hero-content">
+                <!-- Asset Preview -->
+                <div class="asset-preview-section">
+                    <div class="preview-main">
+                        {% if asset.thumbnail %}
+                            <img src="{{ asset.thumbnail.url }}" alt="{{ asset.title }}" 
+                                 class="preview-image" id="mainPreview">
+                        {% else %}
+                            <div class="preview-placeholder">
+                                <i class="fas fa-image"></i>
+                                <span>No Preview Available</span>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Preview Controls -->
+                        <div class="preview-controls">
+                            <button class="preview-btn" onclick="openFullscreen()" title="Fullscreen View">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                            <button class="preview-btn" onclick="downloadPreview()" title="Download Preview">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Asset Badges -->
+                        <div class="asset-detail-badges">
+                            {% if asset.is_featured %}
+                                <span class="detail-badge featured">
+                                    <i class="fas fa-star"></i> Featured
+                                </span>
+                            {% endif %}
+                            {% if asset.is_free %}
+                                <span class="detail-badge free">
+                                    <i class="fas fa-gift"></i> Free
+                                </span>
+                            {% endif %}
+                            {% if asset.is_new %}
+                                <span class="detail-badge new">
+                                    <i class="fas fa-sparkles"></i> New
+                                </span>
+                            {% endif %}
+                        </div>
                     </div>
-                {% endif %}
-            </div>
-
-            <div>
-                <h1 class="asset-title asset-title-detail">{{ asset.title }}</h1>
-                <div class="asset-meta-row">
-                    <div class="asset-meta-user">
-                        <i class="fas fa-user asset-meta-user-icon"></i>
-                        <span class="asset-meta-username">{{ asset.creator.get_full_name|default:asset.creator.username }}</span>
+                    
+                    <!-- Additional Preview Images (if available) -->
+                    {% comment %}
+                    <div class="preview-gallery">
+                        <div class="gallery-item active" onclick="switchPreview(this)">
+                            <img src="{{ asset.thumbnail.url }}" alt="Preview 1">
+                        </div>
+                        <!-- Add more gallery items when multiple images are supported -->
                     </div>
-                    {% if asset.category %}
-                        <span class="asset-category">{{ asset.category.name }}</span>
-                    {% endif %}
+                    {% endcomment %}
                 </div>
-                <div class="asset-meta-dates">
-                    <div>
-                        <i class="fas fa-calendar"></i>
-                        {{ asset.created_at|date:"M d, Y" }}
+                
+                <!-- Asset Information -->
+                <div class="asset-info-section">
+                    <div class="asset-header">
+                        <div class="asset-title-group">
+                            <h1 class="asset-title">{{ asset.title }}</h1>
+                            {% if asset.category %}
+                                <span class="asset-category-badge">{{ asset.category.name }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Asset Stats -->
+                        <div class="asset-stats-bar">
+                            <div class="stat-item">
+                                <i class="fas fa-download"></i>
+                                <span class="stat-number">{{ asset.download_count|default:"0" }}</span>
+                                <span class="stat-label">Downloads</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-heart"></i>
+                                <span class="stat-number">{{ asset.favorite_count|default:"0" }}</span>
+                                <span class="stat-label">Likes</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-star"></i>
+                                <span class="stat-number">{{ asset.rating|default:"5.0" }}</span>
+                                <span class="stat-label">Rating</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-eye"></i>
+                                <span class="stat-number">{{ asset.view_count|default:"0" }}</span>
+                                <span class="stat-label">Views</span>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <i class="fas fa-clock"></i>
-                        {{ asset.updated_at|date:"M d, Y" }}
+                    
+                    <!-- Creator Information -->
+                    <div class="creator-section">
+                        <div class="creator-info">
+                            <div class="creator-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div class="creator-details">
+                                <h3 class="creator-name">{{ asset.creator.get_full_name|default:asset.creator.username }}</h3>
+                                <p class="creator-title">Asset Creator</p>
+                                <div class="creator-meta">
+                                    <span class="creator-assets">{{ asset.creator.assets.count }} assets</span>
+                                    <span class="creator-joined">Joined {{ asset.creator.date_joined|date:"M Y" }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="creator-actions">
+                            <button class="btn btn-outline-primary btn-follow">
+                                <i class="fas fa-plus"></i> Follow
+                            </button>
+                            <button class="btn btn-outline-secondary btn-message">
+                                <i class="fas fa-envelope"></i> Message
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <div class="alert-info asset-description-box">
-                    <h3 class="asset-description-title">Description</h3>
-                    <p class="asset-description-text">{{ asset.description|linebreaks }}</p>
-                </div>
-                <!-- Download Button -->
-                <div class="asset-download-row">
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'assets:download_asset' asset.id %}" class="btn btn-primary asset-download-btn">Download</a>
-                    {% else %}
-                        <a href="{% url 'assets:login' %}?next={% url 'assets:asset_detail' asset.id %}" class="btn btn-primary asset-download-btn">Login to Download</a>
-                    {% endif %}
-                    <button onclick="navigator.share ? navigator.share({title: '{{ asset.title }}', url: window.location.href}) : copyToClipboard(window.location.href)" class="btn btn-secondary asset-share-btn">
-                        <i class="fas fa-share"></i> Share
-                    </button>
-                </div>
-                <div class="alert-success asset-edu-box">
-                    <p class="asset-edu-text">
-                        <i class="fas fa-graduation-cap"></i>
-                        <strong>Educational Use:</strong> This asset is free for educational and learning purposes.
-                    </p>
+                    
+                    <!-- Pricing and Download -->
+                    <div class="download-section">
+                        {% if asset.price and asset.price > 0 %}
+                            <div class="pricing-info">
+                                <span class="price-label">Price</span>
+                                <span class="price-amount">${{ asset.price }}</span>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="download-actions">
+                            {% if user.is_authenticated %}
+                                <a href="{% url 'assets:download_asset' asset.id %}" class="btn btn-primary btn-download">
+                                    <i class="fas fa-download"></i>
+                                    {% if asset.price and asset.price > 0 %}
+                                        Purchase & Download
+                                    {% else %}
+                                        Download Free
+                                    {% endif %}
+                                </a>
+                            {% else %}
+                                <a href="{% url 'assets:login' %}?next={% url 'assets:asset_detail' asset.id %}" 
+                                   class="btn btn-primary btn-download">
+                                    <i class="fas fa-sign-in-alt"></i>
+                                    Sign In to Download
+                                </a>
+                            {% endif %}
+                            
+                            <div class="secondary-actions">
+                                {% if user.is_authenticated %}
+                                    {% if is_in_library %}
+                                        <button class="btn btn-outline-secondary btn-library" onclick="toggleLibrary({{ asset.id }})">
+                                            <i class="fas fa-check"></i> In Library
+                                        </button>
+                                    {% else %}
+                                        <button class="btn btn-outline-secondary btn-library" onclick="toggleLibrary({{ asset.id }})">
+                                            <i class="fas fa-plus"></i> Add to Library
+                                        </button>
+                                    {% endif %}
+                                {% endif %}
+                                <button class="btn btn-outline-secondary btn-wishlist" onclick="toggleWishlist({{ asset.id }})">
+                                    <i class="far fa-heart"></i> Add to Wishlist
+                                </button>
+                                <button class="btn btn-outline-secondary btn-share" onclick="shareAsset()">
+                                    <i class="fas fa-share-alt"></i> Share
+                                </button>
+                            </div>
+                        </div>
+                        
+                        {% if not asset.price or asset.price == 0 %}
+                            <div class="license-info">
+                                <div class="license-badge">
+                                    <i class="fas fa-graduation-cap"></i>
+                                    <span>Free for Educational Use</span>
+                                </div>
+                                <p class="license-text">
+                                    This asset is free for educational and learning purposes. 
+                                    Perfect for students and educational projects.
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- Related Assets -->
-        {% if related_assets %}
-        <div class="related-assets-section">
-            <h2 class="related-assets-title">Related Assets</h2>
-            <div class="asset-grid">
-                {% for related_asset in related_assets %}
-                <div class="asset-card" onclick="window.location.href='{% url 'assets:asset_detail' related_asset.id %}'">
-                    {% if related_asset.thumbnail %}
-                        <img src="{{ related_asset.thumbnail.url }}" alt="{{ related_asset.title }}" class="asset-image">
-                    {% else %}
-                        <div class="asset-image asset-image-empty">
-                            <i class="fas fa-image asset-image-icon-small"></i>
+    </div>
+    
+    <!-- Asset Details Tabs -->
+    <div class="asset-details-section">
+        <div class="container">
+            <div class="details-tabs">
+                <div class="tab-navigation">
+                    <button class="tab-btn active" data-tab="description">
+                        <i class="fas fa-info-circle"></i> Description
+                    </button>
+                    <button class="tab-btn" data-tab="specifications">
+                        <i class="fas fa-cog"></i> Specifications
+                    </button>
+                    <button class="tab-btn" data-tab="files">
+                        <i class="fas fa-folder"></i> Files Included
+                    </button>
+                    <button class="tab-btn" data-tab="reviews">
+                        <i class="fas fa-star"></i> Reviews (0)
+                    </button>
+                </div>
+                
+                <!-- Description Tab -->
+                <div class="tab-content active" id="description">
+                    <div class="description-content">
+                        <div class="description-main">
+                            <h3>About this Asset</h3>
+                            <div class="description-text">
+                                {{ asset.description|linebreaks }}
+                            </div>
+                            
+                            <div class="asset-tags">
+                                <h4>Tags</h4>
+                                <div class="tag-list">
+                                    <span class="tag">{{ asset.category.name|default:"General" }}</span>
+                                    <span class="tag">Game Development</span>
+                                    <span class="tag">{{ asset.is_free|yesno:"Free,Premium" }}</span>
+                                    {% if asset.is_featured %}<span class="tag">Featured</span>{% endif %}
+                                </div>
+                            </div>
                         </div>
-                    {% endif %}
-                    <div class="asset-info">
-                        <h3 class="asset-title">{{ related_asset.title }}</h3>
-                        <p class="asset-creator">by {{ related_asset.creator.get_full_name|default:related_asset.creator.username }}</p>
-                        <p class="asset-related-desc">
-                            {{ related_asset.description|truncatewords:10 }}
-                        </p>
+                        
+                        <div class="description-sidebar">
+                            <div class="info-card">
+                                <h4>Asset Information</h4>
+                                <div class="info-list">
+                                    <div class="info-item">
+                                        <span class="info-label">Created</span>
+                                        <span class="info-value">{{ asset.created_at|date:"M d, Y" }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Updated</span>
+                                        <span class="info-value">{{ asset.updated_at|date:"M d, Y" }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Category</span>
+                                        <span class="info-value">{{ asset.category.name|default:"Uncategorized" }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">File Size</span>
+                                        <span class="info-value">{{ asset.asset_file.size|filesizeformat|default:"Unknown" }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">License</span>
+                                        <span class="info-value">
+                                            {% if asset.is_free %}Educational Use{% else %}Commercial License{% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Specifications Tab -->
+                <div class="tab-content" id="specifications">
+                    <div class="specs-content">
+                        <h3>Technical Specifications</h3>
+                        <div class="specs-grid">
+                            <div class="spec-item">
+                                <span class="spec-label">File Format</span>
+                                <span class="spec-value">{{ asset.asset_file.name|slice:"-4:"|default:"Various" }}</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">Compatibility</span>
+                                <span class="spec-value">Unity, Unreal Engine, Godot</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">Quality</span>
+                                <span class="spec-value">High Definition</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">Support</span>
+                                <span class="spec-value">Community & Documentation</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Files Tab -->
+                <div class="tab-content" id="files">
+                    <div class="files-content">
+                        <h3>Files Included</h3>
+                        <div class="file-list">
+                            <div class="file-item">
+                                <div class="file-icon">
+                                    <i class="fas fa-file-archive"></i>
+                                </div>
+                                <div class="file-info">
+                                    <span class="file-name">{{ asset.asset_file.name|default:"asset_package.zip" }}</span>
+                                    <span class="file-size">{{ asset.asset_file.size|filesizeformat|default:"Unknown size" }}</span>
+                                </div>
+                                <div class="file-actions">
+                                    <span class="file-type">Archive</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Reviews Tab -->
+                <div class="tab-content" id="reviews">
+                    <div class="reviews-content">
+                        <div class="reviews-header">
+                            <h3>User Reviews</h3>
+                            <button class="btn btn-primary btn-write-review">Write a Review</button>
+                        </div>
+                        
+                        <div class="reviews-summary">
+                            <div class="rating-overview">
+                                <div class="average-rating">
+                                    <span class="rating-number">{{ asset.rating|default:"5.0" }}</span>
+                                    <div class="rating-stars">
+                                        {% for i in "12345" %}
+                                            <i class="fas fa-star"></i>
+                                        {% endfor %}
+                                    </div>
+                                    <span class="rating-count">Based on {{ asset.rating_count|default:"0" }} reviews</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="reviews-list">
+                            <div class="no-reviews">
+                                <i class="fas fa-star-o"></i>
+                                <p>No reviews yet. Be the first to review this asset!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Related Assets Section -->
+    {% if related_assets %}
+    <div class="related-assets-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">More from this Category</h2>
+                <p class="section-subtitle">Discover similar assets that might interest you</p>
+            </div>
+            
+            <div class="related-assets-grid">
+                {% for related_asset in related_assets %}
+                <div class="related-asset-card" onclick="window.location.href='{% url 'assets:asset_detail' related_asset.id %}'">
+                    <div class="related-asset-image">
+                        {% if related_asset.thumbnail %}
+                            <img src="{{ related_asset.thumbnail.url }}" alt="{{ related_asset.title }}" loading="lazy">
+                        {% else %}
+                            <div class="image-placeholder">
+                                <i class="fas fa-image"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Quick Actions -->
+                        <div class="related-asset-overlay">
+                            <div class="quick-actions">
+                                <button class="quick-action-btn" title="Quick View">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="quick-action-btn" title="Add to Wishlist">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Asset Badges -->
+                        {% if related_asset.is_free %}
+                            <span class="related-asset-badge">FREE</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="related-asset-info">
+                        <h4 class="related-asset-title">{{ related_asset.title }}</h4>
+                        <p class="related-asset-creator">by {{ related_asset.creator.get_full_name|default:related_asset.creator.username }}</p>
+                        <div class="related-asset-meta">
+                            <span class="meta-item">
+                                <i class="fas fa-download"></i>
+                                {{ related_asset.download_count|default:"0" }}
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-star"></i>
+                                {{ related_asset.rating|default:"5.0" }}
+                            </span>
+                        </div>
+                        {% if related_asset.price and related_asset.price > 0 %}
+                            <div class="related-asset-price">${{ related_asset.price }}</div>
+                        {% endif %}
                     </div>
                 </div>
                 {% endfor %}
             </div>
+            
+            <div class="section-footer">
+                <a href="{% url 'assets:asset_list' %}{% if asset.category %}?category={{ asset.category.slug }}{% endif %}" 
+                   class="btn btn-outline-primary btn-view-all">
+                    <i class="fas fa-th-large"></i>
+                    View All {{ asset.category.name|default:"Assets" }}
+                </a>
+            </div>
         </div>
-        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Fullscreen Preview Modal -->
+<div class="fullscreen-modal" id="fullscreenModal">
+    <div class="fullscreen-overlay" onclick="closeFullscreen()"></div>
+    <div class="fullscreen-content">
+        <div class="fullscreen-header">
+            <h3>{{ asset.title }}</h3>
+            <button class="fullscreen-close" onclick="closeFullscreen()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="fullscreen-body">
+            <img src="{{ asset.thumbnail.url }}" alt="{{ asset.title }}" id="fullscreenImage">
+        </div>
     </div>
 </div>
 
 <script>
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(function() {
-        alert('Link copied to clipboard!');
+document.addEventListener('DOMContentLoaded', function() {
+    // Tab functionality
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const targetTab = this.dataset.tab;
+            
+            // Remove active class from all tabs and contents
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding content
+            this.classList.add('active');
+            document.getElementById(targetTab).classList.add('active');
+        });
+    });
+});
+
+// Fullscreen functionality
+function openFullscreen() {
+    document.getElementById('fullscreenModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeFullscreen() {
+    document.getElementById('fullscreenModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+// Share functionality
+function shareAsset() {
+    if (navigator.share) {
+        navigator.share({
+            title: '{{ asset.title }}',
+            text: 'Check out this amazing game asset!',
+            url: window.location.href
+        });
+    } else {
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(window.location.href).then(function() {
+            // Show toast notification
+            showToast('Link copied to clipboard!');
+        });
+    }
+}
+
+// Wishlist functionality
+function toggleWishlist(assetId) {
+    // Add wishlist toggle logic here
+    const btn = document.querySelector('.btn-wishlist');
+    const icon = btn.querySelector('i');
+    
+    if (icon.classList.contains('far')) {
+        icon.classList.remove('far');
+        icon.classList.add('fas');
+        btn.innerHTML = '<i class="fas fa-heart"></i> Remove from Wishlist';
+        showToast('Added to wishlist!');
+    } else {
+        icon.classList.remove('fas');
+        icon.classList.add('far');
+        btn.innerHTML = '<i class="far fa-heart"></i> Add to Wishlist';
+        showToast('Removed from wishlist!');
+    }
+}
+
+// Library functionality
+function toggleLibrary(assetId) {
+    const btn = document.querySelector('.btn-library');
+    const icon = btn.querySelector('i');
+    const isInLibrary = icon.classList.contains('fa-check');
+    
+    // Determine action and endpoint
+    const action = isInLibrary ? 'remove' : 'add';
+    const endpoint = `/library/${action}/${assetId}/`;
+    
+    fetch(endpoint, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (isInLibrary) {
+                // Change to "Add to Library"
+                icon.classList.remove('fa-check');
+                icon.classList.add('fa-plus');
+                btn.innerHTML = '<i class="fas fa-plus"></i> Add to Library';
+            } else {
+                // Change to "In Library"
+                icon.classList.remove('fa-plus');
+                icon.classList.add('fa-check');
+                btn.innerHTML = '<i class="fas fa-check"></i> In Library';
+            }
+            showToast(data.message);
+        } else {
+            showToast(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Failed to update library.');
     });
 }
-</script>
 
-<style>
-</style>
+// Toast notification
+function showToast(message) {
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    toast.textContent = message;
+    
+    // Add to body
+    document.body.appendChild(toast);
+    
+    // Show toast
+    setTimeout(() => toast.classList.add('show'), 100);
+    
+    // Hide and remove toast
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => document.body.removeChild(toast), 300);
+    }, 3000);
+}
+
+// Download preview
+function downloadPreview() {
+    const link = document.createElement('a');
+    link.href = '{{ asset.thumbnail.url }}';
+    link.download = '{{ asset.title }}_preview.jpg';
+    link.click();
+}
+</script>
 {% endblock %}
 

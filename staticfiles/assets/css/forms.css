@@ -1,0 +1,45 @@
+/* forms.css: Login, Register, Upload Forms - Dark Blue Theme */
+.login-page, .register-page, .upload-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 200px);
+    padding: 2rem 0;
+}
+.login-card, .register-card, .upload-form-card {
+    background-color: var(--gray-200);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 500px;
+    padding: 2rem;
+    border: 1px solid var(--gray-300);
+}
+.login-label, .register-label, .upload-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--gray-800);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.login-input, .register-form input, .upload-form input, 
+.register-form select, .upload-form select, 
+.register-form textarea, .upload-form textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--gray-400);
+    background-color: var(--gray-100);
+    color: var(--gray-800);
+    font-size: 1rem;
+    transition: var(--transition);
+}
+.login-input:focus, .register-form input:focus, .upload-form input:focus, 
+.register-form select:focus, .upload-form select:focus, 
+.register-form textarea:focus, .upload-form textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}

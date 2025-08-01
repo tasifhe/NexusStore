@@ -1,52 +1,435 @@
 {% extends 'assets/base.html' %}
-{% block title %}My Library | GameAsset Store{% endblock %}
+{% load static %}
+
+{% block title %}My Library | NexusStore{% endblock %}
+
 {% block content %}
-<div class="page-header">
-    <h1>My Library</h1>
-    <p class="page-desc">Assets you have added to your personal library.</p>
-</div>
-{% if assets and assets|length > 0 %}
-    <div class="asset-grid">
-        {% for asset in assets %}
-            <div class="asset-card">
-                <div class="asset-image">
-                    {% if asset.thumbnail %}
-                        <img src="{{ asset.thumbnail.url }}" alt="{{ asset.title }} thumbnail">
-                    {% else %}
-                        <i class="fas fa-image"></i>
-                    {% endif %}
+{% csrf_token %}
+<!-- Library Hero Section -->
+<section class="library-hero">
+    <div class="container">
+        <div class="library-hero-content">
+            <h1 class="library-title">My Library</h1>
+            <p class="library-subtitle">Your personal collection of assets, ready for your next project</p>
+            
+            <div class="library-stats">
+                <div class="stat-item">
+                    <span class="stat-number">{{ assets|length }}</span>
+                    <span class="stat-label">Total Assets</span>
                 </div>
-                <div class="asset-info">
-                    <div class="asset-title">{{ asset.title }}</div>
-                    <div class="asset-creator">by {{ asset.creator.username }}</div>
-                    {% if asset.category %}
-                        <div class="asset-category">{{ asset.category.name }}</div>
-                    {% endif %}
-                    <div class="asset-description">{{ asset.description|truncatewords:20 }}</div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ total_size|default:"0 MB" }}</span>
+                    <span class="stat-label">Total Size</span>
                 </div>
-                <div class="asset-content">
-                    <a href="{% url 'assets:asset_detail' asset.id %}" class="btn btn-secondary">View</a>
+                <div class="stat-item">
+                    <span class="stat-number">{{ categories_count|default:"0" }}</span>
+                    <span class="stat-label">Categories</span>
                 </div>
             </div>
-        {% endfor %}
+        </div>
     </div>
+</section>
+
+{% if assets and assets|length > 0 %}
+    <!-- Library Toolbar -->
+    <div class="container">
+        <div class="library-toolbar">
+            <div class="toolbar-row">
+                <div class="toolbar-left">
+                    <!-- Search Box -->
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" placeholder="Search your library..." id="librarySearch">
+                    </div>
+                    
+                    <!-- Filter Dropdown -->
+                    <div class="filter-dropdown">
+                        <button class="filter-btn" id="filterBtn">
+                            <i class="fas fa-filter"></i>
+                            Filter
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="toolbar-right">
+                    <!-- Sort Dropdown -->
+                    <select class="sort-select" id="sortSelect">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="name">Name A-Z</option>
+                        <option value="name-desc">Name Z-A</option>
+                        <option value="creator">By Creator</option>
+                        <option value="category">By Category</option>
+                    </select>
+                    
+                    <!-- View Toggle -->
+                    <div class="view-toggle">
+                        <button class="view-btn active" data-view="grid">
+                            <i class="fas fa-th"></i>
+                        </button>
+                        <button class="view-btn" data-view="list">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="container">
+        <div class="quick-stats">
+            <div class="stat-card">
+                <i class="fas fa-download stat-icon"></i>
+                <div class="stat-title">{{ total_downloads|default:"0" }}</div>
+                <div class="stat-subtitle">Total Downloads</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-clock stat-icon"></i>
+                <div class="stat-title">Recent</div>
+                <div class="stat-subtitle">Last 7 Days</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-star stat-icon"></i>
+                <div class="stat-title">Favorites</div>
+                <div class="stat-subtitle">Top Rated</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assets Grid -->
+    <div class="container">
+        <div class="library-grid" id="libraryGrid">
+            {% for asset in assets %}
+                <div class="library-asset-card" data-asset-id="{{ asset.id }}" data-category="{{ asset.category.name|default:'uncategorized' }}" data-creator="{{ asset.creator.username }}" data-name="{{ asset.title }}">
+                    <!-- Asset Image -->
+                    <div class="library-asset-image">
+                        {% if asset.thumbnail %}
+                            <img src="{{ asset.thumbnail.url }}" alt="{{ asset.title }} thumbnail" loading="lazy">
+                        {% else %}
+                            <div class="image-placeholder">
+                                <i class="fas fa-image"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Asset Overlay -->
+                        <div class="asset-overlay">
+                            <div class="overlay-actions">
+                                <a href="{% url 'assets:asset_detail' asset.id %}" class="overlay-btn primary" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <button class="overlay-btn" title="Quick Preview" onclick="openPreview({{ asset.id }})">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                                <a href="{% url 'assets:download_asset' asset.id %}" class="overlay-btn" title="Download">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Asset Badges -->
+                        <div class="asset-badges">
+                            {% if asset.price == 0 %}
+                                <span class="asset-badge badge-free">Free</span>
+                            {% else %}
+                                <span class="asset-badge badge-premium">${{ asset.price }}</span>
+                            {% endif %}
+                            
+                            {% if asset.is_featured %}
+                                <span class="asset-badge badge-new">Featured</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Asset Info -->
+                    <div class="library-asset-info">
+                        <div class="asset-title-row">
+                            <h3 class="library-asset-title">{{ asset.title }}</h3>
+                            <div class="asset-menu">
+                                <button class="menu-btn" onclick="toggleAssetMenu({{ asset.id }})">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="library-asset-creator">
+                            <div class="creator-avatar">
+                                {{ asset.creator.username|first|upper }}
+                            </div>
+                            by {{ asset.creator.username }}
+                        </div>
+                        
+                        <!-- Asset Meta -->
+                        <div class="asset-meta">
+                            <div class="meta-group">
+                                <span class="meta-value">{{ asset.category.name|default:"General" }}</span>
+                                <span class="meta-label">Category</span>
+                            </div>
+                            <div class="meta-group">
+                                <span class="meta-value">{{ asset.file_size|default:"N/A" }}</span>
+                                <span class="meta-label">Size</span>
+                            </div>
+                            <div class="meta-group">
+                                <span class="meta-value">{{ asset.downloads|default:"0" }}</span>
+                                <span class="meta-label">Downloads</span>
+                            </div>
+                        </div>
+                        
+                        {% if asset.description %}
+                            <p class="library-asset-description">{{ asset.description|truncatewords:20 }}</p>
+                        {% endif %}
+                        
+                        <!-- Asset Actions -->
+                        <div class="asset-actions">
+                            <a href="{% url 'assets:asset_detail' asset.id %}" class="action-btn btn-primary">
+                                <i class="fas fa-eye"></i>
+                                View Details
+                            </a>
+                            <a href="{% url 'assets:download_asset' asset.id %}" class="action-btn btn-secondary">
+                                <i class="fas fa-download"></i>
+                                Download
+                            </a>
+                            <button class="action-btn btn-danger" onclick="removeFromLibrary({{ asset.id }})">
+                                <i class="fas fa-trash"></i>
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Enhanced Pagination -->
     {% if page_obj.has_other_pages %}
-        <div class="pagination-bar">
-            {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">Previous</a>
-            {% endif %}
-            <span class="pagination-info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">Next</a>
-            {% endif %}
+        <div class="container">
+            <div class="library-pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1" class="pagination-btn">
+                        <i class="fas fa-angle-double-left"></i>
+                        First
+                    </a>
+                    <a href="?page={{ page_obj.previous_page_number }}" class="pagination-btn">
+                        <i class="fas fa-angle-left"></i>
+                        Previous
+                    </a>
+                {% endif %}
+                
+                <span class="pagination-info">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    ({{ page_obj.paginator.count }} total assets)
+                </span>
+                
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="pagination-btn">
+                        Next
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-btn">
+                        Last
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                {% endif %}
+            </div>
         </div>
     {% endif %}
+
 {% else %}
-    <div class="empty-state">
-        <div class="empty-icon"><i class="fas fa-box-open"></i></div>
-        <h2>No assets in your library yet</h2>
-        <div class="empty-desc">Browse the store and add assets to your library to see them here.</div>
-        <a href="{% url 'assets:asset_list' %}" class="btn btn-primary">Browse Assets</a>
+    <!-- Enhanced Empty State -->
+    <div class="container">
+        <div class="empty-library">
+            <i class="fas fa-box-open empty-icon"></i>
+            <h2 class="empty-title">Your Library is Empty</h2>
+            <p class="empty-description">
+                Start building your collection by exploring our vast library of game development assets. 
+                Find textures, models, sounds, and more to bring your projects to life.
+            </p>
+            <div class="empty-actions">
+                <a href="{% url 'assets:asset_list' %}" class="empty-btn primary">
+                    <i class="fas fa-compass"></i>
+                    Browse Assets
+                </a>
+                <a href="{% url 'assets:upload_asset' %}" class="empty-btn secondary">
+                    <i class="fas fa-upload"></i>
+                    Upload Asset
+                </a>
+            </div>
+        </div>
     </div>
 {% endif %}
+
+<!-- JavaScript for Enhanced Functionality -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality
+    const searchInput = document.getElementById('librarySearch');
+    const assetCards = document.querySelectorAll('.library-asset-card');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            assetCards.forEach(card => {
+                const title = card.querySelector('.library-asset-title').textContent.toLowerCase();
+                const creator = card.querySelector('.library-asset-creator').textContent.toLowerCase();
+                const description = card.querySelector('.library-asset-description');
+                const descText = description ? description.textContent.toLowerCase() : '';
+                
+                const matches = title.includes(searchTerm) || 
+                               creator.includes(searchTerm) || 
+                               descText.includes(searchTerm);
+                
+                card.style.display = matches ? 'block' : 'none';
+            });
+        });
+    }
+    
+    // Sort functionality
+    const sortSelect = document.getElementById('sortSelect');
+    const libraryGrid = document.getElementById('libraryGrid');
+    
+    if (sortSelect && libraryGrid) {
+        sortSelect.addEventListener('change', function(e) {
+            const sortValue = e.target.value;
+            const cards = Array.from(libraryGrid.children);
+            
+            cards.sort((a, b) => {
+                switch (sortValue) {
+                    case 'name':
+                        return a.dataset.name.localeCompare(b.dataset.name);
+                    case 'name-desc':
+                        return b.dataset.name.localeCompare(a.dataset.name);
+                    case 'creator':
+                        return a.dataset.creator.localeCompare(b.dataset.creator);
+                    case 'category':
+                        return a.dataset.category.localeCompare(b.dataset.category);
+                    default:
+                        return 0;
+                }
+            });
+            
+            cards.forEach(card => libraryGrid.appendChild(card));
+        });
+    }
+    
+    // View toggle functionality
+    const viewBtns = document.querySelectorAll('.view-btn');
+    
+    viewBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            viewBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            const view = this.dataset.view;
+            if (view === 'list') {
+                libraryGrid.classList.add('list-view');
+            } else {
+                libraryGrid.classList.remove('list-view');
+            }
+        });
+    });
+});
+
+// Quick preview function
+function openPreview(assetId) {
+    // Implementation for quick preview modal
+    console.log('Opening preview for asset:', assetId);
+}
+
+// Remove from library function
+function removeFromLibrary(assetId) {
+    if (confirm('Are you sure you want to remove this asset from your library?')) {
+        fetch(`/library/remove/${assetId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Remove the card from the DOM
+                const card = document.querySelector(`[data-asset-id="${assetId}"]`);
+                if (card) {
+                    card.style.transition = 'all 0.3s ease';
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.8)';
+                    setTimeout(() => card.remove(), 300);
+                }
+                
+                // Show success message
+                showNotification(data.message, 'success');
+                
+                // Update stats if necessary
+                updateLibraryStats();
+            } else {
+                showNotification(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Failed to remove asset from library.', 'error');
+        });
+    }
+}
+
+// Show notification function
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    // Add styles
+    notification.style.cssText = `
+        position: fixed;
+        top: 2rem;
+        right: 2rem;
+        background: ${type === 'success' ? '#10b981' : '#ef4444'};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Auto remove
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// Update library stats
+function updateLibraryStats() {
+    const assetCards = document.querySelectorAll('.library-asset-card');
+    const totalAssets = assetCards.length;
+    
+    // Update the stats in the hero section
+    const statNumbers = document.querySelectorAll('.stat-number');
+    if (statNumbers[0]) {
+        statNumbers[0].textContent = totalAssets;
+    }
+}
+
+// Toggle asset menu
+function toggleAssetMenu(assetId) {
+    console.log('Toggling menu for asset:', assetId);
+}
+</script>
+
 {% endblock %}
