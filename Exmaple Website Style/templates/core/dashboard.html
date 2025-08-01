@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - GameAssetHub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1>Welcome back, {{ user.username }}!</h1>
+                {% if user.is_seller %}
+                    <a href="{% url 'assets:create_asset' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add New Asset
+                    </a>
+                {% else %}
+                    <a href="{% url 'accounts:become_seller' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-store"></i> Become a Seller
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if is_seller %}
+        <!-- Seller Dashboard -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ stats.total_assets }}</h4>
+                                <p>Total Assets</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-box fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ stats.total_downloads }}</h4>
+                                <p>Downloads</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-download fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>${{ stats.total_revenue|floatformat:2 }}</h4>
+                                <p>Revenue</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-dollar-sign fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ stats.average_rating|floatformat:1 }}</h4>
+                                <p>Avg Rating</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-star fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Your Assets -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-box"></i> Your Assets</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if user_assets %}
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Asset</th>
+                                            <th>Category</th>
+                                            <th>Price</th>
+                                            <th>Downloads</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for asset in user_assets %}
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        {% if asset.preview_image %}
+                                                            <img src="{{ asset.preview_image.url }}" alt="{{ asset.title }}" class="me-2 rounded" width="40" height="40" style="object-fit: cover;">
+                                                        {% endif %}
+                                                        <div>
+                                                            <strong>{{ asset.title }}</strong><br>
+                                                            <small class="text-muted">{{ asset.created_at|date:"M d, Y" }}</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>{{ asset.category.name }}</td>
+                                                <td>
+                                                    {% if asset.is_free %}
+                                                        <span class="badge bg-success">FREE</span>
+                                                    {% else %}
+                                                        ${{ asset.price }}
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ asset.download_count }}</td>
+                                                <td>
+                                                    {% if asset.status == 'approved' %}
+                                                        <span class="badge bg-success">Approved</span>
+                                                    {% elif asset.status == 'pending' %}
+                                                        <span class="badge bg-warning">Pending</span>
+                                                    {% elif asset.status == 'rejected' %}
+                                                        <span class="badge bg-danger">Rejected</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">Draft</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group" role="group">
+                                                        <a href="{% url 'assets:asset_detail' asset.pk %}" class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                        <a href="{% url 'assets:edit_asset' asset.pk %}" class="btn btn-sm btn-outline-secondary">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <a href="{% url 'assets:delete_asset' asset.pk %}" class="btn btn-sm btn-outline-danger">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-box fa-3x text-muted mb-3"></i>
+                                <h5>No assets yet</h5>
+                                <p class="text-muted">Start by creating your first asset!</p>
+                                <a href="{% url 'assets:create_asset' %}" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Create Asset
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <!-- Buyer Dashboard -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-download"></i> Downloaded Assets</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if purchased_assets %}
+                            <div class="row">
+                                {% for asset in purchased_assets %}
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card">
+                                            {% if asset.preview_image %}
+                                                <img src="{{ asset.preview_image.url }}" class="card-img-top" alt="{{ asset.title }}" style="height: 120px; object-fit: cover;">
+                                            {% endif %}
+                                            <div class="card-body p-2">
+                                                <h6 class="card-title">{{ asset.title|truncatewords:3 }}</h6>
+                                                <p class="card-text small text-muted">by {{ asset.owner.username }}</p>
+                                                <a href="{% url 'assets:download_asset' asset.pk %}" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-download"></i> Download
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-download fa-3x text-muted mb-3"></i>
+                                <h5>No downloads yet</h5>
+                                <p class="text-muted">Start exploring our asset library!</p>
+                                <a href="{% url 'assets:asset_list' %}" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> Browse Assets
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-heart"></i> Wishlist</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if wishlist_assets %}
+                            <div class="row">
+                                {% for asset in wishlist_assets %}
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card">
+                                            {% if asset.preview_image %}
+                                                <img src="{{ asset.preview_image.url }}" class="card-img-top" alt="{{ asset.title }}" style="height: 120px; object-fit: cover;">
+                                            {% endif %}
+                                            <div class="card-body p-2">
+                                                <h6 class="card-title">{{ asset.title|truncatewords:3 }}</h6>
+                                                <p class="card-text small text-muted">by {{ asset.owner.username }}</p>
+                                                <div class="d-flex justify-content-between">
+                                                    <a href="{% url 'assets:asset_detail' asset.pk %}" class="btn btn-sm btn-outline-primary">
+                                                        View
+                                                    </a>
+                                                    <a href="{% url 'assets:remove_from_wishlist' asset.pk %}" class="btn btn-sm btn-outline-danger">
+                                                        <i class="fas fa-heart-broken"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-heart fa-3x text-muted mb-3"></i>
+                                <h5>No items in wishlist</h5>
+                                <p class="text-muted">Save assets you like for later!</p>
+                                <a href="{% url 'assets:asset_list' %}" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> Browse Assets
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

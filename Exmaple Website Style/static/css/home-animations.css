@@ -1,0 +1,92 @@
+/* Animations and visual polish for GameAssetHub home page */
+
+/* Fade-in for hero section */
+.fab-hero {
+  animation: fadeInUp 1s cubic-bezier(.4,2,.6,1);
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Carousel image zoom on hover */
+.hero-slide-img {
+  transition: transform 0.5s cubic-bezier(.4,2,.6,1), box-shadow 0.3s;
+}
+.hero-slide-img:hover {
+  transform: scale(1.04) rotate(-1deg);
+  box-shadow: 0 8px 32px rgba(255,179,71,0.18), 0 2px 12px rgba(102,126,234,0.12);
+}
+
+/* Card hover pop and shadow */
+.fab-product-card, .card {
+  transition: box-shadow 0.25s, transform 0.25s;
+}
+.fab-product-card:hover, .card:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 12px 32px rgba(255,179,71,0.18), 0 2px 12px rgba(102,126,234,0.12);
+  z-index: 2;
+}
+
+/* Button hover animation */
+.btn-fab-primary, .btn-outline-dark {
+  transition: box-shadow 0.2s, background 0.2s, color 0.2s, transform 0.2s;
+}
+.btn-fab-primary:hover, .btn-outline-dark:hover {
+  box-shadow: 0 4px 24px rgba(255,179,71,0.18), 0 2px 12px rgba(102,126,234,0.12);
+  transform: translateY(-2px) scale(1.04);
+}
+
+/* Tab button active/hover effect */
+.fab-featured-tabs .tab-btn {
+  position: relative;
+  overflow: hidden;
+}
+.fab-featured-tabs .tab-btn.active::after, .fab-featured-tabs .tab-btn:hover::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #ffb347 0%, #ffcc33 100%);
+  border-radius: 2px 2px 0 0;
+  animation: tabGlow 0.5s;
+}
+@keyframes tabGlow {
+  from { opacity: 0; transform: scaleX(0.5); }
+  to { opacity: 1; transform: scaleX(1); }
+}
+
+/* Category icon bounce on hover */
+.fab-category-link .fab-category-icon {
+  transition: transform 0.25s cubic-bezier(.4,2,.6,1);
+}
+.fab-category-link:hover .fab-category-icon {
+  transform: scale(1.18) rotate(-8deg);
+}
+
+/* Seller card hover effect */
+.seller-card {
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.seller-card:hover {
+  box-shadow: 0 8px 32px rgba(102,126,234,0.18), 0 2px 12px rgba(255,179,71,0.12);
+  transform: translateY(-6px) scale(1.04);
+}
+
+/* Fade-in for sections */
+section {
+  animation: fadeInSection 0.8s cubic-bezier(.4,2,.6,1);
+}
+@keyframes fadeInSection {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* CTA button pulse */
+.fab-cta-section .btn-fab-primary {
+  animation: ctaPulse 2.5s infinite cubic-bezier(.4,2,.6,1);
+}
+@keyframes ctaPulse {
+  0%, 100% { box-shadow: 0 2px 12px rgba(255,179,71,0.10); }
+  50% { box-shadow: 0 8px 32px rgba(255,179,71,0.18); }
+}

@@ -1,0 +1,653 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Main content starts here. Navigation is handled by base.html -->
+
+<!-- Modern Hero Section with Slideshow -->
+<section class="modern-hero d-flex flex-column justify-content-center align-items-center text-center py-7 position-relative" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 70vh;">
+  <!-- Background Pattern -->
+  <div class="hero-pattern position-absolute w-100 h-100" style="opacity: 0.1; background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><defs><pattern id=\"heroGrid\" width=\"20\" height=\"20\" patternUnits=\"userSpaceOnUse\"><circle cx=\"10\" cy=\"10\" r=\"1\" fill=\"white\" opacity=\"0.3\"/></pattern></defs><rect width=\"100\" height=\"100\" fill=\"url(%23heroGrid)\"/></svg>');"></div>
+  
+  <div class="container position-relative z-2">
+    <div class="row align-items-center">
+      <div class="col-lg-6 text-lg-start text-center">
+        <!-- Main Headline -->
+        <h1 class="display-3 fw-bold text-white mb-4" style="font-family: 'Poppins', sans-serif; line-height: 1.2;">
+          Create Amazing Games with 
+          <span class="text-warning" id="typed-text"></span>
+        </h1>
+        
+        <!-- Subheadline -->
+        <p class="lead text-white-50 mb-4" style="font-size: 1.25rem; font-family: 'Inter', sans-serif;">
+          Discover thousands of high-quality 3D models, textures, animations, and game assets from talented creators worldwide.
+        </p>
+        
+        <!-- Hero Actions -->
+        <div class="hero-actions d-flex flex-column flex-sm-row gap-3 justify-content-lg-start justify-content-center mb-5">
+          <a href="#featured-assets" class="btn btn-warning btn-lg px-5 py-3 rounded-pill fw-bold" style="box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);">
+            <i class="bi bi-search me-2"></i>Explore Assets
+          </a>
+          {% if not user.is_authenticated %}
+          <a href="{% url 'accounts:register' %}" class="btn btn-outline-light btn-lg px-5 py-3 rounded-pill fw-bold">
+            <i class="bi bi-person-plus me-2"></i>Join Free
+          </a>
+          {% endif %}
+        </div>
+        
+        <!-- Trust Indicators -->
+        <div class="trust-indicators d-flex flex-wrap justify-content-lg-start justify-content-center align-items-center gap-4 text-white-50">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-shield-check me-2 text-success"></i>
+            <span class="small">Quality Guaranteed</span>
+          </div>
+          <div class="d-flex align-items-center">
+            <i class="bi bi-download me-2 text-info"></i>
+            <span class="small">Instant Download</span>
+          </div>
+          <div class="d-flex align-items-center">
+            <i class="bi bi-people me-2 text-warning"></i>
+            <span class="small">1000+ Creators</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-6">
+        <!-- Hero Carousel -->
+        <div id="heroAssetCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+          <div class="carousel-inner rounded-4 overflow-hidden shadow-xl">
+            {% if featured_assets.limited_free|length > 0 %}
+              {% for slide in featured_assets.limited_free|slice:':3' %}
+              <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <div class="hero-slide-card bg-white rounded-4 p-4 m-3" style="box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);">
+                  <img src="{{ slide.preview_image.url }}" class="card-img-top rounded-3 mb-3" style="height: 200px; object-fit: cover;" alt="{{ slide.title }}">
+                  <h5 class="fw-bold mb-2">{{ slide.title }}</h5>
+                  <p class="text-muted mb-3">{{ slide.description|truncatewords:12 }}</p>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="badge bg-success px-3 py-2">FREE</span>
+                    <small class="text-muted">{{ slide.category.name }}</small>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="carousel-item active">
+                <div class="hero-slide-card bg-white rounded-4 p-4 m-3" style="box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);">
+                  <div class="placeholder-img bg-light rounded-3 mb-3 d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                  </div>
+                  <h5 class="fw-bold mb-2">Premium Game Assets</h5>
+                  <p class="text-muted mb-3">High-quality 3D models, textures, and animations ready for your game projects.</p>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="badge bg-primary px-3 py-2">Featured</span>
+                    <small class="text-muted">All Categories</small>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+          
+          <!-- Carousel Indicators -->
+          <div class="carousel-indicators">
+            {% for slide in featured_assets.limited_free|slice:':3' %}
+            <button type="button" data-bs-target="#heroAssetCarousel" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"{% endif %}></button>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Scroll Down Indicator -->
+  <div class="scroll-indicator position-absolute bottom-0 start-50 translate-middle-x mb-4">
+    <a href="#features" class="text-white-50 text-decoration-none">
+      <div class="scroll-down-arrow">
+        <i class="bi bi-chevron-down" style="font-size: 1.5rem; animation: bounce 2s infinite;"></i>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- Fab.com-style Featured Carousel -->
+<section class="fab-featured py-6 bg-light border-0">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <h2 class="fw-bold display-6 mb-0">Featured</h2>
+      <div class="fab-featured-tabs d-flex gap-2" role="tablist" aria-label="Featured asset categories">
+        <button class="tab-btn active btn btn-outline-dark px-4 py-2 rounded-pill shadow-sm" data-tab="limited-free" role="tab" aria-selected="true" aria-controls="tab-limited-free" id="tab-btn-limited-free">Limited-Time Free</button>
+        <button class="tab-btn btn btn-outline-dark px-4 py-2 rounded-pill shadow-sm" data-tab="on-sale" role="tab" aria-selected="false" aria-controls="tab-on-sale" id="tab-btn-on-sale">On Sale</button>
+        <button class="tab-btn btn btn-outline-dark px-4 py-2 rounded-pill shadow-sm" data-tab="recent" role="tab" aria-selected="false" aria-controls="tab-recent" id="tab-btn-recent">Recent</button>
+      </div>
+    </div>
+    <div id="featured-assets">
+      <div class="tab-content active" id="tab-limited-free">
+        <div id="fabFeaturedCarousel-limited-free" class="carousel slide fab-featured-carousel" data-bs-ride="carousel" data-bs-interval="7000">
+          <div class="carousel-inner">
+            {% if featured_assets.limited_free|length > 0 %}
+              {% for asset in featured_assets.limited_free %}
+              <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <div class="d-flex justify-content-center">
+                  <div class="card shadow-fab border-0 rounded-4 overflow-hidden fab-product-card featured-carousel-card">
+                    <div class="position-relative">
+                      <img src="{{ asset.preview_image.url }}" class="card-img-top fab-product-img" alt="Preview image for {{ asset.title }}">
+                      <div class="position-absolute top-0 end-0 m-2">
+                        <span class="badge bg-success px-2 py-1 rounded-pill">FREE</span>
+                      </div>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                      <h5 class="card-title text-center mb-2">{{ asset.title }}</h5>
+                      <p class="card-text text-center text-muted mb-3">{{ asset.description|truncatewords:12 }}</p>
+                      <div class="mt-auto">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <span class="badge bg-primary px-3 py-2">{{ asset.category.name }}</span>
+                          <div class="text-end">
+                            <small class="text-muted d-block">Downloads</small>
+                            <small class="fw-bold">{{ asset.downloads|default:"0" }}</small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 px-4 py-3">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'assets:asset_detail' asset.pk %}" class="btn btn-outline-primary btn-sm">View Details</a>
+                        <a href="{% url 'assets:asset_detail' asset.pk %}" class="btn btn-success btn-sm">Download</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="carousel-item active">
+                <div class="d-flex justify-content-center">
+                  <div class="card shadow-fab border-0 rounded-4 overflow-hidden fab-product-card featured-carousel-card">
+                    <div class="position-relative">
+                      <div class="fab-product-img d-flex align-items-center justify-content-center bg-light">
+                        <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                      </div>
+                      <div class="position-absolute top-0 end-0 m-2">
+                        <span class="badge bg-secondary px-2 py-1 rounded-pill">N/A</span>
+                      </div>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                      <h5 class="card-title text-center mb-2">No Limited-Time Free Assets</h5>
+                      <p class="card-text text-center text-muted mb-3">Check back soon for exclusive free assets and special offers!</p>
+                      <div class="mt-auto">
+                        <div class="d-flex justify-content-center">
+                          <span class="badge bg-info px-3 py-2">Coming Soon</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 px-4 py-3">
+                      <div class="d-flex justify-content-center">
+                        <a href="{% url 'assets:asset_list' %}" class="btn btn-outline-primary btn-sm">Browse All Assets</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#fabFeaturedCarousel-limited-free" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#fabFeaturedCarousel-limited-free" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+      </div>
+      <div class="tab-content" id="tab-on-sale" style="display:none;">
+        <div id="fabFeaturedCarousel-on-sale" class="carousel slide fab-featured-carousel" data-bs-ride="carousel" data-bs-interval="7000">
+          <div class="carousel-inner">
+            {% if featured_assets.on_sale|length > 0 %}
+              {% for asset in featured_assets.on_sale %}
+              <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <div class="d-flex justify-content-center">
+                  <div class="card shadow-fab border-0 rounded-4 overflow-hidden fab-product-card featured-carousel-card">
+                    <div class="position-relative">
+                      <img src="{{ asset.preview_image.url }}" class="card-img-top fab-product-img" alt="Preview image for {{ asset.title }}">
+                      <div class="position-absolute top-0 end-0 m-2">
+                        <span class="badge bg-danger px-2 py-1 rounded-pill">ON SALE</span>
+                      </div>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                      <h5 class="card-title text-center mb-2">{{ asset.title }}</h5>
+                      <p class="card-text text-center text-muted mb-3">{{ asset.description|truncatewords:12 }}</p>
+                      <div class="mt-auto">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <span class="badge bg-primary px-3 py-2">{{ asset.category.name }}</span>
+                          <div class="text-end">
+                            <small class="text-muted text-decoration-line-through d-block">${{ asset.original_price|default:"0.00" }}</small>
+                            <small class="fw-bold text-danger">${{ asset.price }}</small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 px-4 py-3">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'assets:asset_detail' asset.pk %}" class="btn btn-outline-primary btn-sm">View Details</a>
+                        <a href="{% url 'assets:asset_detail' asset.pk %}" class="btn btn-danger btn-sm">Buy Now</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="carousel-item active">
+                <div class="d-flex justify-content-center">
+                  <div class="card shadow-fab border-0 rounded-4 overflow-hidden fab-product-card featured-carousel-card">
+                    <div class="position-relative">
+                      <div class="fab-product-img d-flex align-items-center justify-content-center bg-light">
+                        <i class="bi bi-tag text-muted" style="font-size: 3rem;"></i>
+                      </div>
+                      <div class="position-absolute top-0 end-0 m-2">
+                        <span class="badge bg-secondary px-2 py-1 rounded-pill">N/A</span>
+                      </div>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                      <h5 class="card-title text-center mb-2">No On-Sale Assets</h5>
+                      <p class="card-text text-center text-muted mb-3">Check back soon for great deals and discounts!</p>
+                      <div class="mt-auto">
+                        <div class="d-flex justify-content-center">
+                          <span class="badge bg-warning px-3 py-2">Coming Soon</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 px-4 py-3">
+                      <div class="d-flex justify-content-center">
+                        <a href="{% url 'assets:asset_list' %}" class="btn btn-outline-primary btn-sm">Browse All Assets</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+                    </div>
+                    <div class="card-footer bg-white border-0 px-4 py-3 d-flex justify-content-between align-items-center w-100">
+                      <span class="badge bg-secondary px-3 py-2">N/A</span>
+                      <span class="badge bg-danger px-3 py-2">SALE</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#fabFeaturedCarousel-on-sale" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#fabFeaturedCarousel-on-sale" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+      </div>
+      <div class="tab-content" id="tab-recent" style="display:none;">
+        <div id="fabFeaturedCarousel-recent" class="carousel slide fab-featured-carousel" data-bs-ride="carousel" data-bs-interval="7000">
+          <div class="carousel-inner">
+            {% if featured_assets.recent|length > 0 %}
+              {% for asset in featured_assets.recent %}
+              <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <div class="d-flex justify-content-center">
+                  <div class="card shadow-fab border-0 rounded-4 overflow-hidden fab-product-card featured-carousel-card">
+                    <div class="position-relative">
+                      <img src="{{ asset.preview_image.url }}" class="card-img-top fab-product-img" alt="Preview image for {{ asset.title }}">
+                      <div class="position-absolute top-0 end-0 m-2">
+                        <span class="badge bg-info px-2 py-1 rounded-pill">NEW</span>
+                      </div>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                      <h5 class="card-title text-center mb-2">{{ asset.title }}</h5>
+                      <p class="card-text text-center text-muted mb-3">{{ asset.description|truncatewords:12 }}</p>
+                      <div class="mt-auto">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <span class="badge bg-primary px-3 py-2">{{ asset.category.name }}</span>
+                          <div class="text-end">
+                            {% if asset.is_free %}
+                              <small class="text-success fw-bold">FREE</small>
+                            {% else %}
+                              <small class="fw-bold">${{ asset.price }}</small>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 px-4 py-3">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'assets:asset_detail' asset.pk %}" class="btn btn-outline-primary btn-sm">View Details</a>
+                        {% if asset.is_free %}
+                          <a href="{% url 'assets:asset_detail' asset.pk %}" class="btn btn-success btn-sm">Download</a>
+                        {% else %}
+                          <a href="{% url 'assets:asset_detail' asset.pk %}" class="btn btn-primary btn-sm">Buy Now</a>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="carousel-item active">
+                <div class="d-flex justify-content-center">
+                  <div class="card shadow-fab border-0 rounded-4 overflow-hidden fab-product-card featured-carousel-card">
+                    <div class="position-relative">
+                      <div class="fab-product-img d-flex align-items-center justify-content-center bg-light">
+                        <i class="bi bi-clock text-muted" style="font-size: 3rem;"></i>
+                      </div>
+                      <div class="position-absolute top-0 end-0 m-2">
+                        <span class="badge bg-secondary px-2 py-1 rounded-pill">N/A</span>
+                      </div>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                      <h5 class="card-title text-center mb-2">No Recent Assets</h5>
+                      <p class="card-text text-center text-muted mb-3">Check back soon for the latest additions and updates!</p>
+                      <div class="mt-auto">
+                        <div class="d-flex justify-content-center">
+                          <span class="badge bg-info px-3 py-2">Coming Soon</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 px-4 py-3">
+                      <div class="d-flex justify-content-center">
+                        <a href="{% url 'assets:asset_list' %}" class="btn btn-outline-primary btn-sm">Browse All Assets</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#fabFeaturedCarousel-recent" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#fabFeaturedCarousel-recent" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="features-section py-6" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+  <div class="container">
+    <div class="section-header text-center mb-5">
+      <h2 class="display-5 fw-bold text-white mb-4">Why Choose GameAssetHub?</h2>
+      <p class="lead text-white-50 mb-4">Everything you need to create amazing games</p>
+      <div class="d-flex justify-content-center align-items-center gap-3 text-white-50">
+        <small><i class="bi bi-mouse me-1"></i>Click cards to learn more</small>
+        <small><i class="bi bi-arrow-left-right me-1"></i>Use arrow keys to navigate</small>
+      </div>
+    </div>
+    
+    <div class="row g-4">
+      <!-- Feature 1: Quality Assets -->
+      <div class="col-lg-4 col-md-6">
+        <div class="feature-card h-100 bg-white rounded-4 p-4 shadow-lg text-center" data-feature="quality">
+          <div class="feature-icon mb-3">
+            <div class="icon-wrapper d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea, #764ba2);">
+              <i class="bi bi-gem text-white" style="font-size: 2rem;"></i>
+            </div>
+          </div>
+          <h4 class="fw-bold mb-3">Premium Quality</h4>
+          <p class="text-muted mb-3">Handpicked assets from professional artists. Every item is reviewed for quality and performance optimization.</p>
+          <div class="feature-stats d-flex justify-content-center gap-3 text-sm">
+            <span class="badge bg-light text-dark">✓ Quality Tested</span>
+            <span class="badge bg-light text-dark">✓ Optimized</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Feature 2: Easy Integration -->
+      <div class="col-lg-4 col-md-6">
+        <div class="feature-card h-100 bg-white rounded-4 p-4 shadow-lg text-center" data-feature="integration">
+          <div class="feature-icon mb-3">
+            <div class="icon-wrapper d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea, #764ba2);">
+              <i class="bi bi-puzzle text-white" style="font-size: 2rem;"></i>
+            </div>
+          </div>
+          <h4 class="fw-bold mb-3">Easy Integration</h4>
+          <p class="text-muted mb-3">Ready-to-use assets compatible with Unity, Unreal Engine, Blender, and other popular game engines.</p>
+          <div class="feature-stats d-flex justify-content-center gap-2 text-sm">
+            <span class="badge bg-light text-dark">Unity</span>
+            <span class="badge bg-light text-dark">Unreal</span>
+            <span class="badge bg-light text-dark">Blender</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Feature 3: Affordable Pricing -->
+      <div class="col-lg-4 col-md-6">
+        <div class="feature-card h-100 bg-white rounded-4 p-4 shadow-lg text-center" data-feature="pricing">
+          <div class="feature-icon mb-3">
+            <div class="icon-wrapper d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea, #764ba2);">
+              <i class="bi bi-currency-dollar text-white" style="font-size: 2rem;"></i>
+            </div>
+          </div>
+          <h4 class="fw-bold mb-3">Fair Pricing</h4>
+          <p class="text-muted mb-3">Competitive prices with free assets available. Support indie developers with affordable rates and bulk discounts.</p>
+          <div class="feature-stats d-flex justify-content-center gap-3 text-sm">
+            <span class="badge bg-success text-white">Free Assets</span>
+            <span class="badge bg-light text-dark">Bulk Discounts</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Feature 4: Community Driven -->
+      <div class="col-lg-4 col-md-6">
+        <div class="feature-card h-100 bg-white rounded-4 p-4 shadow-lg text-center" data-feature="community">
+          <div class="feature-icon mb-3">
+            <div class="icon-wrapper d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea, #764ba2);">
+              <i class="bi bi-people text-white" style="font-size: 2rem;"></i>
+            </div>
+          </div>
+          <h4 class="fw-bold mb-3">Community Driven</h4>
+          <p class="text-muted mb-3">Join a thriving community of game developers and artists. Share knowledge, get feedback, and grow together.</p>
+          <div class="feature-stats d-flex justify-content-center gap-3 text-sm">
+            <span class="badge bg-light text-dark">1200+ Creators</span>
+            <span class="badge bg-light text-dark">Active Forums</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Feature 5: Instant Download -->
+      <div class="col-lg-4 col-md-6">
+        <div class="feature-card h-100 bg-white rounded-4 p-4 shadow-lg text-center" data-feature="download">
+          <div class="feature-icon mb-3">
+            <div class="icon-wrapper d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea, #764ba2);">
+              <i class="bi bi-download text-white" style="font-size: 2rem;"></i>
+            </div>
+          </div>
+          <h4 class="fw-bold mb-3">Instant Download</h4>
+          <p class="text-muted mb-3">Get your assets immediately after purchase. No waiting, no hassles - just instant access to your files.</p>
+          <div class="feature-stats d-flex justify-content-center gap-3 text-sm">
+            <span class="badge bg-warning text-dark">Instant Access</span>
+            <span class="badge bg-light text-dark">Secure Links</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Feature 6: Multiple Formats -->
+      <div class="col-lg-4 col-md-6">
+        <div class="feature-card h-100 bg-white rounded-4 p-4 shadow-lg text-center" data-feature="formats">
+          <div class="feature-icon mb-3">
+            <div class="icon-wrapper d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea, #764ba2);">
+              <i class="bi bi-file-earmark-code text-white" style="font-size: 2rem;"></i>
+            </div>
+          </div>
+          <h4 class="fw-bold mb-3">Multiple Formats</h4>
+          <p class="text-muted mb-3">Assets available in various formats (FBX, OBJ, PNG, etc.) to suit your specific project needs and workflow.</p>
+          <div class="feature-stats d-flex justify-content-center gap-2 text-sm">
+            <span class="badge bg-light text-dark">FBX</span>
+            <span class="badge bg-light text-dark">OBJ</span>
+            <span class="badge bg-light text-dark">PNG</span>
+            <span class="badge bg-light text-dark">+More</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Statistics Row -->
+    <div class="row mt-6 text-center">
+      <div class="col-md-3 col-6 mb-4">
+        <div class="stat-item" data-stat="assets">
+          <h3 class="display-4 fw-bold text-white mb-2" data-counter="5000">0</h3>
+          <p class="text-white-50 mb-0">Quality Assets</p>
+          <small class="text-white-50 d-block">Click to refresh</small>
+        </div>
+      </div>
+      <div class="col-md-3 col-6 mb-4">
+        <div class="stat-item" data-stat="creators">
+          <h3 class="display-4 fw-bold text-white mb-2" data-counter="1200">0</h3>
+          <p class="text-white-50 mb-0">Active Creators</p>
+          <small class="text-white-50 d-block">Click to refresh</small>
+        </div>
+      </div>
+      <div class="col-md-3 col-6 mb-4">
+        <div class="stat-item" data-stat="downloads">
+          <h3 class="display-4 fw-bold text-white mb-2" data-counter="25000">0</h3>
+          <p class="text-white-50 mb-0">Happy Downloads</p>
+          <small class="text-white-50 d-block">Click to refresh</small>
+        </div>
+      </div>
+      <div class="col-md-3 col-6 mb-4">
+        <div class="stat-item" data-stat="satisfaction">
+          <h3 class="display-4 fw-bold text-white mb-2" data-counter="98">0</h3>
+          <p class="text-white-50 mb-0">% Satisfaction</p>
+          <small class="text-white-50 d-block">Click to refresh</small>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Feature Navigation Hint -->
+    <div class="row mt-5">
+      <div class="col-12 text-center">
+        <div class="feature-navigation-hint">
+          <p class="text-white-50 mb-2">
+            <i class="bi bi-info-circle me-2"></i>
+            Interactive Features: Click any feature card above to learn more details
+          </p>
+          <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <span class="badge bg-light bg-opacity-20 text-white px-3 py-2">
+              <i class="bi bi-mouse me-1"></i>Click Cards
+            </span>
+            <span class="badge bg-light bg-opacity-20 text-white px-3 py-2">
+              <i class="bi bi-arrow-left-right me-1"></i>Arrow Keys
+            </span>
+            <span class="badge bg-light bg-opacity-20 text-white px-3 py-2">
+              <i class="bi bi-123 me-1"></i>Animated Stats
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Fab.com-style Horizontal Category Nav -->
+<section class="fab-categories py-4 bg-white" id="categories">
+  <div class="container">
+    <div class="fab-category-scroll d-flex gap-4 overflow-auto pb-2">
+      {% for category in categories %}
+        <a href="{% url 'core:category_detail' category.slug %}" class="fab-category-link d-flex flex-column align-items-center text-decoration-none px-3 py-2" aria-label="View category {{ category.name }}">
+          <span class="fab-category-icon mb-1 fs-2" aria-hidden="true">{{ category.icon }}</span>
+          <span class="fw-bold text-dark small">{{ category.name }}</span>
+        </a>
+      {% empty %}
+        <span class="text-muted">No categories available.</span>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Recent Assets Section -->
+<section class="recent-assets py-5" style="background: #f8fafc;">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <h2 class="fw-bold">Latest Assets</h2>
+            <p class="lead">Fresh content from our community</p>
+        </div>
+        <div class="row" id="recent-assets">
+            {% for asset in recent_assets %}
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 d-flex align-items-stretch">
+                    <div class="card h-100 shadow-fab border-0 rounded-4 overflow-hidden fab-product-card d-flex flex-column" style="box-shadow:0 2px 16px 0 rgba(0,0,0,0.06);">
+                        <img src="{{ asset.preview_image.url }}" class="card-img-top object-fit-cover fab-product-img mx-auto" alt="Preview image for {{ asset.title }}" style="height:180px;object-fit:cover;">
+                        <div class="card-body d-flex flex-column justify-content-between p-4">
+                            <h6 class="card-title fw-bold mb-2" style="font-family:'Poppins',Inter,sans-serif;font-size:1.1rem;">{{ asset.title }}</h6>
+                            <p class="card-text text-muted mb-0" style="font-size:0.97rem;">{{ asset.description|truncatewords:10 }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center">
+                    <p>No recent assets available.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Top Sellers Section -->
+<section class="top-sellers py-5" style="background: #fff;">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <h2 class="fw-bold">Top Sellers</h2>
+            <p class="lead">Meet our talented creators</p>
+        </div>
+        <div class="row seller-grid justify-content-center">
+            {% for seller in top_sellers %}
+                <div class="col-md-2 col-6 mb-4">
+                    <div class="card h-100 shadow-fab border-0 rounded-4 text-center seller-card p-3 d-flex flex-column align-items-center" style="box-shadow:0 2px 16px 0 rgba(0,0,0,0.06);">
+                        {% if seller.profile_picture %}
+                        <img src="{{ seller.profile_picture.url }}" alt="Profile picture of {{ seller.username }}" class="rounded-circle mb-2" width="60" height="60">
+                        {% else %}
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 60px; height: 60px;">
+                                <i class="fas fa-user" aria-label="No profile picture"></i>
+                            </div>
+                        {% endif %}
+                        <h6 class="card-title fw-bold mt-2 mb-1" style="font-family:'Poppins',Inter,sans-serif;font-size:1.05rem;">{{ seller.username }}</h6>
+                        <p class="card-text small text-muted mb-0" aria-label="Number of assets" style="font-size:0.97rem;">{{ seller.assets.count }} assets</p>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center">
+                    <p>No sellers available.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Fab.com-style Minimal CTA -->
+<section class="fab-cta-section py-7 bg-white text-center" style="background: #f8fafc;">
+  <div class="container">
+    <h2 class="display-5 fw-bold mb-4" style="font-family:'Poppins',Inter,sans-serif;letter-spacing:-1px;">Ready to Start Creating?</h2>
+    <p class="lead mb-5 text-secondary" style="font-size:1.15rem;">Join thousands of developers who trust <span style="color:#3b82f6;font-weight:600;">GameAssetHub</span> for their projects.</p>
+    {% if not user.is_authenticated %}
+      <a href="{% url 'accounts:register' %}" class="btn btn-fab-primary btn-lg px-5 py-3 rounded-pill" aria-label="Sign up for free" style="background:#3b82f6;border:none;color:#fff;font-family:'Poppins',Inter,sans-serif;font-weight:600;transition:background 0.2s;">Sign Up Free</a>
+    {% endif %}
+    {% if user.is_authenticated and not user.is_seller %}
+      <a href="{% url 'accounts:become_seller' %}" class="btn btn-outline-dark btn-lg px-5 py-3 rounded-pill ms-2" aria-label="Become a seller" style="border:2px solid #3b82f6;color:#3b82f6;font-family:'Poppins',Inter,sans-serif;font-weight:600;transition:background 0.2s;">Become a Seller</a>
+    {% endif %}
+  </div>
+</section>
+{# Ensure all if blocks are closed before endblock #}
+{# If you add more logic here, always close with endif before endblock #}
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<link rel="stylesheet" href="{% static 'css/home-animations.css' %}">
+<link rel="stylesheet" href="{% static 'css/custom-ui.css' %}">
+<link rel="stylesheet" href="{% static 'css/features.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/features.js' %}"></script>
+{% endblock %}

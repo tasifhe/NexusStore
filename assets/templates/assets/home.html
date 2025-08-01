@@ -1,117 +1,339 @@
 {% extends 'assets/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'assets/css/home.css' %}">
+{% endblock %}
 
 {% block content %}
-<div class="hero">
-    <div class="container">
-        <h1 class="hero-title"><i class="fas fa-gamepad"></i> Nexus Store</h1>
-        <p class="hero-subtitle">Discover thousands of free game development assets for your next project</p>
-        
-        <div class="search-container">
-            <form method="GET" action="{% url 'assets:search_assets' %}">
-                <input type="text" name="q" class="search-bar" placeholder="Search for 3D models, textures, audio, scripts..." value="{{ request.GET.q }}">
-                <button type="submit" class="search-btn">
-                    <i class="fas fa-search"></i>
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
 
-{# Featured Asset Section #}
-{% if featured_asset %}
-<div class="featured-asset-section">
-    <div class="container">
-        <div class="asset-detail-grid">
-            <div class="asset-image">
-                {% if featured_asset.thumbnail %}
-                    <img src="{{ featured_asset.thumbnail.url }}" alt="{{ featured_asset.title }}" loading="lazy" style="max-height:400px;object-fit:cover;width:100%;border-radius:var(--radius-xl);">
-                {% else %}
-                    <div class="asset-image empty-image" style="height:400px;display:flex;align-items:center;justify-content:center;">
-                        <i class="fas fa-image" style="font-size:4rem;"></i>
+<!-- Hero Section with Slideshow -->
+<section class="hero">
+    <div class="hero-slideshow">
+        <!-- Slide 1: Featured Content -->
+        <div class="hero-slide active" data-slide="featured">
+            <div class="hero-background" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <div class="hero-overlay"></div>
+            </div>
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <span class="hero-badge">🔥 Featured Content</span>
+                        <h1 class="hero-title">Premium Game Assets</h1>
+                        <p class="hero-subtitle">Discover hand-picked, high-quality 3D models, textures, and animations from top creators</p>
+                        <div class="hero-actions">
+                            <a href="{% url 'assets:asset_list' %}" class="btn btn-primary btn-large">Browse Featured</a>
+                            <a href="#featured-content" class="btn btn-outline btn-large">View Collection</a>
+                        </div>
                     </div>
-                {% endif %}
-                <div style="position:absolute;top:18px;left:18px;z-index:3;display:flex;gap:0.5rem;">
-                    {% if featured_asset.is_new %}
-                        <span class="badge" style="background:linear-gradient(90deg,#ff4fd8 60%,#ffd700 100%);color:#232a45;">NEW</span>
-                    {% endif %}
-                    {% if featured_asset.is_free %}
-                        <span class="badge" style="background:linear-gradient(90deg,#10b981 60%,#3b82f6 100%);color:#fffbe8;">FREE</span>
-                    {% endif %}
+                    <div class="hero-visual">
+                        <div class="featured-grid">
+                            <div class="featured-item">🏰</div>
+                            <div class="featured-item">⚔️</div>
+                            <div class="featured-item">🌲</div>
+                            <div class="featured-item">🎨</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="asset-info">
-                <h2 class="asset-title" style="font-size:2rem;">{{ featured_asset.title }}</h2>
-                <p class="asset-creator">by {{ featured_asset.creator.get_full_name|default:featured_asset.creator.username }}</p>
-                {% if featured_asset.rating %}
-                    <span class="asset-rating" style="display:inline-flex;align-items:center;gap:0.18rem;font-size:1.1rem;color:var(--warning);margin-bottom:0.5rem;">
-                        {% for i in "12345" %}
-                            {% if forloop.counter <= featured_asset.rating|floatformat:0 %}
-                                <i class="fas fa-star"></i>
-                            {% elif forloop.counter == featured_asset.rating|floatformat:0|add:'1' and featured_asset.rating|floatformat:1|stringformat:'s'|slice:'-1' == '5' %}
-                                <i class="fas fa-star-half-alt"></i>
-                            {% else %}
-                                <i class="far fa-star"></i>
-                            {% endif %}
-                        {% endfor %}
-                        <span style="color:var(--text-secondary);font-size:0.98rem;margin-left:0.4rem;">{{ featured_asset.rating|floatformat:1 }}</span>
-                    </span>
-                {% endif %}
-                {% if featured_asset.category %}
-                    <span class="asset-category">{{ featured_asset.category.name }}</span>
-                {% endif %}
-                <p class="asset-description" style="font-size:1.1rem;line-height:1.7;">{{ featured_asset.description|truncatewords:30 }}</p>
-                <a href="{% url 'assets:asset_detail' featured_asset.id %}" class="btn btn-primary" style="margin-top:1.2rem;">
-                    <i class="fas fa-eye"></i> View Featured Asset
-                </a>
-            </div>
         </div>
-    </div>
-</div>
-{% endif %}
 
-<div class="section-spacing">
-    <div class="categories">
+        <!-- Slide 2: Categories -->
+        <div class="hero-slide" data-slide="categories">
+            <div class="hero-background" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <div class="hero-overlay"></div>
+            </div>
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <span class="hero-badge">📂 Categories</span>
+                        <h1 class="hero-title">Everything You Need</h1>
+                        <p class="hero-subtitle">Browse through our extensive collection of game assets organized by category</p>
+                        <div class="hero-actions">
+                            <a href="#categories" class="btn btn-primary btn-large">Explore Categories</a>
+                            <a href="{% url 'assets:asset_list' %}" class="btn btn-outline btn-large">View All</a>
+                        </div>
+                    </div>
+                    <div class="hero-visual">
+                        <div class="category-showcase">
+                            {% for category in categories|slice:":6" %}
+                            <div class="category-item">
+                                <div class="category-icon">
+                                    {% if category.name == '2D Art' %}🎨
+                                    {% elif category.name == '3D Models' %}🏛️
+                                    {% elif category.name == 'Audio' %}🎵
+                                    {% elif category.name == 'Textures' %}🌳
+                                    {% elif category.name == 'Scripts' %}⚔️
+                                    {% elif category.name == 'Animations' %}🎭
+                                    {% else %}🏢{% endif %}
+                                </div>
+                                <span>{{ category.name }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: New Assets -->
+        <div class="hero-slide" data-slide="new">
+            <div class="hero-background" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <div class="hero-overlay"></div>
+            </div>
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <span class="hero-badge">✨ New Releases</span>
+                        <h1 class="hero-title">Fresh Content Daily</h1>
+                        <p class="hero-subtitle">Stay up-to-date with the latest game assets from our talented creator community</p>
+                        <div class="hero-actions">
+                            <a href="#recent-assets" class="btn btn-primary btn-large">View New Assets</a>
+                            <a href="{% url 'assets:register' %}" class="btn btn-outline btn-large">Subscribe</a>
+                        </div>
+                    </div>
+                    <div class="hero-visual">
+                        <div class="new-assets-grid">
+                            {% for asset in recent_assets|slice:":3" %}
+                            <div class="new-asset-item">
+                                <div class="asset-preview">
+                                    {% if asset.category.name == '3D Models' %}🐉
+                                    {% elif asset.category.name == 'Textures' %}🌊
+                                    {% elif asset.category.name == 'Audio' %}🎵
+                                    {% else %}🏔️{% endif %}
+                                </div>
+                                <div class="asset-info">
+                                    <span class="asset-title">{{ asset.title|truncatewords:2 }}</span>
+                                    <span class="asset-date">{{ asset.created_at|timesince }} ago</span>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="new-asset-item">
+                                <div class="asset-preview">🐉</div>
+                                <div class="asset-info">
+                                    <span class="asset-title">Dragon Pack</span>
+                                    <span class="asset-date">2 days ago</span>
+                                </div>
+                            </div>
+                            <div class="new-asset-item">
+                                <div class="asset-preview">🌊</div>
+                                <div class="asset-info">
+                                    <span class="asset-title">Ocean Shader</span>
+                                    <span class="asset-date">3 days ago</span>
+                                </div>
+                            </div>
+                            <div class="new-asset-item">
+                                <div class="asset-preview">🏔️</div>
+                                <div class="asset-info">
+                                    <span class="asset-title">Mountain Terrain</span>
+                                    <span class="asset-date">5 days ago</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Free Content -->
+        <div class="hero-slide" data-slide="free">
+            <div class="hero-background" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                <div class="hero-overlay"></div>
+            </div>
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <span class="hero-badge">🎁 Free Assets</span>
+                        <h1 class="hero-title">Get Started for Free</h1>
+                        <p class="hero-subtitle">Download high-quality game assets at no cost and kickstart your game development journey</p>
+                        <div class="hero-actions">
+                            <a href="{% url 'assets:asset_list' %}?free=true" class="btn btn-primary btn-large">Browse Free Assets</a>
+                            <a href="{% url 'assets:register' %}" class="btn btn-outline btn-large">Join Now</a>
+                        </div>
+                    </div>
+                    <div class="hero-visual">
+                        <div class="free-assets-grid">
+                            <div class="free-asset-item">
+                                <div class="asset-icon">🎮</div>
+                                <div class="free-badge">FREE</div>
+                            </div>
+                            <div class="free-asset-item">
+                                <div class="asset-icon">🎯</div>
+                                <div class="free-badge">FREE</div>
+                            </div>
+                            <div class="free-asset-item">
+                                <div class="asset-icon">🎪</div>
+                                <div class="free-badge">FREE</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide Navigation -->
+        <div class="hero-nav">
+            <button class="hero-nav-btn prev" onclick="changeSlide(-1)">❮</button>
+            <button class="hero-nav-btn next" onclick="changeSlide(1)">❯</button>
+        </div>
+
+        <!-- Slide Indicators -->
+        <div class="hero-indicators">
+            <button class="indicator active" onclick="currentSlide(1)"></button>
+            <button class="indicator" onclick="currentSlide(2)"></button>
+            <button class="indicator" onclick="currentSlide(3)"></button>
+            <button class="indicator" onclick="currentSlide(4)"></button>
+        </div>
+
+        <!-- Slideshow Progress Bar -->
+        <div class="slideshow-progress">
+            <div class="progress-bar"></div>
+        </div>
+    </div>
+
+    <!-- Hero Stats -->
+    <div class="hero-stats-section">
         <div class="container">
-            <h2 class="section-title category-title">Browse by Category</h2>
-            <div class="category-grid">
-                {% for category in categories %}
-                <a href="{% url 'assets:category_assets' category.slug %}" class="category-card">
-                    <i class="fas fa-{% if category.name == '2D Art' %}paint-brush{% elif category.name == '3D Models' %}cube{% elif category.name == 'Audio' %}music{% elif category.name == 'Textures' %}image{% elif category.name == 'Scripts' %}code{% elif category.name == 'Animations' %}play{% elif category.name == 'UI Elements' %}window-maximize{% else %}folder{% endif %}"></i>
-                    <h3>{{ category.name }}</h3>
-                </a>
-                {% endfor %}
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-number">50K+</span>
+                    <span class="stat-label">Assets</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">10K+</span>
+                    <span class="stat-label">Creators</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">1M+</span>
+                    <span class="stat-label">Downloads</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">150+</span>
+                    <span class="stat-label">Countries</span>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</section>
+
+<!-- Featured Content Section -->
+<section class="featured-content" id="featured-content">
+    <div class="container">
+        <div class="section-header">
+            <h2>Featured Content</h2>
+            <div class="section-tabs">
+                <button class="tab-btn active" data-tab="limited-free">Limited-Time Free</button>
+                <button class="tab-btn" data-tab="on-sale">On Sale</button>
+                <button class="tab-btn" data-tab="recent">Recent Releases</button>
+            </div>
+        </div>
+        
+        <div class="asset-grid" id="featured-assets">
+            <!-- Asset cards will be populated by JavaScript or show featured asset -->
+            {% if featured_asset %}
+            <div class="featured-asset-card-horizontal">
+                <div class="asset-image-container">
+                    {% if featured_asset.thumbnail %}
+                        <img src="{{ featured_asset.thumbnail.url }}" alt="{{ featured_asset.title }}" class="featured-asset-image">
+                    {% else %}
+                        <div class="featured-asset-placeholder">
+                            <i class="fas fa-image"></i>
+                        </div>
+                    {% endif %}
+                    <div class="asset-badges">
+                        {% if featured_asset.is_new %}
+                            <span class="badge badge-new">NEW</span>
+                        {% endif %}
+                        {% if featured_asset.is_free %}
+                            <span class="badge badge-free">FREE</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="featured-asset-info">
+                    <h3 class="featured-asset-title">{{ featured_asset.title }}</h3>
+                    <p class="featured-asset-creator">by {{ featured_asset.creator.get_full_name|default:featured_asset.creator.username }}</p>
+                    {% if featured_asset.rating %}
+                        <div class="asset-rating">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= featured_asset.rating|floatformat:0 %}
+                                    <i class="fas fa-star"></i>
+                                {% elif forloop.counter == featured_asset.rating|floatformat:0|add:'1' and featured_asset.rating|floatformat:1|stringformat:'s'|slice:'-1' == '5' %}
+                                    <i class="fas fa-star-half-alt"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="rating-value">{{ featured_asset.rating|floatformat:1 }}</span>
+                        </div>
+                    {% endif %}
+                    {% if featured_asset.category %}
+                        <span class="asset-category-tag">{{ featured_asset.category.name }}</span>
+                    {% endif %}
+                    <p class="featured-asset-description">{{ featured_asset.description|truncatewords:20 }}</p>
+                    <a href="{% url 'assets:asset_detail' featured_asset.id %}" class="btn btn-primary">
+                        <i class="fas fa-eye"></i> View Featured Asset
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="section categories" id="categories">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Browse by Category</h2>
+            <p class="section-subtitle">Find assets that match your project needs</p>
+        </div>
+        <div class="category-grid">
+            {% for category in categories %}
+            <a href="{% url 'assets:category_assets' category.slug %}" class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-{% if category.name == '2D Art' %}paint-brush{% elif category.name == '3D Models' %}cube{% elif category.name == 'Audio' %}music{% elif category.name == 'Textures' %}image{% elif category.name == 'Scripts' %}code{% elif category.name == 'Animations' %}play{% elif category.name == 'UI Elements' %}window-maximize{% else %}folder{% endif %}"></i>
+                </div>
+                <h3>{{ category.name }}</h3>
+                <p>Explore our collection</p>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
 
 {% if recent_assets %}
-<div class="recent-assets-section">
+<section class="section recent-assets" id="recent-assets">
     <div class="container">
-        <h2 class="section-title recent-assets-title">Recent Assets</h2>
+        <div class="section-header">
+            <h2 class="section-title">Recent Assets</h2>
+            <p class="section-subtitle">Latest additions from our creator community</p>
+        </div>
         <div class="asset-grid">
             {% for asset in recent_assets %}
             <div class="asset-card" onclick="window.location.href='{% url 'assets:asset_detail' asset.id %}'">
-                <div style="position:absolute;top:16px;left:16px;z-index:3;display:flex;gap:0.5rem;">
-                    {% if asset.is_new %}
-                        <span class="badge" style="background:linear-gradient(90deg,#ff4fd8 60%,#ffd700 100%);color:#232a45;">NEW</span>
+                <div class="asset-image-wrapper">
+                    {% if asset.thumbnail %}
+                        <img src="{{ asset.thumbnail.url }}" alt="{{ asset.title }}" class="asset-image">
+                    {% else %}
+                        <div class="asset-image-placeholder">
+                            <i class="fas fa-image"></i>
+                        </div>
                     {% endif %}
-                    {% if asset.is_free %}
-                        <span class="badge" style="background:linear-gradient(90deg,#10b981 60%,#3b82f6 100%);color:#fffbe8;">FREE</span>
-                    {% endif %}
-                </div>
-                {% if asset.thumbnail %}
-                    <img src="{{ asset.thumbnail.url }}" alt="{{ asset.title }}" class="asset-image">
-                {% else %}
-                    <div class="asset-image empty-image">
-                        <i class="fas fa-image"></i>
+                    <div class="asset-badges">
+                        {% if asset.is_new %}
+                            <span class="badge badge-new">NEW</span>
+                        {% endif %}
+                        {% if asset.is_free %}
+                            <span class="badge badge-free">FREE</span>
+                        {% endif %}
                     </div>
-                {% endif %}
-                <div class="asset-info">
-                    <h3 class="asset-title">{{ asset.title }}</h3>
-                    <p class="asset-creator">by {{ asset.creator.get_full_name|default:asset.creator.username }}</p>
+                </div>
+                <div class="asset-card-info">
+                    <h3 class="asset-card-title">{{ asset.title }}</h3>
+                    <p class="asset-card-creator">by {{ asset.creator.get_full_name|default:asset.creator.username }}</p>
                     {% if asset.rating %}
-                        <span class="asset-rating" style="display:inline-flex;align-items:center;gap:0.13rem;font-size:1rem;color:var(--warning);margin-bottom:0.3rem;">
+                        <div class="asset-rating">
                             {% for i in "12345" %}
                                 {% if forloop.counter <= asset.rating|floatformat:0 %}
                                     <i class="fas fa-star"></i>
@@ -121,13 +343,13 @@
                                     <i class="far fa-star"></i>
                                 {% endif %}
                             {% endfor %}
-                            <span style="color:var(--text-secondary);font-size:0.93rem;margin-left:0.3rem;">{{ asset.rating|floatformat:1 }}</span>
-                        </span>
+                            <span class="rating-value">{{ asset.rating|floatformat:1 }}</span>
+                        </div>
                     {% endif %}
                     {% if asset.category %}
-                        <span class="asset-category">{{ asset.category.name }}</span>
+                        <span class="asset-category-tag">{{ asset.category.name }}</span>
                     {% endif %}
-                    <p class="asset-description">
+                    <p class="asset-card-description">
                         {{ asset.description|truncatewords:15 }}
                     </p>
                 </div>
@@ -135,48 +357,167 @@
             {% endfor %}
         </div>
         
-        <div class="view-all-assets">
-            <a href="{% url 'assets:asset_list' %}" class="btn btn-primary">
+        <div class="view-all-section">
+            <a href="{% url 'assets:asset_list' %}" class="btn btn-primary btn-lg">
                 <i class="fas fa-arrow-right"></i> View All Assets
             </a>
         </div>
     </div>
-</div>
+</section>
 {% endif %}
 
-<div class="content-wrapper community-cta">
+<!-- Newsletter Section -->
+<section class="newsletter">
     <div class="container">
-        <div class="community-cta-card" style="background:linear-gradient(135deg,rgba(0,245,255,0.10) 0%,rgba(140,82,255,0.10) 100%);border-radius:var(--r-xl);box-shadow:0 4px 32px 0 rgba(0,245,255,0.08),var(--shadow-md);padding:2.5rem 2rem 2rem 2rem;max-width:600px;margin:0 auto 2.5rem auto;text-align:center;position:relative;overflow:hidden;">
-            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
-                <span style="display:inline-flex;align-items:center;justify-content:center;width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,var(--accent-cyan),var(--accent-purple));box-shadow:0 2px 16px 0 rgba(0,245,255,0.13);margin-bottom:1.2rem;">
-                    <i class="fas fa-users" style="font-size:2.3rem;color:#fff;"></i>
-                </span>
-                <h2 class="community-title" style="font-size:2.1rem;font-weight:800;color:var(--text-100);margin-bottom:0.7rem;letter-spacing:0.01em;">Join Our Community</h2>
-                <p class="community-desc" style="font-size:1.15rem;color:var(--text-300);margin-bottom:2rem;max-width:420px;margin-left:auto;margin-right:auto;">
-                    Share your creations with fellow game developers and download assets for free educational use.
-                </p>
-                {% if not user.is_authenticated %}
-                <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;">
-                    <a href="{% url 'assets:register' %}" class="btn btn-primary join-btn" style="min-width:150px;font-size:1.08rem;">
-                        <i class="fas fa-user-plus"></i> Join Now
-                    </a>
-                    <a href="{% url 'assets:login' %}" class="btn btn-secondary login-btn" style="min-width:120px;font-size:1.08rem;">
-                        <i class="fas fa-sign-in-alt"></i> Login
-                    </a>
-                </div>
-                {% elif not user.userprofile.is_verified %}
-                <p class="alert-info alert-info-community" style="margin-top:1.5rem;font-size:1.05rem;background:rgba(59,130,246,0.08);color:var(--accent-cyan);border-radius:var(--r-lg);padding:1rem 1.2rem;">
-                    <i class="fas fa-info-circle"></i> 
-                    Contact admin to get verified and start uploading your assets!
-                </p>
-                {% else %}
-                <a href="{% url 'assets:upload_asset' %}" class="btn btn-primary" style="min-width:180px;font-size:1.08rem;margin-top:1rem;">
-                    <i class="fas fa-upload"></i> Upload Your Asset
+        <div class="newsletter-content">
+            <h2>Join Our Community</h2>
+            <p>Share your creations with fellow game developers and download assets for free educational use.</p>
+            {% if not user.is_authenticated %}
+            <div class="cta-buttons">
+                <a href="{% url 'assets:register' %}" class="btn btn-primary">
+                    <i class="fas fa-user-plus"></i> Join Now
                 </a>
-                {% endif %}
+                <a href="{% url 'assets:login' %}" class="btn btn-secondary">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
             </div>
+            {% elif not user.userprofile.is_verified %}
+            <div class="alert-info-community">
+                <i class="fas fa-info-circle"></i> 
+                Contact admin to get verified and start uploading your assets!
+            </div>
+            {% else %}
+            <a href="{% url 'assets:upload_asset' %}" class="btn btn-primary">
+                <i class="fas fa-upload"></i> Upload Your Asset
+            </a>
+            {% endif %}
         </div>
     </div>
-</div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Hero Slideshow Variables
+let currentSlideIndex = 0;
+let slideInterval;
+const slideAutoAdvanceDelay = 8000; // 8 seconds
+const slideTransitionDuration = 800; // 0.8 seconds
+
+// Initialize slideshow when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initializeHeroSlideshow();
+});
+
+// Hero Slideshow Functions
+function initializeHeroSlideshow() {
+    const slides = document.querySelectorAll('.hero-slide');
+    const indicators = document.querySelectorAll('.indicator');
+    
+    if (slides.length === 0) return;
+    
+    // Set up initial state
+    updateSlideVisibility();
+    
+    // Start auto-advance
+    startSlideshow();
+    
+    // Pause slideshow on hover
+    const heroSection = document.querySelector('.hero');
+    if (heroSection) {
+        heroSection.addEventListener('mouseenter', pauseSlideshow);
+        heroSection.addEventListener('mouseleave', startSlideshow);
+    }
+}
+
+function updateSlideVisibility() {
+    const slides = document.querySelectorAll('.hero-slide');
+    const indicators = document.querySelectorAll('.indicator');
+    
+    slides.forEach((slide, index) => {
+        slide.classList.remove('active', 'prev');
+        if (index === currentSlideIndex) {
+            slide.classList.add('active');
+        } else if (index === currentSlideIndex - 1 || (currentSlideIndex === 0 && index === slides.length - 1)) {
+            slide.classList.add('prev');
+        }
+    });
+    
+    // Update indicators
+    indicators.forEach((indicator, index) => {
+        indicator.classList.toggle('active', index === currentSlideIndex);
+    });
+    
+    // Update progress bar
+    updateProgressBar();
+}
+
+function updateProgressBar() {
+    const progressBar = document.querySelector('.progress-bar');
+    if (progressBar) {
+        const progress = ((currentSlideIndex + 1) / document.querySelectorAll('.hero-slide').length) * 100;
+        progressBar.style.width = progress + '%';
+    }
+}
+
+function startSlideshow() {
+    clearInterval(slideInterval);
+    slideInterval = setInterval(() => {
+        nextSlide();
+    }, slideAutoAdvanceDelay);
+}
+
+function pauseSlideshow() {
+    clearInterval(slideInterval);
+}
+
+function nextSlide() {
+    const slides = document.querySelectorAll('.hero-slide');
+    currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+    updateSlideVisibility();
+}
+
+function prevSlide() {
+    const slides = document.querySelectorAll('.hero-slide');
+    currentSlideIndex = (currentSlideIndex - 1 + slides.length) % slides.length;
+    updateSlideVisibility();
+}
+
+function changeSlide(direction) {
+    if (direction === 1) {
+        nextSlide();
+    } else {
+        prevSlide();
+    }
+    // Restart auto-advance
+    startSlideshow();
+}
+
+function currentSlide(index) {
+    currentSlideIndex = index - 1;
+    updateSlideVisibility();
+    // Restart auto-advance
+    startSlideshow();
+}
+
+// Tab functionality for featured content
+document.addEventListener('DOMContentLoaded', function() {
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Here you can add logic to load different content based on the tab
+            const tabType = this.getAttribute('data-tab');
+            console.log('Loading content for:', tabType);
+        });
+    });
+});
+</script>
 {% endblock %}
 

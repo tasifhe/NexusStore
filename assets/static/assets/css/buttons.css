@@ -1,0 +1,92 @@
+/* buttons.css: Button Styles */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    padding: .875rem 1.75rem;
+    border: none;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    font-size: .875rem;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+/* Modern Primary Button */
+.btn-primary {
+    background-color: var(--primary-color);
+    color: var(--white);
+    box-shadow: var(--box-shadow);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    text-decoration: none;
+    color: var(--white);
+}
+
+/* Modern Secondary Button */
+.btn-secondary {
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--primary-color);
+    color: var(--white);
+    text-decoration: none;
+}
+
+/* Legacy styles for backward compatibility */
+.btn-primary.legacy {
+    background: linear-gradient(135deg,var(--accent-cyan),var(--accent-purple));
+    color: #000;
+    box-shadow: var(--shadow-md),var(--glow-cyan);
+    border-radius: var(--r-full);
+}
+
+.btn-primary.legacy:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: var(--shadow-lg),var(--glow-cyan);
+}
+
+.btn-secondary.legacy {
+    background: rgba(255,255,255,.08);
+    color: var(--text-secondary);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: var(--r-full);
+}
+.btn-secondary:hover {
+    background: rgba(255,255,255,.15);
+    transform: translateY(-2px);
+}
+.profile-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(0,245,255,0.10), rgba(140,82,255,0.10));
+    color: var(--text-primary);
+    font-size: 2.1rem;
+    border: 2.5px solid var(--accent-cyan);
+    cursor: pointer;
+    transition: color 0.18s, border-color 0.18s, box-shadow 0.18s, background 0.18s;
+    outline: none;
+    box-shadow: 0 2px 16px 0 rgba(0,245,255,0.10);
+}
+.profile-btn:hover, .profile-btn:focus {
+    color: var(--accent-cyan);
+    background: linear-gradient(135deg, rgba(0,245,255,0.18), rgba(140,82,255,0.18));
+    border-color: var(--accent-purple);
+    box-shadow: 0 4px 24px 0 rgba(140,82,255,0.18), 0 0 0 4px rgba(0,245,255,0.10);
+    text-shadow: 0 2px 12px var(--accent-cyan);
+}

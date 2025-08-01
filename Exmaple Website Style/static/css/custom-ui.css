@@ -1,0 +1,233 @@
+/* Custom UI refinements for GameAssetHub */
+
+body {
+  font-family: 'Poppins', 'Inter', Arial, sans-serif;
+  background: #f6f8fa;
+  color: #23272f;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', 'Inter', Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.fab-product-card, .seller-card {
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.06);
+  border-radius: 1.25rem;
+  background: #fff;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.fab-product-card:hover, .seller-card:hover {
+  box-shadow: 0 6px 32px 0 rgba(59,130,246,0.12);
+  transform: translateY(-4px) scale(1.02);
+}
+
+.card-title, .fw-bold {
+  font-weight: 600 !important;
+}
+
+.btn-fab-primary {
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-weight: 600;
+  font-family: 'Poppins', 'Inter', Arial, sans-serif;
+  letter-spacing: 0.5px;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px 0 rgba(59,130,246,0.08);
+}
+.btn-fab-primary:hover, .btn-fab-primary:focus {
+  background: #2563eb;
+  color: #fff;
+  box-shadow: 0 4px 16px 0 rgba(59,130,246,0.16);
+}
+
+.btn-outline-dark {
+  border-radius: 999px;
+  border: 2px solid #3b82f6;
+  color: #3b82f6;
+  background: #fff;
+  font-weight: 600;
+  font-family: 'Poppins', 'Inter', Arial, sans-serif;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+}
+.btn-outline-dark:hover, .btn-outline-dark:focus {
+  background: #3b82f6;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+input, textarea, select {
+  border-radius: 0.75rem;
+  border: 1.5px solid #e5e7eb;
+  font-family: 'Inter', Arial, sans-serif;
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+  outline: none;
+}
+
+.fab-category-link {
+  background: #fff;
+  border-radius: 1rem;
+  padding: 0.75rem 1.25rem;
+  box-shadow: 0 1px 6px 0 rgba(59,130,246,0.04);
+  transition: box-shadow 0.2s, background 0.2s;
+}
+.fab-category-link:hover, .fab-category-link:focus {
+  background: #e0e7ff;
+  box-shadow: 0 2px 12px 0 rgba(59,130,246,0.10);
+  text-decoration: none;
+}
+
+.badge.bg-success {
+  background: #22c55e !important;
+}
+.badge.bg-danger {
+  background: #ef4444 !important;
+}
+.badge.bg-dark {
+  background: #23272f !important;
+}
+.badge.bg-secondary {
+  background: #a1a1aa !important;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  background: #f3f4f6;
+}
+::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 8px;
+}
+
+/* Animations & Microinteractions */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes blurIn {
+  from { filter: blur(8px); opacity: 0.5; }
+  to { filter: blur(0); opacity: 1; }
+}
+
+.asset-card, .fab-product-card, .seller-card {
+  transition: box-shadow 0.4s cubic-bezier(0.4,0,0.2,1), transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  animation: fadeInUp 0.7s cubic-bezier(0.4,0,0.2,1) both;
+}
+.asset-card:hover, .fab-product-card:hover, .seller-card:hover {
+  box-shadow: 0 16px 40px -8px rgba(80, 28, 110, 0.18);
+  transform: translateY(-8px) scale(1.03);
+}
+
+.btn, .btn-fab-primary, .btn-outline-dark {
+  border-radius: 2em;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+}
+.btn:hover, .btn:focus, .btn-fab-primary:hover, .btn-fab-primary:focus, .btn-outline-dark:hover, .btn-outline-dark:focus {
+  background: #2563eb;
+  color: #fff;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 16px 0 rgba(59,130,246,0.16);
+}
+
+.fab-category-link {
+  position: relative;
+  overflow: hidden;
+}
+.fab-category-link::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 0;
+  height: 3px;
+  background: #3b82f6;
+  transition: width 0.3s, left 0.3s;
+}
+.fab-category-link:hover::after, .fab-category-link:focus::after {
+  width: 80%;
+  left: 10%;
+}
+
+/* Skeleton Loader */
+.skeleton {
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.2s infinite linear;
+  border-radius: 0.5em;
+}
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Modal Animations */
+.modal.fade .modal-dialog {
+  transform: scale(0.95);
+  opacity: 0;
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.modal.show .modal-dialog {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Carousel/Slideshow Animations */
+.carousel-item {
+  transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1);
+}
+.carousel-item-next.carousel-item-left,
+.carousel-item-prev.carousel-item-right {
+  opacity: 0;
+  transform: translateX(50px);
+}
+.carousel-indicators .active {
+  background: #3b82f6;
+  transition: background 0.3s;
+}
+
+/* Lazy load blur-up */
+img[data-blur] {
+  filter: blur(8px);
+  transition: filter 0.5s;
+}
+img[data-blur].loaded {
+  filter: blur(0);
+}
+
+/* Dark mode toggle (basic) */
+body.dark-mode {
+  background: #18181b;
+  color: #f3f4f6;
+}
+body.dark-mode .card, body.dark-mode .fab-product-card, body.dark-mode .seller-card {
+  background: #23272f;
+  color: #f3f4f6;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.18);
+}
+body.dark-mode .btn-fab-primary {
+  background: #6366f1;
+}
+body.dark-mode .btn-outline-dark {
+  border-color: #6366f1;
+  color: #6366f1;
+}
+body.dark-mode .fab-category-link {
+  background: #23272f;
+}
+body.dark-mode .fab-category-link:hover {
+  background: #3730a3;
+  color: #fff;
+}

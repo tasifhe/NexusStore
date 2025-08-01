@@ -1,0 +1,234 @@
+/* Home page custom styles - extracted from previous inline CSS */
+
+.fab-hero {
+  background: #fff;
+  min-height: 55vh;
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+  color: #222;
+  position: relative;
+  transition: all 0.3s ease;
+}
+.hero-slide-img {
+  height: 340px;
+  object-fit: cover;
+  border-radius: 2rem;
+  background: #f3f3f3;
+  box-shadow: 0 8px 32px rgba(102,126,234,0.10);
+  transition: transform 0.3s cubic-bezier(.4,2,.6,1), box-shadow 0.3s;
+}
+.carousel-inner {
+  min-height: 340px;
+}
+.carousel-item {
+  padding: 2.5rem 0;
+}
+.carousel-control-prev, .carousel-control-next {
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.08));
+}
+.carousel-control-prev-icon, .carousel-control-next-icon {
+  background-size: 2.5rem 2.5rem;
+}
+.carousel-indicators [data-bs-target] {
+  background-color: #ffb347;
+}
+.carousel-indicators .active {
+  background-color: #ffcc33;
+}
+.btn-fab-primary {
+  background: linear-gradient(90deg, #ffb347 0%, #ffcc33 100%);
+  color: #222;
+  border: none;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 12px rgba(255,179,71,0.10);
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.btn-fab-primary:hover {
+  background: linear-gradient(90deg, #ffcc33 0%, #ffb347 100%);
+  color: #111;
+  box-shadow: 0 4px 24px rgba(255,179,71,0.18);
+}
+
+.fab-featured {
+  background: #f8f8f8;
+  border: 0;
+  padding-top: 3.5rem;
+  padding-bottom: 3.5rem;
+  transition: all 0.3s ease;
+}
+.fab-featured-tabs .tab-btn {
+  background: #fff;
+  border: 1px solid #eee;
+  color: #222;
+  font-weight: 600;
+  border-radius: 2rem;
+  transition: background 0.15s, color 0.15s, box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+}
+.fab-featured-tabs .tab-btn.active, .fab-featured-tabs .tab-btn:hover {
+  background: #ffb347;
+  color: #fff;
+  border-color: #ffb347;
+  box-shadow: 0 2px 12px rgba(255,179,71,0.10);
+}
+.fab-carousel {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+.fab-scroll-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 2.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: #ffb347 #f3f3f3;
+}
+.fab-carousel-card {
+  min-width: 290px;
+  max-width: 290px;
+  flex: 0 0 290px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: stretch;
+}
+.fab-product-card {
+  border-radius: 2rem !important;
+  box-shadow: 0 4px 24px rgba(102,126,234,0.10), 0 1.5px 8px rgba(255,179,71,0.10);
+  transition: box-shadow 0.2s, transform 0.2s;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.fab-product-card:hover {
+  box-shadow: 0 8px 32px rgba(255,179,71,0.18), 0 2px 12px rgba(102,126,234,0.12);
+  transform: translateY(-4px) scale(1.04);
+}
+.fab-product-img {
+  height: 220px;
+  object-fit: cover;
+  border-radius: 2rem 2rem 0 0;
+  background: #f3f3f3;
+  transition: box-shadow 0.2s;
+}
+.fab-product-card:hover .fab-product-img {
+  box-shadow: 0 4px 24px rgba(255,179,71,0.10);
+}
+.card-title, .card-text {
+  word-break: break-word;
+}
+.card-footer {
+  border-top: none;
+  background: #fff;
+}
+
+.fab-categories {
+  background: #fff;
+  border-bottom: 1px solid #f3f3f3;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  transition: all 0.3s ease;
+}
+.fab-category-scroll {
+  display: flex;
+  gap: 2.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: #ffb347 #f3f3f3;
+}
+.fab-category-link {
+  text-align: center;
+  color: #222;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 1.5rem;
+  transition: background 0.15s, color 0.15s, box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+}
+.fab-category-link:hover, .fab-category-link.active {
+  background: #ffb347;
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(255,179,71,0.10);
+}
+.fab-category-icon {
+  font-size: 2.2rem;
+  background: linear-gradient(90deg, #ffb347 0%, #ffcc33 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
+.recent-assets, .top-sellers {
+  transition: all 0.3s ease;
+}
+.recent-assets {
+  background: #f8f8f8;
+}
+.top-sellers {
+  background: #fff;
+}
+
+.fab-cta-section {
+  background: #fff;
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+  transition: all 0.3s ease;
+}
+.fab-cta-section h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+.fab-cta-section p {
+  font-size: 1.2rem;
+  color: #888;
+}
+
+.rating {
+  font-size: 0.9rem;
+}
+.seller-avatar img {
+  object-fit: cover;
+}
+.tab-content {
+  width: 100%;
+}
+.tab-content:not(.active) {
+  display: none;
+}
+
+/* Responsive fixes for featured asset grid */
+@media (max-width: 991.98px) {
+  .fab-scroll-row {
+    gap: 1.5rem;
+  }
+  .fab-carousel-card {
+    min-width: 220px;
+    max-width: 220px;
+    flex: 0 0 220px;
+  }
+}
+@media (max-width: 767.98px) {
+  .fab-scroll-row {
+    gap: 1rem;
+  }
+  .fab-carousel-card {
+    min-width: 160px;
+    max-width: 160px;
+    flex: 0 0 160px;
+  }
+}
+
+/* Fix for Bootstrap carousel controls on dark backgrounds */
+body.dark-mode .carousel-control-prev-icon,
+body.dark-mode .carousel-control-next-icon {
+  filter: invert(1);
+}
+
+/* Add any additional home-specific styles below */
