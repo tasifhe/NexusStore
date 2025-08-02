@@ -1,6 +1,32 @@
 {% extends 'assets/base.html' %}
+{% load static %}
 
 {% block title %}{{ category.name }} Assets - GameAsset Store{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Page-specific animations */
+.asset-card {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.asset-card:nth-child(1) { animation-delay: 0.1s; }
+.asset-card:nth-child(2) { animation-delay: 0.2s; }
+.asset-card:nth-child(3) { animation-delay: 0.3s; }
+.asset-card:nth-child(4) { animation-delay: 0.4s; }
+.asset-card:nth-child(5) { animation-delay: 0.5s; }
+.asset-card:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+{% endblock %}
 
 {% block content %}
 
@@ -44,25 +70,183 @@
                     {{ page_obj.paginator.count }} {{ category.name|lower }} asset{{ page_obj.paginator.count|pluralize }} available
                 </p>
             </div>
+            
+            <!-- Filter and Sort Controls -->
+            <div class="category-controls">
+                <div class="view-controls">
+                    <div class="sort-dropdown">
+                        <button class="sort-btn" id="sortToggle">
+                            <i class="fas fa-sort"></i>
+                            Sort by: <span id="currentSort">Latest</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="sort-menu" id="sortMenu">
+                            <button class="sort-option active" data-sort="latest">
+                                <i class="fas fa-clock"></i> Latest First
+                            </button>
+                            <button class="sort-option" data-sort="oldest">
+                                <i class="fas fa-history"></i> Oldest First
+                            </button>
+                            <button class="sort-option" data-sort="title">
+                                <i class="fas fa-font"></i> Alphabetical
+                            </button>
+                            <button class="sort-option" data-sort="popular">
+                                <i class="fas fa-fire"></i> Most Popular
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="view-toggle">
+                        <button class="view-btn active" data-view="grid" title="Grid View">
+                            <i class="fas fa-th"></i>
+                        </button>
+                        <button class="view-btn" data-view="list" title="List View">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="filter-controls">
+                    <button class="filter-btn" id="filterToggle">
+                        <i class="fas fa-filter"></i>
+                        Filters
+                        <span class="filter-count" id="filterCount" style="display: none;">0</span>
+                    </button>
+                    
+                    <div class="filter-panel" id="filterPanel">
+                        <div class="filter-group">
+                            <h4>Price</h4>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" data-filter="free" />
+                                <span>Free Assets</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" data-filter="paid" />
+                                <span>Paid Assets</span>
+                            </label>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <h4>Status</h4>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" data-filter="new" />
+                                <span>New Assets</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox" data-filter="featured" />
+                                <span>Featured</span>
+                            </label>
+                        </div>
+                        
+                        <div class="filter-actions">
+                            <button class="btn btn-secondary btn-sm" onclick="clearFilters()">
+                                Clear All
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="applyFilters()">
+                                Apply Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="asset-grid">
                 {% for asset in assets %}
-                <div class="asset-card" onclick="window.location.href='{% url 'assets:asset_detail' asset.id %}'">
-                    {% if asset.thumbnail %}
-                        <img src="{{ asset.thumbnail.url }}" alt="{{ asset.title }}" class="asset-image">
-                    {% else %}
-                        <div class="asset-image asset-image-empty">
-                            <i class="fas fa-image asset-image-icon-medium"></i>
+                <div class="asset-card" onclick="window.location.href='{% url 'assets:asset_detail' asset.id %}'" 
+                     role="button" tabindex="0" 
+                     onkeypress="if(event.key==='Enter') window.location.href='{% url 'assets:asset_detail' asset.id %}'"
+                     aria-label="View {{ asset.title }} details">
+                    
+                    <div class="asset-image-container">
+                        {% if asset.thumbnail %}
+                            <img src="{{ asset.thumbnail.url }}" alt="{{ asset.title }}" class="asset-image" loading="lazy">
+                        {% else %}
+                            <div class="asset-image asset-image-empty">
+                                <i class="fas fa-image asset-image-icon-medium"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Asset badges -->
+                        <div class="asset-badges">
+                            {% if asset.is_featured %}
+                                <span class="asset-badge badge-featured">
+                                    <i class="fas fa-star"></i> Featured
+                                </span>
+                            {% endif %}
+                            {% if asset.is_free %}
+                                <span class="asset-badge badge-free">
+                                    <i class="fas fa-gift"></i> Free
+                                </span>
+                            {% endif %}
+                            {% if asset.created_at|timesince|slice:":1" == "0" %}
+                                <span class="asset-badge badge-new">
+                                    <i class="fas fa-sparkles"></i> New
+                                </span>
+                            {% endif %}
                         </div>
-                    {% endif %}
+                        
+                        <!-- Quick action overlay -->
+                        <div class="asset-overlay">
+                            <div class="overlay-actions">
+                                <button class="quick-action-btn" title="Quick Preview" 
+                                        onclick="event.stopPropagation(); showQuickPreview('{{ asset.id }}')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="quick-action-btn" title="Add to Wishlist"
+                                        onclick="event.stopPropagation(); toggleWishlist('{{ asset.id }}')">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="asset-info">
                         <h3 class="asset-title">{{ asset.title }}</h3>
-                        <p class="asset-creator">by {{ asset.creator.get_full_name|default:asset.creator.username }}</p>
+                        <p class="asset-creator">
+                            <i class="fas fa-user"></i> 
+                            by {{ asset.creator.get_full_name|default:asset.creator.username }}
+                        </p>
+                        
+                        {% if asset.rating %}
+                        <div class="asset-rating">
+                            <div class="stars">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= asset.rating|floatformat:0 %}
+                                        <i class="fas fa-star"></i>
+                                    {% elif forloop.counter == asset.rating|floatformat:0|add:'1' and asset.rating|floatformat:1|stringformat:'s'|slice:'-1' == '5' %}
+                                        <i class="fas fa-star-half-alt"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <span class="rating-value">{{ asset.rating|floatformat:1 }}</span>
+                        </div>
+                        {% endif %}
+                        
                         <p class="asset-desc-short">
                             {{ asset.description|truncatewords:15 }}
                         </p>
-                        <div class="asset-date-short">
-                            <i class="fas fa-calendar"></i> {{ asset.created_at|date:"M d, Y" }}
+                        
+                        <div class="asset-meta">
+                            <div class="asset-date-short">
+                                <i class="fas fa-calendar"></i> 
+                                {{ asset.created_at|date:"M d, Y" }}
+                            </div>
+                            
+                            {% if asset.download_count %}
+                            <div class="asset-downloads">
+                                <i class="fas fa-download"></i> 
+                                {{ asset.download_count }}
+                            </div>
+                            {% endif %}
+                            
+                            {% if asset.price and asset.price > 0 %}
+                            <div class="asset-price">
+                                <i class="fas fa-tag"></i> 
+                                ${{ asset.price }}
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -117,9 +301,447 @@
             </div>
         {% endif %}
     </div>
-    </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Quick preview functionality
+function showQuickPreview(assetId) {
+    // Create modal overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'quick-preview-overlay';
+    overlay.innerHTML = `
+        <div class="quick-preview-modal">
+            <div class="quick-preview-header">
+                <h3>Quick Preview</h3>
+                <button class="close-preview" onclick="closeQuickPreview()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="quick-preview-content">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    Loading preview...
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(overlay);
+    
+    // Simulate loading (in real implementation, fetch asset details)
+    setTimeout(() => {
+        const content = overlay.querySelector('.quick-preview-content');
+        content.innerHTML = `
+            <p>Asset ID: ${assetId}</p>
+            <p>This would show a quick preview of the asset...</p>
+            <div class="quick-preview-actions">
+                <a href="/assets/${assetId}/" class="btn btn-primary">View Full Details</a>
+            </div>
+        `;
+    }, 500);
+}
+
+function closeQuickPreview() {
+    const overlay = document.querySelector('.quick-preview-overlay');
+    if (overlay) {
+        overlay.remove();
+    }
+}
+
+// Wishlist functionality
+function toggleWishlist(assetId) {
+    const btn = event.target.closest('.quick-action-btn');
+    const icon = btn.querySelector('i');
+    
+    // Toggle heart icon
+    if (icon.classList.contains('fas')) {
+        icon.classList.remove('fas');
+        icon.classList.add('far');
+        btn.title = 'Add to Wishlist';
+        showNotification('Removed from wishlist', 'info');
+    } else {
+        icon.classList.remove('far');
+        icon.classList.add('fas');
+        btn.title = 'Remove from Wishlist';
+        showNotification('Added to wishlist!', 'success');
+    }
+}
+
+// Notification system
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+        <span>${message}</span>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => notification.classList.add('show'), 100);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// Enhanced search functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchForm = document.querySelector('.search-container form');
+    const searchInput = document.querySelector('.search-bar');
+    
+    // Add search suggestions (mock implementation)
+    searchInput.addEventListener('input', function() {
+        const value = this.value.toLowerCase();
+        if (value.length > 2) {
+            // In real implementation, fetch suggestions from server
+            console.log('Searching for:', value);
+        }
+    });
+    
+    // Smooth scroll to results after search
+    searchForm.addEventListener('submit', function() {
+        setTimeout(() => {
+            const assetsSection = document.querySelector('.asset-grid');
+            if (assetsSection) {
+                assetsSection.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }
+        }, 100);
+    });
+    
+    // Initialize filter and sort controls
+    initializeControls();
+});
+
+// Initialize filter and sort controls
+function initializeControls() {
+    // Sort dropdown functionality
+    const sortToggle = document.getElementById('sortToggle');
+    const sortMenu = document.getElementById('sortMenu');
+    const sortOptions = document.querySelectorAll('.sort-option');
+    const currentSort = document.getElementById('currentSort');
+    
+    if (sortToggle && sortMenu) {
+        sortToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            sortMenu.classList.toggle('active');
+            closeFilterPanel();
+        });
+        
+        sortOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const sortValue = this.dataset.sort;
+                const sortText = this.textContent.trim();
+                
+                // Update active state
+                sortOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Update button text
+                currentSort.textContent = sortText.split(' ')[0] + (sortText.split(' ')[1] || '');
+                
+                // Close menu
+                sortMenu.classList.remove('active');
+                
+                // Apply sort
+                applySorting(sortValue);
+            });
+        });
+    }
+    
+    // Filter panel functionality
+    const filterToggle = document.getElementById('filterToggle');
+    const filterPanel = document.getElementById('filterPanel');
+    
+    if (filterToggle && filterPanel) {
+        filterToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            filterPanel.classList.toggle('active');
+            closeSortMenu();
+        });
+    }
+    
+    // View toggle functionality
+    const viewButtons = document.querySelectorAll('.view-btn');
+    viewButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            viewButtons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            const view = this.dataset.view;
+            toggleView(view);
+        });
+    });
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function() {
+        closeSortMenu();
+        closeFilterPanel();
+    });
+    
+    // Filter checkboxes
+    const filterCheckboxes = document.querySelectorAll('.filter-checkbox input');
+    filterCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateFilterCount);
+    });
+    
+    updateFilterCount();
+}
+
+function closeSortMenu() {
+    const sortMenu = document.getElementById('sortMenu');
+    if (sortMenu) {
+        sortMenu.classList.remove('active');
+    }
+}
+
+function closeFilterPanel() {
+    const filterPanel = document.getElementById('filterPanel');
+    if (filterPanel) {
+        filterPanel.classList.remove('active');
+    }
+}
+
+function applySorting(sortValue) {
+    const assetCards = Array.from(document.querySelectorAll('.asset-card'));
+    const assetGrid = document.querySelector('.asset-grid');
+    
+    assetCards.sort((a, b) => {
+        switch (sortValue) {
+            case 'title':
+                const titleA = a.querySelector('.asset-title').textContent.toLowerCase();
+                const titleB = b.querySelector('.asset-title').textContent.toLowerCase();
+                return titleA.localeCompare(titleB);
+                
+            case 'oldest':
+                // In real implementation, use actual dates
+                return Math.random() - 0.5;
+                
+            case 'popular':
+                // In real implementation, use download counts or ratings
+                return Math.random() - 0.5;
+                
+            case 'latest':
+            default:
+                // In real implementation, use actual dates
+                return Math.random() - 0.5;
+        }
+    });
+    
+    // Re-append sorted cards
+    assetCards.forEach(card => assetGrid.appendChild(card));
+    
+    showNotification(`Sorted by ${sortValue}`, 'info');
+}
+
+function toggleView(view) {
+    const assetGrid = document.querySelector('.asset-grid');
+    
+    if (view === 'list') {
+        assetGrid.classList.add('list-view');
+        showNotification('Switched to list view', 'info');
+    } else {
+        assetGrid.classList.remove('list-view');
+        showNotification('Switched to grid view', 'info');
+    }
+}
+
+function updateFilterCount() {
+    const checkedFilters = document.querySelectorAll('.filter-checkbox input:checked');
+    const filterCount = document.getElementById('filterCount');
+    
+    if (filterCount) {
+        if (checkedFilters.length > 0) {
+            filterCount.textContent = checkedFilters.length;
+            filterCount.style.display = 'flex';
+        } else {
+            filterCount.style.display = 'none';
+        }
+    }
+}
+
+function clearFilters() {
+    const filterCheckboxes = document.querySelectorAll('.filter-checkbox input');
+    filterCheckboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    updateFilterCount();
+    applyFilters();
+    showNotification('Filters cleared', 'info');
+}
+
+function applyFilters() {
+    const checkedFilters = Array.from(document.querySelectorAll('.filter-checkbox input:checked'))
+        .map(cb => cb.dataset.filter);
+    
+    const assetCards = document.querySelectorAll('.asset-card');
+    
+    assetCards.forEach(card => {
+        let shouldShow = true;
+        
+        if (checkedFilters.length > 0) {
+            shouldShow = checkedFilters.some(filter => {
+                switch (filter) {
+                    case 'free':
+                        return card.querySelector('.badge-free') !== null;
+                    case 'paid':
+                        return card.querySelector('.asset-price') !== null;
+                    case 'new':
+                        return card.querySelector('.badge-new') !== null;
+                    case 'featured':
+                        return card.querySelector('.badge-featured') !== null;
+                    default:
+                        return true;
+                }
+            });
+        }
+        
+        card.style.display = shouldShow ? 'block' : 'none';
+    });
+    
+    closeFilterPanel();
+    
+    if (checkedFilters.length > 0) {
+        showNotification(`Applied ${checkedFilters.length} filter${checkedFilters.length > 1 ? 's' : ''}`, 'success');
+    }
+}
+
+// Close quick preview when clicking outside
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('quick-preview-overlay')) {
+        closeQuickPreview();
+    }
+});
+
+// Keyboard navigation support
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeQuickPreview();
+    }
+});
+</script>
+
 <style>
+/* Quick Preview Modal Styles */
+.quick-preview-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    animation: fadeIn 0.3s ease forwards;
+}
+
+.quick-preview-modal {
+    background: var(--gray-200, #334155);
+    border-radius: 16px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: hidden;
+    transform: scale(0.8);
+    animation: scaleIn 0.3s ease forwards;
+}
+
+.quick-preview-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--gray-300, #475569);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.quick-preview-header h3 {
+    color: var(--white, #ffffff);
+    margin: 0;
+}
+
+.close-preview {
+    background: none;
+    border: none;
+    color: var(--gray-500, #94a3b8);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.close-preview:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--white, #ffffff);
+}
+
+.quick-preview-content {
+    padding: 1.5rem;
+    color: var(--gray-600, #cbd5e1);
+}
+
+.loading-spinner {
+    text-align: center;
+    padding: 2rem;
+    color: var(--primary-color, #3b82f6);
+}
+
+.quick-preview-actions {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+/* Notification Styles */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--gray-200, #334155);
+    color: var(--white, #ffffff);
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    border: 2px solid;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 1001;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification-success {
+    border-color: #10b981;
+    background: linear-gradient(135deg, #065f46, #047857);
+}
+
+.notification-info {
+    border-color: var(--primary-color, #3b82f6);
+    background: linear-gradient(135deg, #1e40af, #2563eb);
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+    to { transform: scale(1); }
+}
 </style>
 {% endblock %}
 

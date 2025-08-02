@@ -772,29 +772,109 @@ section,
 .section-tabs {
     display: flex;
     justify-content: center;
-    gap: var(--space-2);
-    margin-top: var(--space-8);
+    gap: var(--space-2, 0.5rem);
+    margin-top: var(--space-8, 2rem);
+    flex-wrap: wrap;
+    padding: 0 1rem;
 }
 
 .tab-btn {
-    padding: var(--space-3) var(--space-6);
-    background: var(--gray-100);
-    border: 2px solid transparent;
-    border-radius: var(--border-radius-full);
-    color: var(--gray-600);
-    font-weight: 500;
+    padding: var(--space-3, 0.75rem) var(--space-6, 1.5rem);
+    background: var(--gray-200, #334155);
+    border: 2px solid var(--gray-300, #475569);
+    border-radius: var(--border-radius-full, 9999px);
+    color: var(--gray-700, #e2e8f0);
+    font-weight: 600;
+    font-size: 0.875rem;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tab-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--primary-color, #3b82f6), var(--primary-hover, #2563eb));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: inherit;
+}
+
+.tab-btn span {
+    position: relative;
+    z-index: 2;
 }
 
 .tab-btn.active {
-    background: var(--primary-color);
-    color: var(--white);
+    background: var(--primary-color, #3b82f6);
+    color: var(--white, #ffffff);
+    border-color: var(--primary-color, #3b82f6);
+    box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.3);
+    transform: translateY(-1px);
+}
+
+.tab-btn.active::before {
+    opacity: 1;
 }
 
 .tab-btn:hover:not(.active) {
-    background: var(--gray-200);
-    color: var(--gray-800);
+    background: var(--gray-300, #475569);
+    color: var(--white, #ffffff);
+    border-color: var(--gray-400, #64748b);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.15);
+}
+
+.tab-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+}
+
+.tab-btn:active {
+    transform: translateY(0);
+}
+
+/* Tab Button Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .section-tabs {
+        gap: var(--space-1, 0.25rem);
+        margin-top: var(--space-6, 1.5rem);
+        padding: 0 0.5rem;
+    }
+    
+    .tab-btn {
+        padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
+        font-size: 0.75rem;
+        font-weight: 600;
+        min-height: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .section-tabs {
+        flex-direction: column;
+        gap: var(--space-2, 0.5rem);
+        align-items: center;
+    }
+    
+    .tab-btn {
+        width: 100%;
+        max-width: 280px;
+        justify-content: center;
+        padding: var(--space-3, 0.75rem) var(--space-5, 1.25rem);
+        font-size: 0.875rem;
+    }
 }
 
 /* Categories Section */
