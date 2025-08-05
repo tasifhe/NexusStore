@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="{% static 'assets/css/base.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/layout.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/header.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/css/navbar-enhanced.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/navbar-redesigned.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/footer.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/buttons.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/utilities.css' %}">
@@ -75,7 +75,7 @@
             <div class="header-content">
                 <div class="logo">
                     <a href="{% url 'assets:home' %}" style="text-decoration: none;">
-                        <h1><span class="logo-icon">🎮</span>Nexus Store</h1>
+                        <h1><i class="fas fa-cube logo-icon"></i>Nexus Store</h1>
                     </a>
                 </div>
                 
@@ -91,65 +91,101 @@
                     <nav class="main-nav" id="main-nav">
                         <ul>
                             <li><a href="{% url 'assets:asset_list' %}" class="nav-link">Discover</a></li>
-                            <li><a href="#" class="nav-link">Categories</a></li>
+                            <li class="nav-dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" id="categoriesDropdown">
+                                    Categories <i class="fas fa-chevron-down"></i>
+                                </a>
+                                <div class="nav-dropdown-menu" id="categoriesMenu">
+                                    <a href="{% url 'assets:category_assets' '2d-art' %}" class="dropdown-item">
+                                        <i class="fas fa-paint-brush"></i> 2D Art
+                                    </a>
+                                    <a href="{% url 'assets:category_assets' '3d-models' %}" class="dropdown-item">
+                                        <i class="fas fa-cube"></i> 3D Models
+                                    </a>
+                                    <a href="{% url 'assets:category_assets' 'audio' %}" class="dropdown-item">
+                                        <i class="fas fa-music"></i> Audio
+                                    </a>
+                                    <a href="{% url 'assets:category_assets' 'textures' %}" class="dropdown-item">
+                                        <i class="fas fa-image"></i> Textures
+                                    </a>
+                                    <a href="{% url 'assets:category_assets' 'scripts' %}" class="dropdown-item">
+                                        <i class="fas fa-code"></i> Scripts
+                                    </a>
+                                    <a href="{% url 'assets:category_assets' 'animations' %}" class="dropdown-item">
+                                        <i class="fas fa-play"></i> Animations
+                                    </a>
+                                    <a href="{% url 'assets:category_assets' 'ui-elements' %}" class="dropdown-item">
+                                        <i class="fas fa-window-maximize"></i> UI Elements
+                                    </a>
+                                    <a href="{% url 'assets:category_assets' 'environments' %}" class="dropdown-item">
+                                        <i class="fas fa-mountain"></i> Environments
+                                    </a>
+                                    <a href="{% url 'assets:category_assets' 'vfx' %}" class="dropdown-item">
+                                        <i class="fas fa-magic"></i> VFX
+                                    </a>
+                                    <div class="dropdown-divider"></div>
+                                    <a href="{% url 'assets:asset_list' %}" class="dropdown-item">
+                                        <i class="fas fa-th-large"></i> Browse All Categories
+                                    </a>
+                                </div>
+                            </li>
                             <!-- Free Assets and Sell buttons removed as requested -->
                         </ul>
                     </nav>
                     
-                    <form class="search-bar" role="search" onsubmit="return false;">
+                    <form class="search-bar" role="search" method="get" action="{% url 'assets:search_assets' %}">
                         <label for="search-input" class="visually-hidden">Search assets</label>
-                        <input type="text" placeholder="Search for assets, textures, models..." id="search-input" aria-label="Search assets">
-                        <button type="button" class="search-btn" aria-label="Search">
+                        <input type="text" name="q" placeholder="Search for assets, textures, models..." id="search-input" aria-label="Search assets">
+                        <button type="submit" class="search-btn" aria-label="Search">
                             <i class="fas fa-search"></i>
                         </button>
                     </form>
                 </div>
                 
                 <div class="user-actions">
-                        {% if user.is_authenticated %}
-                            <div class="profile-dropdown-container">
-                                <button class="profile-btn" id="profileBtn" type="button" aria-label="Profile menu">
-                                    <i class="fas fa-user-circle"></i>
-                                </button>
-                                <div class="profile-dropdown-menu" id="profileDropdown">
-                                    <div class="dropdown-header">
-                                        <div class="user-info">
-                                            <i class="fas fa-user-circle user-avatar"></i>
-                                            <div class="user-details">
-                                                <span class="user-name">{{ user.username }}</span>
-                                                <span class="user-email">{{ user.email }}</span>
-                                            </div>
+                    {% if user.is_authenticated %}
+                        <div class="profile-dropdown-container">
+                            <button class="profile-btn" id="profileBtn" type="button" aria-label="Profile menu">
+                                <i class="fas fa-user-circle"></i>
+                            </button>
+                            <div class="profile-dropdown-menu" id="profileDropdown">
+                                <div class="dropdown-header">
+                                    <div class="user-info">
+                                        <i class="fas fa-user-circle user-avatar"></i>
+                                        <div class="user-details">
+                                            <span class="user-name">{{ user.username }}</span>
+                                            <span class="user-email">{{ user.email }}</span>
                                         </div>
                                     </div>
-                                    <div class="dropdown-items">
-                                        <a class="dropdown-item" href="{% url 'assets:profile' %}">
-                                            <i class="fas fa-user"></i>
-                                            <span>Profile</span>
+                                </div>
+                                <div class="dropdown-items">
+                                    <a class="dropdown-item" href="{% url 'assets:profile' %}">
+                                        <i class="fas fa-user"></i>
+                                        <span>Profile</span>
+                                    </a>
+                                    <a class="dropdown-item" href="{% url 'assets:my_library' %}">
+                                        <i class="fas fa-book"></i>
+                                        <span>My Library</span>
+                                    </a>
+                                    {% if user.userprofile.is_verified %}
+                                        <a class="dropdown-item" href="{% url 'assets:upload_asset' %}">
+                                            <i class="fas fa-upload"></i>
+                                            <span>Publish Asset</span>
                                         </a>
-                                        <a class="dropdown-item" href="{% url 'assets:my_library' %}">
-                                            <i class="fas fa-book"></i>
-                                            <span>My Library</span>
-                                        </a>
-                                        {% if user.userprofile.is_verified %}
-                                            <a class="dropdown-item" href="{% url 'assets:upload_asset' %}">
-                                                <i class="fas fa-upload"></i>
-                                                <span>Publish Asset</span>
-                                            </a>
-                                        {% endif %}
-                                        <div class="dropdown-separator"></div>
-                                        <a class="dropdown-item logout-item" href="{% url 'assets:logout' %}">
-                                            <i class="fas fa-sign-out-alt"></i>
-                                            <span>Logout</span>
-                                        </a>
-                                    </div>
+                                    {% endif %}
+                                    <div class="dropdown-separator"></div>
+                                    <a class="dropdown-item logout-item" href="{% url 'assets:logout' %}">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        <span>Logout</span>
+                                    </a>
                                 </div>
                             </div>
-                        {% else %}
-                            <button class="btn btn-outline" onclick="window.location.href='{% url 'assets:login' %}'">Sign In</button>
-                            <button class="btn btn-primary" onclick="window.location.href='{% url 'assets:register' %}'">Sign Up</button>
-                        {% endif %}
-                        <div class="cart-icon">🛒</div>
-                    </div>
+                        </div>
+                    {% else %}
+                        <button class="btn btn-outline" onclick="window.location.href='{% url 'assets:login' %}'">Sign In</button>
+                        <button class="btn btn-primary" onclick="window.location.href='{% url 'assets:register' %}'">Sign Up</button>
+                    {% endif %}
+                    <div class="cart-icon">🛒</div>
                 </div>
             </div>
         </div>
@@ -189,64 +225,138 @@
     {% endblock %}
 
     <script>
-        // New Profile Dropdown Implementation
+        // ===================================
+        // NEXUS STORE - NAVBAR JAVASCRIPT
+        // ===================================
+
         document.addEventListener('DOMContentLoaded', function() {
+            initializeNavbar();
+            initializeProfileDropdown();
+            initializeCategoriesDropdown();
+            initializeSearch();
+            initializeMobileMenu();
+        });
+
+        // Profile Dropdown Implementation
+        function initializeProfileDropdown() {
             const profileBtn = document.getElementById('profileBtn');
             const profileDropdown = document.getElementById('profileDropdown');
+            const profileContainer = document.querySelector('.profile-dropdown-container');
             
-            if (profileBtn && profileDropdown) {
-                // Toggle dropdown on button click
+            if (profileBtn && profileDropdown && profileContainer) {
                 profileBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     
-                    const isOpen = profileDropdown.classList.contains('show');
+                    const isOpen = profileContainer.classList.contains('show');
                     
-                    // Close if open, open if closed
-                    if (isOpen) {
-                        profileDropdown.classList.remove('show');
-                        profileBtn.classList.remove('active');
-                    } else {
-                        profileDropdown.classList.add('show');
-                        profileBtn.classList.add('active');
+                    // Close all other dropdowns first
+                    closeAllDropdowns();
+                    
+                    if (!isOpen) {
+                        profileContainer.classList.add('show');
+                        profileBtn.setAttribute('aria-expanded', 'true');
                     }
                 });
-                
-                // Close dropdown when clicking outside
-                document.addEventListener('click', function(e) {
-                    if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
-                        profileDropdown.classList.remove('show');
-                        profileBtn.classList.remove('active');
-                    }
-                });
-                
-                // Close dropdown on escape key
-                document.addEventListener('keydown', function(e) {
-                    if (e.key === 'Escape') {
-                        profileDropdown.classList.remove('show');
-                        profileBtn.classList.remove('active');
-                    }
-                });
-            }
-        });
-
-        // Mobile menu toggle
-        function toggleMobileMenu() {
-            const nav = document.getElementById('main-nav');
-            const toggle = document.querySelector('.mobile-menu-toggle');
-            
-            if (nav && toggle) {
-                nav.classList.toggle('mobile-open');
-                toggle.classList.toggle('active');
             }
         }
 
-        // Active page highlighting and initialization
-        document.addEventListener('DOMContentLoaded', function() {
+        // Categories Dropdown Implementation
+        function initializeCategoriesDropdown() {
+            const categoriesDropdown = document.getElementById('categoriesDropdown');
+            const categoriesMenu = document.getElementById('categoriesMenu');
+            const navDropdown = document.querySelector('.nav-dropdown');
+            
+            if (categoriesDropdown && categoriesMenu && navDropdown) {
+                categoriesDropdown.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const isOpen = navDropdown.classList.contains('show');
+                    
+                    // Close all other dropdowns first
+                    closeAllDropdowns();
+                    
+                    if (!isOpen) {
+                        navDropdown.classList.add('show');
+                        categoriesDropdown.setAttribute('aria-expanded', 'true');
+                    }
+                });
+            }
+        }
+
+        // Mobile Menu Implementation
+        function initializeMobileMenu() {
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            const navSearchSection = document.querySelector('.nav-search-section');
+            
+            if (mobileToggle && navSearchSection) {
+                mobileToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const isOpen = navSearchSection.classList.contains('mobile-menu-open');
+                    
+                    if (isOpen) {
+                        navSearchSection.classList.remove('mobile-menu-open');
+                        mobileToggle.classList.remove('active');
+                        mobileToggle.setAttribute('aria-expanded', 'false');
+                    } else {
+                        closeAllDropdowns();
+                        navSearchSection.classList.add('mobile-menu-open');
+                        mobileToggle.classList.add('active');
+                        mobileToggle.setAttribute('aria-expanded', 'true');
+                    }
+                });
+            }
+        }
+
+        // Global function for mobile menu toggle (called from HTML onclick)
+        function toggleMobileMenu() {
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            if (mobileToggle) {
+                mobileToggle.click();
+            }
+        }
+
+        // Search Functionality
+        function initializeSearch() {
+            const searchBtn = document.querySelector('.search-btn');
+            const searchInput = document.getElementById('search-input');
+            const searchForm = document.querySelector('.search-bar');
+            
+            function performSearch() {
+                const query = searchInput.value.trim();
+                if (query) {
+                    // Use the correct URL pattern for your Django setup
+                    const searchUrl = searchForm ? searchForm.action : '/search/';
+                    window.location.href = `${searchUrl}?q=${encodeURIComponent(query)}`;
+                }
+            }
+            
+            if (searchBtn) {
+                searchBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    performSearch();
+                });
+            }
+            
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        performSearch();
+                    }
+                });
+            }
+        }
+
+        // Navigation Initialization
+        function initializeNavbar() {
+            // Add active state to current page
             const currentPath = window.location.pathname;
             const navLinks = document.querySelectorAll('.nav-link');
             
-            // Add active class to current page
             navLinks.forEach(link => {
                 const href = link.getAttribute('href');
                 if (href === currentPath || (currentPath.includes(href) && href !== '/' && href !== '#')) {
@@ -254,29 +364,90 @@
                 }
             });
 
-            // Search functionality
-            const searchBtn = document.querySelector('.search-btn');
-            const searchInput = document.getElementById('search-input');
+            // Scroll effect for navbar
+            let lastScrollTop = 0;
+            const header = document.getElementById('main-header');
             
-            function performSearch() {
-                const query = searchInput.value.trim();
-                if (query) {
-                    window.location.href = `{% url 'assets:search_assets' %}?q=${encodeURIComponent(query)}`;
+            window.addEventListener('scroll', function() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                if (scrollTop > 50) {
+                    header.classList.add('header-scrolled');
+                } else {
+                    header.classList.remove('header-scrolled');
+                }
+                
+                lastScrollTop = scrollTop;
+            }, { passive: true });
+
+            // Global click handler to close dropdowns
+            document.addEventListener('click', function(e) {
+                const isDropdownClick = e.target.closest('.nav-dropdown, .profile-dropdown-container, .mobile-menu-toggle');
+                if (!isDropdownClick) {
+                    closeAllDropdowns();
+                }
+            });
+            
+            // Global escape key handler
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeAllDropdowns();
+                }
+            });
+            
+            // Handle window resize to close mobile menu on desktop
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    const navSearchSection = document.querySelector('.nav-search-section');
+                    const mobileToggle = document.querySelector('.mobile-menu-toggle');
+                    
+                    if (navSearchSection && navSearchSection.classList.contains('mobile-menu-open')) {
+                        navSearchSection.classList.remove('mobile-menu-open');
+                        mobileToggle.classList.remove('active');
+                        mobileToggle.setAttribute('aria-expanded', 'false');
+                    }
+                }
+            });
+        }
+
+        // Utility function to close all dropdowns
+        function closeAllDropdowns() {
+            // Close profile dropdown
+            const profileContainer = document.querySelector('.profile-dropdown-container');
+            if (profileContainer && profileContainer.classList.contains('show')) {
+                profileContainer.classList.remove('show');
+                const profileBtn = document.getElementById('profileBtn');
+                if (profileBtn) profileBtn.setAttribute('aria-expanded', 'false');
+            }
+            
+            // Close categories dropdown
+            const navDropdown = document.querySelector('.nav-dropdown');
+            if (navDropdown && navDropdown.classList.contains('show')) {
+                navDropdown.classList.remove('show');
+                const categoriesDropdown = document.getElementById('categoriesDropdown');
+                if (categoriesDropdown) categoriesDropdown.setAttribute('aria-expanded', 'false');
+            }
+            
+            // Close mobile menu
+            const navSearchSection = document.querySelector('.nav-search-section');
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            if (navSearchSection && navSearchSection.classList.contains('mobile-menu-open')) {
+                navSearchSection.classList.remove('mobile-menu-open');
+                if (mobileToggle) {
+                    mobileToggle.classList.remove('active');
+                    mobileToggle.setAttribute('aria-expanded', 'false');
                 }
             }
-            
-            if (searchBtn) {
-                searchBtn.addEventListener('click', performSearch);
+        }
+
+        // Legacy function support (for any existing onclick handlers)
+        function toggleDropdown(event) {
+            event.preventDefault();
+            const categoriesDropdown = document.getElementById('categoriesDropdown');
+            if (categoriesDropdown) {
+                categoriesDropdown.click();
             }
-            
-            if (searchInput) {
-                searchInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        performSearch();
-                    }
-                });
-            }
-        });
+        }
     </script>
 
     <!-- Messages -->
@@ -417,23 +588,49 @@
         </div>
     </footer>
 
-    <!-- Chatbot -->
+    <!-- Enhanced Chatbot -->
     <div class="chatbot-container">
-        <button class="chatbot-toggle" onclick="toggleChatbot()">
-            <i class="fas fa-comments"></i>
+        <button class="chatbot-toggle" id="chatbotToggle" onclick="toggleChatbot()" aria-label="Toggle chat assistant">
+            <i class="fas fa-comments" id="chatbotIcon"></i>
         </button>
         <div class="chatbot-window" id="chatbot-window">
             <div class="chatbot-header">
-                <i class="fas fa-robot"></i> Asset Assistant
+                <div class="chatbot-header-info">
+                    <i class="fas fa-robot"></i>
+                    <div>
+                        <div style="font-weight: 600;">Asset Assistant</div>
+                        <div style="font-size: 0.75rem; opacity: 0.9;">
+                            <span class="chatbot-status"></span>
+                            Online
+                        </div>
+                    </div>
+                </div>
+                <button class="chatbot-close" onclick="closeChatbot()" aria-label="Close chat">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
+            
             <div class="chatbot-messages" id="chatbot-messages">
                 <div class="message bot">
-                    Hi! I'm your asset assistant. I can help you find the perfect assets for your game development project. What are you looking for?
+                    <div style="margin-bottom: 0.5rem;">👋 <strong>Hi! I'm your Asset Assistant.</strong></div>
+                    <div style="margin-bottom: 0.75rem;">I can help you find the perfect assets for your game development project. What are you looking for today?</div>
+                    <div class="message-actions">
+                        <button class="message-action-btn" onclick="sendQuickMessage('What assets do you have?')">Browse Assets</button>
+                        <button class="message-action-btn" onclick="sendQuickMessage('Show me 3D models')">3D Models</button>
+                    </div>
                 </div>
             </div>
+            
+            <div class="quick-actions" id="quickActions">
+                <button class="quick-action-btn" onclick="sendQuickMessage('Show me popular assets')">🔥 Popular</button>
+                <button class="quick-action-btn" onclick="sendQuickMessage('What are the latest assets?')">🆕 Latest</button>
+                <button class="quick-action-btn" onclick="sendQuickMessage('I need help')">❓ Help</button>
+                <button class="quick-action-btn" onclick="sendQuickMessage('Show me 2D art')">🎨 2D Art</button>
+            </div>
+            
             <div class="chatbot-input">
-                <input type="text" id="chatbot-input" placeholder="Ask me about assets..." onkeypress="handleChatbotKeypress(event)">
-                <button onclick="sendChatbotMessage()">
+                <input type="text" id="chatbot-input" placeholder="Ask me about assets..." onkeypress="handleChatbotKeypress(event)" maxlength="500">
+                <button class="chatbot-send-btn" id="chatbotSendBtn" onclick="sendChatbotMessage()" aria-label="Send message">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
@@ -441,40 +638,186 @@
     </div>
 
     <script>
+        // ===================================
+        // ENHANCED CHATBOT FUNCTIONALITY
+        // ===================================
+        
+        let chatbotState = {
+            isOpen: false,
+            isTyping: false,
+            conversationHistory: [],
+            currentRequestId: null
+        };
+
         function toggleChatbot() {
             const window = document.getElementById('chatbot-window');
-            window.style.display = window.style.display === 'flex' ? 'none' : 'flex';
+            const toggle = document.getElementById('chatbotToggle');
+            const icon = document.getElementById('chatbotIcon');
+            
+            if (chatbotState.isOpen) {
+                closeChatbot();
+            } else {
+                openChatbot();
+            }
         }
 
-        // This duplicate profile dropdown handler has been removed to prevent conflicts
-        // The main profile dropdown functionality is handled by toggleProfileDropdown() above
+        function openChatbot() {
+            const window = document.getElementById('chatbot-window');
+            const toggle = document.getElementById('chatbotToggle');
+            const icon = document.getElementById('chatbotIcon');
+            
+            window.style.display = 'flex';
+            toggle.classList.add('active');
+            icon.className = 'fas fa-times';
+            chatbotState.isOpen = true;
+            
+            // Focus input
+            setTimeout(() => {
+                document.getElementById('chatbot-input').focus();
+            }, 300);
+            
+            // Scroll to bottom
+            scrollToBottom();
+        }
+
+        function closeChatbot() {
+            const window = document.getElementById('chatbot-window');
+            const toggle = document.getElementById('chatbotToggle');
+            const icon = document.getElementById('chatbotIcon');
+            
+            window.classList.add('closing');
+            toggle.classList.remove('active');
+            icon.className = 'fas fa-comments';
+            chatbotState.isOpen = false;
+            
+            setTimeout(() => {
+                window.style.display = 'none';
+                window.classList.remove('closing');
+            }, 300);
+        }
 
         function handleChatbotKeypress(event) {
-            if (event.key === 'Enter') {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
                 sendChatbotMessage();
             }
         }
 
+        function sendQuickMessage(message) {
+            if (chatbotState.isTyping) return; // Prevent multiple clicks while processing
+            
+            const input = document.getElementById('chatbot-input');
+            const quickActionBtns = document.querySelectorAll('.quick-action-btn');
+            
+            // Add loading state to all buttons
+            quickActionBtns.forEach(btn => {
+                btn.classList.add('loading');
+                btn.disabled = true;
+            });
+            
+            // Set the message and send
+            input.value = message;
+            sendChatbotMessage();
+        }
+
+        function showTypingIndicator() {
+            const messages = document.getElementById('chatbot-messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.id = 'typing-indicator';
+            typingDiv.innerHTML = `
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            messages.appendChild(typingDiv);
+            scrollToBottom();
+        }
+
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        function addMessage(content, type = 'bot', actions = null) {
+            const messages = document.getElementById('chatbot-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            let messageContent = `<div>${content}</div>`;
+            
+            if (actions && actions.length > 0) {
+                messageContent += '<div class="message-actions">';
+                actions.forEach(action => {
+                    messageContent += `<button class="message-action-btn" onclick="sendQuickMessage('${action.text}')">${action.label}</button>`;
+                });
+                messageContent += '</div>';
+            }
+            
+            messageDiv.innerHTML = messageContent;
+            messages.appendChild(messageDiv);
+            scrollToBottom();
+            
+            // Store in conversation history
+            chatbotState.conversationHistory.push({
+                type: type,
+                content: content,
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        function scrollToBottom() {
+            const messages = document.getElementById('chatbot-messages');
+            setTimeout(() => {
+                messages.scrollTop = messages.scrollHeight;
+            }, 100);
+        }
+
+        function setInputState(enabled) {
+            const input = document.getElementById('chatbot-input');
+            const sendBtn = document.getElementById('chatbotSendBtn');
+            const quickActionBtns = document.querySelectorAll('.quick-action-btn');
+            
+            input.disabled = !enabled;
+            sendBtn.disabled = !enabled;
+            chatbotState.isTyping = !enabled;
+            
+            // Handle quick action buttons
+            quickActionBtns.forEach(btn => {
+                if (enabled) {
+                    btn.classList.remove('loading');
+                    btn.disabled = false;
+                } else {
+                    // Don't add loading class here as it might already be added by sendQuickMessage
+                    btn.disabled = true;
+                }
+            });
+        }
+
         async function sendChatbotMessage() {
             const input = document.getElementById('chatbot-input');
-            const messages = document.getElementById('chatbot-messages');
             const message = input.value.trim();
             
-            if (!message) return;
+            if (!message || chatbotState.isTyping) return;
 
             // Add user message
-            const userMessage = document.createElement('div');
-            userMessage.className = 'message user';
-            userMessage.textContent = message;
-            messages.appendChild(userMessage);
-
-            // Clear input
+            addMessage(message, 'user');
+            
+            // Clear input and disable it
             input.value = '';
+            setInputState(false);
+            
+            // Show typing indicator
+            showTypingIndicator();
 
-            // Scroll to bottom
-            messages.scrollTop = messages.scrollHeight;
+            // Generate request ID for this conversation
+            const requestId = Date.now().toString();
+            chatbotState.currentRequestId = requestId;
 
-            // Send to backend
             try {
                 const response = await fetch('{% url "assets:chatbot_api" %}', {
                     method: 'POST',
@@ -482,27 +825,92 @@
                         'Content-Type': 'application/json',
                         'X-CSRFToken': '{{ csrf_token }}',
                     },
-                    body: JSON.stringify({ message: message })
+                    body: JSON.stringify({ 
+                        message: message,
+                        conversation_history: chatbotState.conversationHistory.slice(-5), // Last 5 messages for context
+                        request_id: requestId
+                    })
                 });
 
+                // Check if this is still the current request
+                if (chatbotState.currentRequestId !== requestId) {
+                    return; // Ignore if a newer request has been made
+                }
+
                 const data = await response.json();
+                
+                // Hide typing indicator
+                hideTypingIndicator();
 
-                // Add bot response
-                const botMessage = document.createElement('div');
-                botMessage.className = 'message bot';
-                botMessage.textContent = data.response;
-                messages.appendChild(botMessage);
-
-                // Scroll to bottom
-                messages.scrollTop = messages.scrollHeight;
+                if (response.ok) {
+                    // Add bot response with actions if provided
+                    const actions = data.actions || null;
+                    addMessage(data.response, 'bot', actions);
+                    
+                    // Update quick actions if provided
+                    if (data.quick_actions) {
+                        updateQuickActions(data.quick_actions);
+                    }
+                } else {
+                    throw new Error(data.error || 'Something went wrong');
+                }
             } catch (error) {
-                console.error('Error:', error);
-                const errorMessage = document.createElement('div');
-                errorMessage.className = 'message bot';
-                errorMessage.textContent = 'Sorry, I encountered an error. Please try again.';
-                messages.appendChild(errorMessage);
-                messages.scrollTop = messages.scrollHeight;
+                console.error('Chatbot error:', error);
+                hideTypingIndicator();
+                addMessage('Sorry, I encountered an error. Please try again in a moment. 🤖', 'bot');
+            } finally {
+                // Re-enable input
+                setInputState(true);
+                
+                // Focus input again
+                setTimeout(() => {
+                    document.getElementById('chatbot-input').focus();
+                }, 100);
             }
+        }
+
+        function updateQuickActions(actions) {
+            const quickActions = document.getElementById('quickActions');
+            quickActions.innerHTML = '';
+            
+            actions.forEach(action => {
+                const btn = document.createElement('button');
+                btn.className = 'quick-action-btn';
+                btn.onclick = () => sendQuickMessage(action.text);
+                btn.innerHTML = `${action.icon || '💬'} ${action.label}`;
+                quickActions.appendChild(btn);
+            });
+        }
+
+        // Initialize chatbot on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add welcome message with current time
+            const welcomeTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            // Close chatbot on outside click
+            document.addEventListener('click', function(event) {
+                const chatbotContainer = document.querySelector('.chatbot-container');
+                if (chatbotState.isOpen && !chatbotContainer.contains(event.target)) {
+                    closeChatbot();
+                }
+            });
+            
+            // Prevent chatbot from closing when clicking inside
+            document.getElementById('chatbot-window').addEventListener('click', function(event) {
+                event.stopPropagation();
+            });
+            
+            // Add escape key handler
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' && chatbotState.isOpen) {
+                    closeChatbot();
+                }
+            });
+        });
+
+        // Legacy function support
+        function toggleProfileDropdown() {
+            // This function is handled by the main navbar JavaScript above
         }
     </script>
 

@@ -10,6 +10,7 @@ urlpatterns = [
     path('library/remove/<int:asset_id>/', views.remove_from_library, name='remove_from_library'),
     path('assets/', views.asset_list, name='asset_list'),
     path('assets/<int:asset_id>/', views.asset_detail, name='asset_detail'),
+    path('assets/<int:asset_id>/preview/', views.asset_preview_api, name='asset_preview_api'),
     path('assets/download/<int:asset_id>/', views.download_asset, name='download_asset'),
     path('upload/', views.upload_asset, name='upload_asset'),
     path('category/<slug:category_slug>/', views.category_assets, name='category_assets'),

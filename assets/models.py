@@ -55,8 +55,17 @@ class Asset(models.Model):
     is_featured = models.BooleanField(default=False, help_text="Mark this asset as featured.")
     
     # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['category', 'is_featured']),
+            models.Index(fields=['creator', 'created_at']),
+            models.Index(fields=['is_featured', 'created_at']),
+            models.Index(fields=['price']),
+        ]
 
     @property
     def is_free(self):
@@ -114,24 +123,11 @@ class Asset(models.Model):
         """Return number of ratings for this asset"""
         # Placeholder for future rating system
         return 23
-        return 0
 
     @property
     def view_count(self):
         """Return the number of times this asset has been viewed"""
         # For now, return a placeholder. In the future, this could be tracked with a separate model
-        return 0
-
-    @property
-    def rating(self):
-        """Return the average rating for this asset"""
-        # For now, return a placeholder. In the future, this could be calculated from a Rating model
-        return None
-
-    @property
-    def rating_count(self):
-        """Return the number of ratings for this asset"""
-        # For now, return a placeholder. In the future, this could be calculated from a Rating model
         return 0
 
     def __str__(self):

@@ -4,95 +4,152 @@
 {% block title %}{{ category.name }} Assets - GameAsset Store{% endblock %}
 
 {% block extra_css %}
-<style>
-/* Page-specific animations */
-.asset-card {
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 0.6s ease forwards;
-}
-
-.asset-card:nth-child(1) { animation-delay: 0.1s; }
-.asset-card:nth-child(2) { animation-delay: 0.2s; }
-.asset-card:nth-child(3) { animation-delay: 0.3s; }
-.asset-card:nth-child(4) { animation-delay: 0.4s; }
-.asset-card:nth-child(5) { animation-delay: 0.5s; }
-.asset-card:nth-child(6) { animation-delay: 0.6s; }
-
-@keyframes fadeInUp {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-</style>
+<link rel="stylesheet" href="{% static 'assets/css/category-assets-redesigned.css' %}">
 {% endblock %}
 
 {% block content %}
-
-<div class="category-hero">
+<!-- Modern Category Hero -->
+<section class="category-hero-modern">
+    <div class="hero-background">
+        <div class="hero-gradient"></div>
+        <div class="hero-pattern"></div>
+    </div>
     <div class="container">
-        <h1>
-            <i class="fas fa-{% if category.name == '2D Art' %}paint-brush{% elif category.name == '3D Models' %}cube{% elif category.name == 'Audio' %}music{% elif category.name == 'Textures' %}image{% elif category.name == 'Scripts' %}code{% elif category.name == 'Animations' %}play{% elif category.name == 'UI Elements' %}window-maximize{% else %}folder{% endif %}"></i>
-            {{ category.name }}
-        </h1>
-        <p class="category-hero-desc">Explore our collection of {{ category.name|lower }} assets</p>
-        <div class="search-container">
-            <form method="GET" action="{% url 'assets:search_assets' %}">
-                <input type="text" name="q" class="search-bar" placeholder="Search {{ category.name|lower }}..." value="{{ request.GET.q }}">
-                <button type="submit" class="search-btn">
-                    <i class="fas fa-search"></i>
-                </button>
-            </form>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-{% if category.name == '2D Art' %}paint-brush{% elif category.name == '3D Models' %}cube{% elif category.name == 'Audio' %}music{% elif category.name == 'Textures' %}image{% elif category.name == 'Scripts' %}code{% elif category.name == 'Animations' %}play{% elif category.name == 'UI Elements' %}window-maximize{% else %}folder{% endif %}"></i>
+                <span>{{ category.name }}</span>
+            </div>
+            <h1 class="hero-title">{{ category.name }} Collection</h1>
+            <p class="hero-description">Discover premium {{ category.name|lower }} assets crafted by our talented community</p>
+            
+            <!-- Enhanced Search -->
+            <div class="hero-search">
+                <form method="GET" action="{% url 'assets:search_assets' %}" class="search-form">
+                    <div class="search-input-group">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" name="q" class="search-input" 
+                               placeholder="Search {{ category.name|lower }} assets..." 
+                               value="{{ request.GET.q }}">
+                        <button type="submit" class="search-button">
+                            <span>Search</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
+</section>
 
-<div class="category-content">
+<!-- Main Content -->
+<main class="category-main">
     <div class="container">
-        <!-- Breadcrumb -->
-        <div class="category-breadcrumb">
-            <nav class="category-breadcrumb-nav">
-                <a href="{% url 'assets:home' %}" class="category-breadcrumb-link">
-                    <i class="fas fa-home"></i> Home
-                </a>
-                <i class="fas fa-chevron-right category-breadcrumb-sep"></i>
-                <a href="{% url 'assets:asset_list' %}" class="category-breadcrumb-link">Assets</a>
-                <i class="fas fa-chevron-right category-breadcrumb-sep"></i>
-                <span>{{ category.name }}</span>
-            </nav>
-        </div>
+        <!-- Breadcrumb Navigation -->
+        <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{% url 'assets:home' %}">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="{% url 'assets:asset_list' %}">Assets</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    {{ category.name }}
+                </li>
+            </ol>
+        </nav>
 
 
         {% if assets %}
-            <div class="category-assets-count">
-                <p class="category-assets-count-text">
-                    {{ page_obj.paginator.count }} {{ category.name|lower }} asset{{ page_obj.paginator.count|pluralize }} available
-                </p>
-            </div>
-            
-            <!-- Filter and Sort Controls -->
-            <div class="category-controls">
-                <div class="view-controls">
-                    <div class="sort-dropdown">
-                        <button class="sort-btn" id="sortToggle">
-                            <i class="fas fa-sort"></i>
-                            Sort by: <span id="currentSort">Latest</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="sort-menu" id="sortMenu">
-                            <button class="sort-option active" data-sort="latest">
-                                <i class="fas fa-clock"></i> Latest First
+            <!-- Results Header -->
+            <div class="results-header">
+                <div class="results-info">
+                    <h2 class="results-count">
+                        {{ page_obj.paginator.count }} 
+                        <span class="count-label">{{ category.name|lower }} asset{{ page_obj.paginator.count|pluralize }}</span>
+                    </h2>
+                    <p class="results-subtitle">High-quality assets from verified creators</p>
+                </div>
+                
+                <!-- Modern Controls -->
+                <div class="controls-section">
+                    <div class="control-group">
+                        <div class="sort-control">
+                            <button class="control-btn" id="sortBtn">
+                                <i class="fas fa-sort-amount-down"></i>
+                                <span id="sortLabel">Latest</span>
+                                <i class="fas fa-chevron-down"></i>
                             </button>
-                            <button class="sort-option" data-sort="oldest">
-                                <i class="fas fa-history"></i> Oldest First
+                            <div class="dropdown-menu" id="sortMenu">
+                                <button class="dropdown-item active" data-sort="latest">
+                                    <i class="fas fa-clock"></i>
+                                    <span>Latest First</span>
+                                </button>
+                                <button class="dropdown-item" data-sort="oldest">
+                                    <i class="fas fa-history"></i>
+                                    <span>Oldest First</span>
+                                </button>
+                                <button class="dropdown-item" data-sort="title">
+                                    <i class="fas fa-font"></i>
+                                    <span>Alphabetical</span>
+                                </button>
+                                <button class="dropdown-item" data-sort="popular">
+                                    <i class="fas fa-fire"></i>
+                                    <span>Most Popular</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="filter-control">
+                            <button class="control-btn" id="filterBtn">
+                                <i class="fas fa-filter"></i>
+                                <span>Filters</span>
+                                <span class="filter-badge" id="filterBadge">0</span>
                             </button>
-                            <button class="sort-option" data-sort="title">
-                                <i class="fas fa-font"></i> Alphabetical
-                            </button>
-                            <button class="sort-option" data-sort="popular">
-                                <i class="fas fa-fire"></i> Most Popular
-                            </button>
+                            <div class="filter-panel" id="filterPanel">
+                                <div class="filter-header">
+                                    <h3>Filter Assets</h3>
+                                    <button class="filter-close" onclick="closeFilters()">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="filter-content">
+                                    <div class="filter-section">
+                                        <h4>Price</h4>
+                                        <label class="filter-option">
+                                            <input type="checkbox" data-filter="free">
+                                            <span class="checkmark"></span>
+                                            <span class="label">Free Assets</span>
+                                        </label>
+                                        <label class="filter-option">
+                                            <input type="checkbox" data-filter="paid">
+                                            <span class="checkmark"></span>
+                                            <span class="label">Premium Assets</span>
+                                        </label>
+                                    </div>
+                                    <div class="filter-section">
+                                        <h4>Special</h4>
+                                        <label class="filter-option">
+                                            <input type="checkbox" data-filter="featured">
+                                            <span class="checkmark"></span>
+                                            <span class="label">Featured</span>
+                                        </label>
+                                        <label class="filter-option">
+                                            <input type="checkbox" data-filter="new">
+                                            <span class="checkmark"></span>
+                                            <span class="label">New Releases</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="filter-actions">
+                                    <button class="btn-secondary" onclick="clearAllFilters()">Clear All</button>
+                                    <button class="btn-primary" onclick="applyFilters()">Apply Filters</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
@@ -105,258 +162,293 @@
                         </button>
                     </div>
                 </div>
-                
-                <div class="filter-controls">
-                    <button class="filter-btn" id="filterToggle">
-                        <i class="fas fa-filter"></i>
-                        Filters
-                        <span class="filter-count" id="filterCount" style="display: none;">0</span>
-                    </button>
-                    
-                    <div class="filter-panel" id="filterPanel">
-                        <div class="filter-group">
-                            <h4>Price</h4>
-                            <label class="filter-checkbox">
-                                <input type="checkbox" data-filter="free" />
-                                <span>Free Assets</span>
-                            </label>
-                            <label class="filter-checkbox">
-                                <input type="checkbox" data-filter="paid" />
-                                <span>Paid Assets</span>
-                            </label>
-                        </div>
-                        
-                        <div class="filter-group">
-                            <h4>Status</h4>
-                            <label class="filter-checkbox">
-                                <input type="checkbox" data-filter="new" />
-                                <span>New Assets</span>
-                            </label>
-                            <label class="filter-checkbox">
-                                <input type="checkbox" data-filter="featured" />
-                                <span>Featured</span>
-                            </label>
-                        </div>
-                        
-                        <div class="filter-actions">
-                            <button class="btn btn-secondary btn-sm" onclick="clearFilters()">
-                                Clear All
-                            </button>
-                            <button class="btn btn-primary btn-sm" onclick="applyFilters()">
-                                Apply Filters
-                            </button>
-                        </div>
-                    </div>
-                </div>
             </div>
 
-            <div class="asset-grid">
-                {% for asset in assets %}
-                <div class="asset-card" onclick="window.location.href='{% url 'assets:asset_detail' asset.id %}'" 
-                     role="button" tabindex="0" 
-                     onkeypress="if(event.key==='Enter') window.location.href='{% url 'assets:asset_detail' asset.id %}'"
-                     aria-label="View {{ asset.title }} details">
-                    
-                    <div class="asset-image-container">
-                        {% if asset.thumbnail %}
-                            <img src="{{ asset.thumbnail.url }}" alt="{{ asset.title }}" class="asset-image" loading="lazy">
-                        {% else %}
-                            <div class="asset-image asset-image-empty">
-                                <i class="fas fa-image asset-image-icon-medium"></i>
+            <!-- Assets Grid -->
+            <div class="assets-container">
+                <div class="assets-grid" id="assetsGrid">
+                    {% for asset in assets %}
+                    <article class="asset-card modern" 
+                             onclick="window.location.href='{% url 'assets:asset_detail' asset.id %}'" 
+                             role="button" tabindex="0"
+                             onkeypress="if(event.key==='Enter') window.location.href='{% url 'assets:asset_detail' asset.id %}'"
+                             aria-label="View {{ asset.title }} details">
+                        
+                        <div class="asset-media">
+                            {% if asset.thumbnail %}
+                                <img src="{{ asset.thumbnail.url }}" 
+                                     alt="{{ asset.title }}" 
+                                     class="asset-image" 
+                                     loading="lazy">
+                            {% else %}
+                                <div class="asset-placeholder">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Badges -->
+                            <div class="asset-badges">
+                                {% if asset.is_featured %}
+                                    <span class="badge featured">
+                                        <i class="fas fa-star"></i>
+                                        Featured
+                                    </span>
+                                {% endif %}
+                                {% if asset.is_free %}
+                                    <span class="badge free">
+                                        <i class="fas fa-gift"></i>
+                                        Free
+                                    </span>
+                                {% endif %}
+                                {% if asset.created_at|timesince|slice:":1" == "0" %}
+                                    <span class="badge new">
+                                        <i class="fas fa-sparkles"></i>
+                                        New
+                                    </span>
+                                {% endif %}
                             </div>
-                        {% endif %}
-                        
-                        <!-- Asset badges -->
-                        <div class="asset-badges">
-                            {% if asset.is_featured %}
-                                <span class="asset-badge badge-featured">
-                                    <i class="fas fa-star"></i> Featured
-                                </span>
-                            {% endif %}
-                            {% if asset.is_free %}
-                                <span class="asset-badge badge-free">
-                                    <i class="fas fa-gift"></i> Free
-                                </span>
-                            {% endif %}
-                            {% if asset.created_at|timesince|slice:":1" == "0" %}
-                                <span class="asset-badge badge-new">
-                                    <i class="fas fa-sparkles"></i> New
-                                </span>
-                            {% endif %}
-                        </div>
-                        
-                        <!-- Quick action overlay -->
-                        <div class="asset-overlay">
-                            <div class="overlay-actions">
-                                <button class="quick-action-btn" title="Quick Preview" 
+                            
+                            <!-- Quick Actions -->
+                            <div class="asset-actions">
+                                <button class="action-btn" 
+                                        title="Quick Preview" 
                                         onclick="event.stopPropagation(); showQuickPreview('{{ asset.id }}')">
                                     <i class="fas fa-eye"></i>
                                 </button>
-                                <button class="quick-action-btn" title="Add to Wishlist"
+                                <button class="action-btn wishlist-btn" 
+                                        title="Add to Wishlist"
                                         onclick="event.stopPropagation(); toggleWishlist('{{ asset.id }}')">
-                                    <i class="fas fa-heart"></i>
+                                    <i class="far fa-heart"></i>
                                 </button>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="asset-info">
-                        <h3 class="asset-title">{{ asset.title }}</h3>
-                        <p class="asset-creator">
-                            <i class="fas fa-user"></i> 
-                            by {{ asset.creator.get_full_name|default:asset.creator.username }}
-                        </p>
                         
-                        {% if asset.rating %}
-                        <div class="asset-rating">
-                            <div class="stars">
-                                {% for i in "12345" %}
-                                    {% if forloop.counter <= asset.rating|floatformat:0 %}
-                                        <i class="fas fa-star"></i>
-                                    {% elif forloop.counter == asset.rating|floatformat:0|add:'1' and asset.rating|floatformat:1|stringformat:'s'|slice:'-1' == '5' %}
-                                        <i class="fas fa-star-half-alt"></i>
-                                    {% else %}
-                                        <i class="far fa-star"></i>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                            <span class="rating-value">{{ asset.rating|floatformat:1 }}</span>
-                        </div>
-                        {% endif %}
-                        
-                        <p class="asset-desc-short">
-                            {{ asset.description|truncatewords:15 }}
-                        </p>
-                        
-                        <div class="asset-meta">
-                            <div class="asset-date-short">
-                                <i class="fas fa-calendar"></i> 
-                                {{ asset.created_at|date:"M d, Y" }}
-                            </div>
+                        <div class="asset-content">
+                            <h3 class="asset-title">{{ asset.title }}</h3>
+                            <p class="asset-creator">
+                                <i class="fas fa-user-circle"></i>
+                                {{ asset.creator.get_full_name|default:asset.creator.username }}
+                            </p>
                             
-                            {% if asset.download_count %}
-                            <div class="asset-downloads">
-                                <i class="fas fa-download"></i> 
-                                {{ asset.download_count }}
+                            {% if asset.rating %}
+                            <div class="asset-rating">
+                                <div class="stars">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= asset.rating|floatformat:0 %}
+                                            <i class="fas fa-star"></i>
+                                        {% elif forloop.counter == asset.rating|floatformat:0|add:'1' and asset.rating|floatformat:1|stringformat:'s'|slice:'-1' == '5' %}
+                                            <i class="fas fa-star-half-alt"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <span class="rating-text">{{ asset.rating|floatformat:1 }}</span>
                             </div>
                             {% endif %}
                             
-                            {% if asset.price and asset.price > 0 %}
-                            <div class="asset-price">
-                                <i class="fas fa-tag"></i> 
-                                ${{ asset.price }}
+                            <p class="asset-description">{{ asset.description|truncatewords:12 }}</p>
+                            
+                            <div class="asset-meta">
+                                <div class="meta-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>{{ asset.created_at|date:"M d, Y" }}</span>
+                                </div>
+                                {% if asset.download_count %}
+                                <div class="meta-item">
+                                    <i class="fas fa-download"></i>
+                                    <span>{{ asset.download_count }}</span>
+                                </div>
+                                {% endif %}
+                                {% if asset.price and asset.price > 0 %}
+                                <div class="meta-item price">
+                                    <i class="fas fa-tag"></i>
+                                    <span>${{ asset.price }}</span>
+                                </div>
+                                {% endif %}
                             </div>
-                            {% endif %}
                         </div>
-                    </div>
+                    </article>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
 
-            <!-- Pagination -->
+            <!-- Modern Pagination -->
             {% if page_obj.has_other_pages %}
-            <div class="category-pagination">
-                {% if page_obj.has_previous %}
-                    <a href="?page=1" class="btn btn-secondary">
-                        <i class="fas fa-angle-double-left"></i> First
-                    </a>
-                    <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">
-                        <i class="fas fa-angle-left"></i> Previous
-                    </a>
-                {% endif %}
+            <nav class="pagination-nav" aria-label="Page navigation">
+                <div class="pagination-info">
+                    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                </div>
+                <div class="pagination-controls">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1" class="pagination-btn" aria-label="First page">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                        <a href="?page={{ page_obj.previous_page_number }}" class="pagination-btn" aria-label="Previous page">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    {% endif %}
 
-                <span class="category-pagination-info">
-                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-                </span>
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <span class="pagination-btn active">{{ num }}</span>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <a href="?page={{ num }}" class="pagination-btn">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
 
-                {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">
-                        Next <i class="fas fa-angle-right"></i>
-                    </a>
-                    <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-secondary">
-                        Last <i class="fas fa-angle-double-right"></i>
-                    </a>
-                {% endif %}
-            </div>
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" class="pagination-btn" aria-label="Next page">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-btn" aria-label="Last page">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </nav>
             {% endif %}
         {% else %}
-            <div class="category-empty">
-                <i class="fas fa-{% if category.name == '2D Art' %}paint-brush{% elif category.name == '3D Models' %}cube{% elif category.name == 'Audio' %}music{% elif category.name == 'Textures' %}image{% elif category.name == 'Scripts' %}code{% elif category.name == 'Animations' %}play{% elif category.name == 'UI Elements' %}window-maximize{% else %}folder{% endif %} category-empty-icon"></i>
-                <h2>No {{ category.name }} Assets Yet</h2>
-                <p class="category-empty-desc">Be the first to upload {{ category.name|lower }} assets to our community!</p>
-                {% if user.is_authenticated and user.userprofile.is_verified %}
-                    <a href="{% url 'assets:upload_asset' %}" class="btn btn-primary">
-                        <i class="fas fa-upload"></i> Upload {{ category.name }} Asset
-                    </a>
-                {% else %}
-                    <div class="category-empty-btns">
-                        <a href="{% url 'assets:asset_list' %}" class="btn btn-secondary">
-                            <i class="fas fa-th-large"></i> Browse All Assets
-                        </a>
-                        <a href="{% url 'assets:home' %}" class="btn btn-primary">
-                            <i class="fas fa-home"></i> Back to Home
-                        </a>
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-illustration">
+                    <i class="fas fa-{% if category.name == '2D Art' %}paint-brush{% elif category.name == '3D Models' %}cube{% elif category.name == 'Audio' %}music{% elif category.name == 'Textures' %}image{% elif category.name == 'Scripts' %}code{% elif category.name == 'Animations' %}play{% elif category.name == 'UI Elements' %}window-maximize{% else %}folder{% endif %}"></i>
+                </div>
+                <div class="empty-content">
+                    <h2>No {{ category.name }} Assets Found</h2>
+                    <p>Be the first to contribute {{ category.name|lower }} assets to our community!</p>
+                    
+                    <div class="empty-actions">
+                        {% if user.is_authenticated and user.userprofile.is_verified %}
+                            <a href="{% url 'assets:upload_asset' %}" class="btn-primary">
+                                <i class="fas fa-upload"></i>
+                                Upload {{ category.name }} Asset
+                            </a>
+                        {% else %}
+                            <a href="{% url 'assets:asset_list' %}" class="btn-secondary">
+                                <i class="fas fa-th-large"></i>
+                                Browse All Assets
+                            </a>
+                            <a href="{% url 'assets:home' %}" class="btn-primary">
+                                <i class="fas fa-home"></i>
+                                Back to Home
+                            </a>
+                        {% endif %}
                     </div>
-                {% endif %}
+                </div>
             </div>
         {% endif %}
     </div>
-</div>
+</main>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-// Quick preview functionality
+// Modern Quick Preview System
 function showQuickPreview(assetId) {
-    // Create modal overlay
-    const overlay = document.createElement('div');
-    overlay.className = 'quick-preview-overlay';
-    overlay.innerHTML = `
-        <div class="quick-preview-modal">
-            <div class="quick-preview-header">
-                <h3>Quick Preview</h3>
-                <button class="close-preview" onclick="closeQuickPreview()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="quick-preview-content">
-                <div class="loading-spinner">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    Loading preview...
+    const modal = createModal();
+    document.body.appendChild(modal);
+    
+    // Animate in
+    requestAnimationFrame(() => {
+        modal.classList.add('active');
+    });
+    
+    // Fetch asset data
+    fetch(`/assets/${assetId}/preview/`)
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to load preview');
+            return response.json();
+        })
+        .then(data => {
+            const content = modal.querySelector('.modal-content');
+            content.innerHTML = `
+                <div class="preview-header">
+                    <div class="preview-title">
+                        <h3>${data.title}</h3>
+                        <p class="preview-creator">by ${data.creator}</p>
+                    </div>
+                    <button class="modal-close" onclick="closeQuickPreview()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="preview-body">
+                    <p class="preview-description">${data.description.substring(0, 200)}...</p>
+                    <div class="preview-meta">
+                        <span class="meta-item">
+                            <i class="fas fa-folder"></i>
+                            ${data.category}
+                        </span>
+                        <span class="meta-item price ${data.price > 0 ? 'paid' : 'free'}">
+                            <i class="fas fa-${data.price > 0 ? 'tag' : 'gift'}"></i>
+                            ${data.price > 0 ? '$' + data.price : 'Free'}
+                        </span>
+                    </div>
+                </div>
+                <div class="preview-actions">
+                    <a href="/assets/${assetId}/" class="btn-primary">
+                        <i class="fas fa-eye"></i>
+                        View Details
+                    </a>
+                    <button class="btn-secondary" onclick="closeQuickPreview()">
+                        <i class="fas fa-times"></i>
+                        Close
+                    </button>
+                </div>
+            `;
+        })
+        .catch(error => {
+            const content = modal.querySelector('.modal-content');
+            content.innerHTML = `
+                <div class="error-state">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Preview Unavailable</h3>
+                    <p>Unable to load asset preview. Please try again.</p>
+                    <button class="btn-primary" onclick="closeQuickPreview()">Close</button>
+                </div>
+            `;
+            console.error('Preview error:', error);
+        });
+}
+
+function createModal() {
+    const modal = document.createElement('div');
+    modal.className = 'preview-modal-overlay';
+    modal.onclick = (e) => {
+        if (e.target === modal) closeQuickPreview();
+    };
+    
+    modal.innerHTML = `
+        <div class="preview-modal">
+            <div class="modal-content">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading preview...</p>
                 </div>
             </div>
         </div>
     `;
     
-    document.body.appendChild(overlay);
-    
-    // Simulate loading (in real implementation, fetch asset details)
-    setTimeout(() => {
-        const content = overlay.querySelector('.quick-preview-content');
-        content.innerHTML = `
-            <p>Asset ID: ${assetId}</p>
-            <p>This would show a quick preview of the asset...</p>
-            <div class="quick-preview-actions">
-                <a href="/assets/${assetId}/" class="btn btn-primary">View Full Details</a>
-            </div>
-        `;
-    }, 500);
+    return modal;
 }
 
 function closeQuickPreview() {
-    const overlay = document.querySelector('.quick-preview-overlay');
-    if (overlay) {
-        overlay.remove();
+    const modal = document.querySelector('.preview-modal-overlay');
+    if (modal) {
+        modal.classList.add('closing');
+        setTimeout(() => modal.remove(), 300);
     }
 }
 
-// Wishlist functionality
+// Enhanced Wishlist System
 function toggleWishlist(assetId) {
-    const btn = event.target.closest('.quick-action-btn');
+    const btn = event.target.closest('.wishlist-btn');
     const icon = btn.querySelector('i');
     
-    // Toggle heart icon
-    if (icon.classList.contains('fas')) {
+    const isWishlisted = icon.classList.contains('fas');
+    
+    // Optimistic update
+    if (isWishlisted) {
         icon.classList.remove('fas');
         icon.classList.add('far');
         btn.title = 'Add to Wishlist';
@@ -367,381 +459,277 @@ function toggleWishlist(assetId) {
         btn.title = 'Remove from Wishlist';
         showNotification('Added to wishlist!', 'success');
     }
+    
+    // Add animation
+    btn.classList.add('wishlist-animate');
+    setTimeout(() => btn.classList.remove('wishlist-animate'), 300);
 }
 
-// Notification system
+// Modern Notification System
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
+    notification.className = `notification ${type}`;
+    
+    const icons = {
+        success: 'check-circle',
+        error: 'exclamation-triangle',
+        info: 'info-circle',
+        warning: 'exclamation-circle'
+    };
+    
     notification.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
-        <span>${message}</span>
+        <div class="notification-content">
+            <i class="fas fa-${icons[type]}"></i>
+            <span>${message}</span>
+        </div>
+        <button class="notification-close" onclick="this.parentElement.remove()">
+            <i class="fas fa-times"></i>
+        </button>
     `;
     
     document.body.appendChild(notification);
     
     // Animate in
-    setTimeout(() => notification.classList.add('show'), 100);
+    requestAnimationFrame(() => {
+        notification.classList.add('show');
+    });
     
-    // Remove after 3 seconds
+    // Auto remove
     setTimeout(() => {
         notification.classList.remove('show');
         setTimeout(() => notification.remove(), 300);
-    }, 3000);
+    }, 4000);
 }
 
-// Enhanced search functionality
+// Initialize Enhanced Controls
 document.addEventListener('DOMContentLoaded', function() {
-    const searchForm = document.querySelector('.search-container form');
-    const searchInput = document.querySelector('.search-bar');
-    
-    // Add search suggestions (mock implementation)
-    searchInput.addEventListener('input', function() {
-        const value = this.value.toLowerCase();
-        if (value.length > 2) {
-            // In real implementation, fetch suggestions from server
-            console.log('Searching for:', value);
-        }
-    });
-    
-    // Smooth scroll to results after search
-    searchForm.addEventListener('submit', function() {
-        setTimeout(() => {
-            const assetsSection = document.querySelector('.asset-grid');
-            if (assetsSection) {
-                assetsSection.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' 
-                });
-            }
-        }, 100);
-    });
-    
-    // Initialize filter and sort controls
     initializeControls();
+    initializeSearch();
+    setupKeyboardNavigation();
 });
 
-// Initialize filter and sort controls
 function initializeControls() {
-    // Sort dropdown functionality
-    const sortToggle = document.getElementById('sortToggle');
+    // Sort dropdown
+    const sortBtn = document.getElementById('sortBtn');
     const sortMenu = document.getElementById('sortMenu');
-    const sortOptions = document.querySelectorAll('.sort-option');
-    const currentSort = document.getElementById('currentSort');
+    const sortLabel = document.getElementById('sortLabel');
     
-    if (sortToggle && sortMenu) {
-        sortToggle.addEventListener('click', function(e) {
+    if (sortBtn && sortMenu) {
+        sortBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             sortMenu.classList.toggle('active');
-            closeFilterPanel();
+            closeFilters();
         });
         
-        sortOptions.forEach(option => {
-            option.addEventListener('click', function() {
-                const sortValue = this.dataset.sort;
-                const sortText = this.textContent.trim();
-                
+        sortMenu.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', () => {
                 // Update active state
-                sortOptions.forEach(opt => opt.classList.remove('active'));
-                this.classList.add('active');
+                sortMenu.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
                 
-                // Update button text
-                currentSort.textContent = sortText.split(' ')[0] + (sortText.split(' ')[1] || '');
+                // Update label
+                sortLabel.textContent = item.querySelector('span').textContent;
                 
                 // Close menu
                 sortMenu.classList.remove('active');
                 
-                // Apply sort
+                // Apply sorting
+                const sortValue = item.dataset.sort;
                 applySorting(sortValue);
             });
         });
     }
     
-    // Filter panel functionality
-    const filterToggle = document.getElementById('filterToggle');
+    // Filter control
+    const filterBtn = document.getElementById('filterBtn');
     const filterPanel = document.getElementById('filterPanel');
     
-    if (filterToggle && filterPanel) {
-        filterToggle.addEventListener('click', function(e) {
+    if (filterBtn && filterPanel) {
+        filterBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             filterPanel.classList.toggle('active');
             closeSortMenu();
         });
     }
     
-    // View toggle functionality
-    const viewButtons = document.querySelectorAll('.view-btn');
-    viewButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            viewButtons.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
+    // View toggle
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
             
-            const view = this.dataset.view;
+            const view = btn.dataset.view;
             toggleView(view);
         });
     });
     
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', function() {
-        closeSortMenu();
-        closeFilterPanel();
-    });
-    
     // Filter checkboxes
-    const filterCheckboxes = document.querySelectorAll('.filter-checkbox input');
-    filterCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', updateFilterCount);
+    document.querySelectorAll('.filter-option input').forEach(checkbox => {
+        checkbox.addEventListener('change', updateFilterBadge);
     });
     
-    updateFilterCount();
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', () => {
+        closeSortMenu();
+        closeFilters();
+    });
+    
+    updateFilterBadge();
 }
 
 function closeSortMenu() {
     const sortMenu = document.getElementById('sortMenu');
-    if (sortMenu) {
-        sortMenu.classList.remove('active');
-    }
+    if (sortMenu) sortMenu.classList.remove('active');
 }
 
-function closeFilterPanel() {
+function closeFilters() {
     const filterPanel = document.getElementById('filterPanel');
-    if (filterPanel) {
-        filterPanel.classList.remove('active');
-    }
+    if (filterPanel) filterPanel.classList.remove('active');
 }
 
 function applySorting(sortValue) {
-    const assetCards = Array.from(document.querySelectorAll('.asset-card'));
-    const assetGrid = document.querySelector('.asset-grid');
+    const grid = document.getElementById('assetsGrid');
+    const cards = Array.from(grid.querySelectorAll('.asset-card'));
     
-    assetCards.sort((a, b) => {
+    cards.sort((a, b) => {
         switch (sortValue) {
             case 'title':
                 const titleA = a.querySelector('.asset-title').textContent.toLowerCase();
                 const titleB = b.querySelector('.asset-title').textContent.toLowerCase();
                 return titleA.localeCompare(titleB);
-                
+            
             case 'oldest':
-                // In real implementation, use actual dates
-                return Math.random() - 0.5;
-                
+                // Would need server-side implementation for accurate sorting
+                return Math.random() - 0.5; // Placeholder
+            
             case 'popular':
-                // In real implementation, use download counts or ratings
-                return Math.random() - 0.5;
-                
+                const downloadsA = parseInt(a.querySelector('.meta-item:has(.fa-download)')?.textContent || '0');
+                const downloadsB = parseInt(b.querySelector('.meta-item:has(.fa-download)')?.textContent || '0');
+                return downloadsB - downloadsA;
+            
             case 'latest':
             default:
-                // In real implementation, use actual dates
-                return Math.random() - 0.5;
+                return Math.random() - 0.5; // Would need server-side for accurate dates
         }
     });
     
-    // Re-append sorted cards
-    assetCards.forEach(card => assetGrid.appendChild(card));
+    // Re-append sorted cards with animation
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            grid.appendChild(card);
+            requestAnimationFrame(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            });
+        }, index * 50);
+    });
     
-    showNotification(`Sorted by ${sortValue}`, 'info');
+    showNotification(`Sorted by ${sortValue}`, 'success');
 }
 
 function toggleView(view) {
-    const assetGrid = document.querySelector('.asset-grid');
+    const grid = document.getElementById('assetsGrid');
     
     if (view === 'list') {
-        assetGrid.classList.add('list-view');
+        grid.classList.add('list-view');
         showNotification('Switched to list view', 'info');
     } else {
-        assetGrid.classList.remove('list-view');
+        grid.classList.remove('list-view');
         showNotification('Switched to grid view', 'info');
     }
 }
 
-function updateFilterCount() {
-    const checkedFilters = document.querySelectorAll('.filter-checkbox input:checked');
-    const filterCount = document.getElementById('filterCount');
+function updateFilterBadge() {
+    const checkedFilters = document.querySelectorAll('.filter-option input:checked');
+    const badge = document.getElementById('filterBadge');
     
-    if (filterCount) {
-        if (checkedFilters.length > 0) {
-            filterCount.textContent = checkedFilters.length;
-            filterCount.style.display = 'flex';
-        } else {
-            filterCount.style.display = 'none';
-        }
+    if (badge) {
+        const count = checkedFilters.length;
+        badge.textContent = count;
+        badge.classList.toggle('active', count > 0);
     }
 }
 
-function clearFilters() {
-    const filterCheckboxes = document.querySelectorAll('.filter-checkbox input');
-    filterCheckboxes.forEach(checkbox => {
+function clearAllFilters() {
+    document.querySelectorAll('.filter-option input').forEach(checkbox => {
         checkbox.checked = false;
     });
-    updateFilterCount();
+    updateFilterBadge();
     applyFilters();
-    showNotification('Filters cleared', 'info');
+    showNotification('All filters cleared', 'info');
 }
 
 function applyFilters() {
-    const checkedFilters = Array.from(document.querySelectorAll('.filter-checkbox input:checked'))
+    const checkedFilters = Array.from(document.querySelectorAll('.filter-option input:checked'))
         .map(cb => cb.dataset.filter);
     
-    const assetCards = document.querySelectorAll('.asset-card');
+    const cards = document.querySelectorAll('.asset-card');
+    let visibleCount = 0;
     
-    assetCards.forEach(card => {
+    cards.forEach(card => {
         let shouldShow = true;
         
         if (checkedFilters.length > 0) {
             shouldShow = checkedFilters.some(filter => {
                 switch (filter) {
                     case 'free':
-                        return card.querySelector('.badge-free') !== null;
+                        return card.querySelector('.badge.free') !== null;
                     case 'paid':
-                        return card.querySelector('.asset-price') !== null;
+                        return card.querySelector('.meta-item.price') !== null;
                     case 'new':
-                        return card.querySelector('.badge-new') !== null;
+                        return card.querySelector('.badge.new') !== null;
                     case 'featured':
-                        return card.querySelector('.badge-featured') !== null;
+                        return card.querySelector('.badge.featured') !== null;
                     default:
                         return true;
                 }
             });
         }
         
-        card.style.display = shouldShow ? 'block' : 'none';
+        if (shouldShow) {
+            card.style.display = 'block';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
     });
     
-    closeFilterPanel();
+    closeFilters();
     
     if (checkedFilters.length > 0) {
-        showNotification(`Applied ${checkedFilters.length} filter${checkedFilters.length > 1 ? 's' : ''}`, 'success');
+        showNotification(`${visibleCount} assets match your filters`, 'success');
     }
 }
 
-// Close quick preview when clicking outside
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('quick-preview-overlay')) {
-        closeQuickPreview();
+function initializeSearch() {
+    const searchInput = document.querySelector('.search-input');
+    if (searchInput) {
+        let searchTimeout;
+        
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const value = this.value.toLowerCase();
+                if (value.length > 2) {
+                    // In a real implementation, show search suggestions
+                    console.log('Search suggestions for:', value);
+                }
+            }, 300);
+        });
     }
-});
+}
 
-// Keyboard navigation support
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        closeQuickPreview();
-    }
-});
+function setupKeyboardNavigation() {
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeQuickPreview();
+            closeSortMenu();
+            closeFilters();
+        }
+    });
+}
 </script>
-
-<style>
-/* Quick Preview Modal Styles */
-.quick-preview-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    opacity: 0;
-    animation: fadeIn 0.3s ease forwards;
-}
-
-.quick-preview-modal {
-    background: var(--gray-200, #334155);
-    border-radius: 16px;
-    max-width: 500px;
-    width: 90%;
-    max-height: 80vh;
-    overflow: hidden;
-    transform: scale(0.8);
-    animation: scaleIn 0.3s ease forwards;
-}
-
-.quick-preview-header {
-    padding: 1.5rem;
-    border-bottom: 1px solid var(--gray-300, #475569);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.quick-preview-header h3 {
-    color: var(--white, #ffffff);
-    margin: 0;
-}
-
-.close-preview {
-    background: none;
-    border: none;
-    color: var(--gray-500, #94a3b8);
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-}
-
-.close-preview:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--white, #ffffff);
-}
-
-.quick-preview-content {
-    padding: 1.5rem;
-    color: var(--gray-600, #cbd5e1);
-}
-
-.loading-spinner {
-    text-align: center;
-    padding: 2rem;
-    color: var(--primary-color, #3b82f6);
-}
-
-.quick-preview-actions {
-    margin-top: 1.5rem;
-    text-align: center;
-}
-
-/* Notification Styles */
-.notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: var(--gray-200, #334155);
-    color: var(--white, #ffffff);
-    padding: 1rem 1.5rem;
-    border-radius: 10px;
-    border: 2px solid;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    transform: translateX(100%);
-    transition: transform 0.3s ease;
-    z-index: 1001;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-.notification.show {
-    transform: translateX(0);
-}
-
-.notification-success {
-    border-color: #10b981;
-    background: linear-gradient(135deg, #065f46, #047857);
-}
-
-.notification-info {
-    border-color: var(--primary-color, #3b82f6);
-    background: linear-gradient(135deg, #1e40af, #2563eb);
-}
-
-@keyframes fadeIn {
-    to { opacity: 1; }
-}
-
-@keyframes scaleIn {
-    to { transform: scale(1); }
-}
-</style>
 {% endblock %}
 

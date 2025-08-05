@@ -183,27 +183,118 @@ def category_assets(request, category_slug):
     return render(request, 'assets/category_assets.html', context)
 
 def search_assets(request):
-    """Search assets"""
+    """Enhanced search assets with filtering and sorting"""
     query = request.GET.get('q', '')
-    assets = Asset.objects.select_related('creator', 'category').order_by('-created_at')
+    category_id = request.GET.get('category')
+    price_range = request.GET.get('price_range')
+    file_type = request.GET.get('file_type')
+    sort = request.GET.get('sort', '')
     
+    # Start with all assets
+    assets = Asset.objects.select_related('creator', 'category').all()
+    
+    # Apply search query filter
     if query:
         assets = assets.filter(
             Q(title__icontains=query) |
             Q(description__icontains=query) |
             Q(category__name__icontains=query) |
-            Q(creator__username__icontains=query)
+            Q(creator__username__icontains=query) |
+            Q(creator__first_name__icontains=query) |
+            Q(creator__last_name__icontains=query)
         )
+    
+    # Apply category filter
+    if category_id:
+        try:
+            assets = assets.filter(category_id=int(category_id))
+        except (ValueError, TypeError):
+            pass
+    
+    # Apply price range filter
+    if price_range:
+        if price_range == 'free':
+            assets = assets.filter(price=0)
+        elif price_range == '0-10':
+            assets = assets.filter(price__gt=0, price__lte=10)
+        elif price_range == '10-50':
+            assets = assets.filter(price__gt=10, price__lte=50)
+        elif price_range == '50-100':
+            assets = assets.filter(price__gt=50, price__lte=100)
+        elif price_range == '100+':
+            assets = assets.filter(price__gt=100)
+    
+    # Apply file type filter (basic implementation)
+    if file_type:
+        if file_type == 'image':
+            assets = assets.filter(
+                Q(file__icontains='.jpg') | Q(file__icontains='.jpeg') |
+                Q(file__icontains='.png') | Q(file__icontains='.gif') |
+                Q(file__icontains='.bmp') | Q(file__icontains='.tiff')
+            )
+        elif file_type == '3d':
+            assets = assets.filter(
+                Q(file__icontains='.obj') | Q(file__icontains='.fbx') |
+                Q(file__icontains='.blend') | Q(file__icontains='.3ds') |
+                Q(file__icontains='.dae') | Q(file__icontains='.max')
+            )
+        elif file_type == 'audio':
+            assets = assets.filter(
+                Q(file__icontains='.mp3') | Q(file__icontains='.wav') |
+                Q(file__icontains='.ogg') | Q(file__icontains='.flac') |
+                Q(file__icontains='.m4a')
+            )
+        elif file_type == 'video':
+            assets = assets.filter(
+                Q(file__icontains='.mp4') | Q(file__icontains='.avi') |
+                Q(file__icontains='.mov') | Q(file__icontains='.wmv') |
+                Q(file__icontains='.flv') | Q(file__icontains='.webm')
+            )
+        elif file_type == 'script':
+            assets = assets.filter(
+                Q(file__icontains='.py') | Q(file__icontains='.js') |
+                Q(file__icontains='.cs') | Q(file__icontains='.cpp') |
+                Q(file__icontains='.c') | Q(file__icontains='.java')
+            )
+    
+    # Apply sorting
+    if sort == 'newest':
+        assets = assets.order_by('-created_at')
+    elif sort == 'oldest':
+        assets = assets.order_by('created_at')  
+    elif sort == 'price_low':
+        assets = assets.order_by('price', '-created_at')
+    elif sort == 'price_high':
+        assets = assets.order_by('-price', '-created_at')
+    elif sort == 'name':
+        assets = assets.order_by('title')
+    else:
+        # Default ordering - featured first, then by relevance/date
+        if query:
+            # For search results, order by relevance (basic implementation)
+            assets = assets.order_by('-is_featured', '-created_at')
+        else:
+            assets = assets.order_by('-is_featured', '-created_at')
     
     # Pagination
     paginator = Paginator(assets, 12)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
+    # Get categories for filter dropdown
+    categories = Category.objects.all().order_by('name')
+    
     context = {
         'query': query,
         'page_obj': page_obj,
         'assets': page_obj,
+        'categories': categories,
+        'current_filters': {
+            'category': category_id,
+            'price_range': price_range,
+            'file_type': file_type,
+            'sort': sort,
+        }
     }
     return render(request, 'assets/search_results.html', context)
 
@@ -272,98 +363,272 @@ def user_logout(request):
 
 @csrf_exempt
 def chatbot_api(request):
-    """Simple chatbot API for asset recommendations"""
+    """Enhanced AI chatbot API for asset recommendations"""
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            user_message = data.get('message', '').lower()
+            user_message = data.get('message', '').lower().strip()
+            conversation_history = data.get('conversation_history', [])
+            request_id = data.get('request_id', '')
             
-            # Simple keyword-based responses
-            response = generate_chatbot_response(user_message)
+            if not user_message:
+                return JsonResponse({'error': 'Message cannot be empty'}, status=400)
             
-            return JsonResponse({'response': response})
+            # Generate enhanced chatbot response
+            response_data = generate_enhanced_chatbot_response(user_message, conversation_history)
+            
+            return JsonResponse(response_data)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+            return JsonResponse({'error': f'Server error: {str(e)}'}, status=500)
     
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
-def generate_chatbot_response(message):
-    """Generate chatbot response based on keywords"""
-    message = message.lower()
+def generate_enhanced_chatbot_response(message, conversation_history=None):
+    """Generate enhanced chatbot response with actions and context awareness"""
+    message = message.lower().strip()
     
-    # Asset type recommendations
-    if any(word in message for word in ['3d', 'model', 'character', 'object']):
-        assets = Asset.objects.filter(category__name__icontains='3D').order_by('-created_at')[:3]
+    # Context from conversation history
+    has_context = conversation_history and len(conversation_history) > 0
+    
+    # Greeting responses
+    if any(word in message for word in ['hi', 'hello', 'hey', 'greetings', 'good morning', 'good afternoon']):
+        return {
+            'response': "Hello! 👋 Welcome to Nexus Store! I'm here to help you find amazing game development assets. What type of project are you working on?",
+            'actions': [
+                {'label': '3D Game', 'text': 'I need 3D assets'},
+                {'label': '2D Game', 'text': 'I need 2D assets'},
+                {'label': 'Just Browsing', 'text': 'Show me popular assets'}
+            ],
+            'quick_actions': [
+                {'icon': '🎮', 'label': '3D Models', 'text': 'Show me 3D models'},
+                {'icon': '🎨', 'label': '2D Art', 'text': 'Show me 2D art'},
+                {'icon': '🎵', 'label': 'Audio', 'text': 'Show me audio assets'},
+                {'icon': '🔥', 'label': 'Popular', 'text': 'Show me popular assets'}
+            ]
+        }
+    
+    # Asset type specific searches with enhanced responses
+    if any(word in message for word in ['3d', 'model', 'character', 'object', 'mesh']):
+        assets = Asset.objects.filter(category__name__icontains='3D').order_by('-created_at')[:5]
         if assets:
-            asset_list = ', '.join([asset.title for asset in assets])
-            return f"I found some great 3D models for you: {asset_list}. You can find more in our 3D Models category!"
-        return "Check out our 3D Models category for characters, objects, and environments!"
+            asset_names = [asset.title for asset in assets]
+            asset_list = ', '.join(asset_names[:3])
+            count = assets.count()
+            
+            response = f"🎮 Great choice! I found {count}+ 3D models including: **{asset_list}**"
+            if count > 3:
+                response += f" and {count-3} more!"
+            response += "\n\nThese are perfect for characters, environments, and game objects. Would you like to see a specific type?"
+            
+            return {
+                'response': response,
+                'actions': [
+                    {'label': 'Characters', 'text': 'Show me 3D characters'},
+                    {'label': 'Environments', 'text': 'Show me 3D environments'},
+                    {'label': 'Browse All', 'text': 'Browse all 3D models'}
+                ],
+                'quick_actions': [
+                    {'icon': '👤', 'label': 'Characters', 'text': 'Show me 3D characters'},
+                    {'icon': '🏰', 'label': 'Buildings', 'text': 'Show me 3D buildings'},
+                    {'icon': '🚗', 'label': 'Vehicles', 'text': 'Show me 3D vehicles'},
+                    {'icon': '⚔️', 'label': 'Weapons', 'text': 'Show me 3D weapons'}
+                ]
+            }
+        return {
+            'response': "🎮 Our 3D Models category has characters, environments, props, and more! Perfect for Unity, Unreal Engine, and Blender projects. What specific type of 3D asset are you looking for?",
+            'actions': [
+                {'label': 'Browse 3D', 'text': 'Browse all 3D models'},
+                {'label': 'Characters', 'text': 'Show me 3D characters'},
+                {'label': 'Environments', 'text': 'Show me 3D environments'}
+            ]
+        }
     
-    elif any(word in message for word in ['2d', 'sprite', 'art', 'drawing']):
-        assets = Asset.objects.filter(category__name__icontains='2D').order_by('-created_at')[:3]
+    elif any(word in message for word in ['2d', 'sprite', 'art', 'drawing', 'pixel']):
+        assets = Asset.objects.filter(category__name__icontains='2D').order_by('-created_at')[:5]
         if assets:
-            asset_list = ', '.join([asset.title for asset in assets])
-            return f"Here are some amazing 2D art assets: {asset_list}. Browse our 2D Art category for more!"
-        return "Our 2D Art category has sprites, backgrounds, and illustrations perfect for your game!"
+            asset_names = [asset.title for asset in assets]
+            asset_list = ', '.join(asset_names[:3])
+            count = assets.count()
+            
+            response = f"🎨 Perfect! I found {count}+ 2D art assets including: **{asset_list}**"
+            if count > 3:
+                response += f" and {count-3} more!"
+            response += "\n\nThese include sprites, backgrounds, UI elements, and pixel art. What style are you looking for?"
+            
+            return {
+                'response': response,
+                'actions': [
+                    {'label': 'Sprites', 'text': 'Show me character sprites'},
+                    {'label': 'Backgrounds', 'text': 'Show me 2D backgrounds'},
+                    {'label': 'Browse All', 'text': 'Browse all 2D art'}
+                ],
+                'quick_actions': [
+                    {'icon': '🧙', 'label': 'Characters', 'text': 'Show me 2D characters'},
+                    {'icon': '🏞️', 'label': 'Backgrounds', 'text': 'Show me 2D backgrounds'},
+                    {'icon': '🔳', 'label': 'Pixel Art', 'text': 'Show me pixel art'},
+                    {'icon': '🎭', 'label': 'Icons', 'text': 'Show me 2D icons'}
+                ]
+            }
+        return {
+            'response': "🎨 Our 2D Art collection includes sprites, backgrounds, pixel art, and illustrations! Great for indie games, mobile games, and retro-style projects. What kind of 2D assets do you need?",
+            'actions': [
+                {'label': 'Browse 2D', 'text': 'Browse all 2D art'},
+                {'label': 'Pixel Art', 'text': 'Show me pixel art'},
+                {'label': 'Sprites', 'text': 'Show me character sprites'}
+            ]
+        }
     
-    elif any(word in message for word in ['audio', 'sound', 'music', 'sfx']):
-        assets = Asset.objects.filter(category__name__icontains='Audio').order_by('-created_at')[:3]
+    elif any(word in message for word in ['audio', 'sound', 'music', 'sfx', 'soundtrack']):
+        assets = Asset.objects.filter(category__name__icontains='Audio').order_by('-created_at')[:5]
         if assets:
-            asset_list = ', '.join([asset.title for asset in assets])
-            return f"I found these audio assets: {asset_list}. Check our Audio category for more sounds!"
-        return "Visit our Audio category for music tracks, sound effects, and ambient sounds!"
+            asset_names = [asset.title for asset in assets]
+            asset_list = ', '.join(asset_names[:3])
+            count = assets.count()
+            
+            response = f"🎵 Awesome! I found {count}+ audio assets including: **{asset_list}**"
+            if count > 3:
+                response += f" and {count-3} more!"
+            response += "\n\nWe have background music, sound effects, and ambient sounds. What type of audio do you need?"
+            
+            return {
+                'response': response,
+                'actions': [
+                    {'label': 'Music', 'text': 'Show me background music'},
+                    {'label': 'Sound Effects', 'text': 'Show me sound effects'},
+                    {'label': 'Browse All', 'text': 'Browse all audio'}
+                ],
+                'quick_actions': [
+                    {'icon': '🎼', 'label': 'Music', 'text': 'Show me background music'},
+                    {'icon': '💥', 'label': 'SFX', 'text': 'Show me sound effects'},
+                    {'icon': '🌊', 'label': 'Ambient', 'text': 'Show me ambient sounds'},
+                    {'icon': '🎸', 'label': 'Loops', 'text': 'Show me music loops'}
+                ]
+            }
+        return {
+            'response': "🎵 Our Audio collection includes background music, sound effects, ambient sounds, and voice clips! Perfect for creating immersive game experiences. What type of audio are you looking for?",
+            'actions': [
+                {'label': 'Browse Audio', 'text': 'Browse all audio'},
+                {'label': 'Background Music', 'text': 'Show me background music'},
+                {'label': 'Sound Effects', 'text': 'Show me sound effects'}
+            ]
+        }
     
-    elif any(word in message for word in ['texture', 'material']):
-        assets = Asset.objects.filter(category__name__icontains='Texture').order_by('-created_at')[:3]
-        if assets:
-            asset_list = ', '.join([asset.title for asset in assets])
-            return f"Here are some texture assets: {asset_list}. Find more in our Textures category!"
-        return "Our Textures category has materials for walls, floors, and surfaces!"
+    # Popular/trending assets
+    elif any(word in message for word in ['popular', 'trending', 'best', 'top', 'featured']):
+        featured_assets = Asset.objects.filter(is_featured=True).order_by('-created_at')[:4]
+        if featured_assets:
+            asset_list = ', '.join([asset.title for asset in featured_assets[:3]])
+            response = f"🔥 Here are our most popular assets right now: **{asset_list}**"
+            if len(featured_assets) > 3:
+                response += f" and more!"
+            response += f"\n\nThese have been downloaded by hundreds of developers. Check them out!"
+            
+            return {
+                'response': response,
+                'actions': [
+                    {'label': 'View Featured', 'text': 'Show me all featured assets'},
+                    {'label': 'Most Downloaded', 'text': 'Show me most downloaded'},
+                    {'label': 'Recent Popular', 'text': 'Show me recent popular assets'}
+                ]
+            }
+        return {
+            'response': "🔥 Our featured assets are the community favorites! These are high-quality, well-reviewed assets that developers love. Want to see what's trending?",
+            'actions': [
+                {'label': 'View Featured', 'text': 'Show me featured assets'},
+                {'label': 'Browse All', 'text': 'Browse all assets'}
+            ]
+        }
     
-    elif any(word in message for word in ['script', 'code', 'programming']):
-        assets = Asset.objects.filter(category__name__icontains='Script').order_by('-created_at')[:3]
-        if assets:
-            asset_list = ', '.join([asset.title for asset in assets])
-            return f"Check out these scripts: {asset_list}. More available in our Scripts category!"
-        return "Browse our Scripts category for useful code snippets and tools!"
+    # Latest/new assets
+    elif any(word in message for word in ['latest', 'new', 'recent', 'newest']):
+        recent_assets = Asset.objects.order_by('-created_at')[:4]
+        if recent_assets:
+            asset_list = ', '.join([asset.title for asset in recent_assets[:3]])
+            response = f"🆕 Fresh additions to our collection: **{asset_list}**"
+            if len(recent_assets) > 3:
+                response += " and more!"
+            response += "\n\nThese were just added by our amazing community of creators!"
+            
+            return {
+                'response': response,
+                'actions': [
+                    {'label': 'View All New', 'text': 'Show me all new assets'},
+                    {'label': 'This Week', 'text': 'Show me assets from this week'},
+                    {'label': 'Subscribe', 'text': 'How do I get notified of new assets?'}
+                ]
+            }
+        return {
+            'response': "🆕 We're constantly adding new assets to our collection! Our creators upload fresh content regularly. Want to see the latest additions?",
+            'actions': [
+                {'label': 'View Latest', 'text': 'Show me latest assets'},
+                {'label': 'Browse All', 'text': 'Browse all assets'}
+            ]
+        }
     
-    elif any(word in message for word in ['ui', 'interface', 'button', 'menu']):
-        assets = Asset.objects.filter(category__name__icontains='UI').order_by('-created_at')[:3]
-        if assets:
-            asset_list = ', '.join([asset.title for asset in assets])
-            return f"Here are some UI elements: {asset_list}. Find more in our UI Elements category!"
-        return "Our UI Elements category has buttons, menus, and interface components!"
+    # Help and guidance
+    elif any(word in message for word in ['help', 'how', 'guide', 'tutorial', 'explain']):
+        return {
+            'response': "🤝 I'm here to help! I can assist you with:\n\n• **Finding Assets**: Tell me what type of assets you need\n• **Categories**: Browse our organized collections\n• **Downloads**: Learn how to download and use assets\n• **Uploads**: Information about sharing your creations\n\nWhat would you like to know more about?",
+            'actions': [
+                {'label': 'Finding Assets', 'text': 'How do I find the right assets?'},
+                {'label': 'Downloads', 'text': 'How do I download assets?'},
+                {'label': 'Upload Guide', 'text': 'How do I upload my assets?'}
+            ],
+            'quick_actions': [
+                {'icon': '📁', 'label': 'Categories', 'text': 'Show me all categories'},
+                {'icon': '⬇️', 'label': 'Download Help', 'text': 'How do I download assets?'},
+                {'icon': '⬆️', 'label': 'Upload Help', 'text': 'How do I upload assets?'},
+                {'icon': '🔍', 'label': 'Search Tips', 'text': 'Give me search tips'}
+            ]
+        }
     
-    elif any(word in message for word in ['animation', 'animate']):
-        assets = Asset.objects.filter(category__name__icontains='Animation').order_by('-created_at')[:3]
-        if assets:
-            asset_list = ', '.join([asset.title for asset in assets])
-            return f"I found these animations: {asset_list}. Browse our Animations category for more!"
-        return "Check out our Animations category for character and object animations!"
+    # Download information
+    elif any(word in message for word in ['download', 'free', 'cost', 'price']):
+        return {
+            'response': "💰 All assets on Nexus Store are **completely free** for educational use! 🎉\n\n**To download:**\n1. Browse or search for assets\n2. Click on any asset you like\n3. Hit the download button\n4. Enjoy creating!\n\n*Note: You'll need to be logged in to download assets.*",
+            'actions': [
+                {'label': 'Sign Up', 'text': 'How do I create an account?'},
+                {'label': 'Browse Assets', 'text': 'Show me assets to download'},
+                {'label': 'License Info', 'text': 'Tell me about licenses'}
+            ]
+        }
     
-    elif any(word in message for word in ['environment', 'level', 'scene']):
-        assets = Asset.objects.filter(category__name__icontains='Environment').order_by('-created_at')[:3]
-        if assets:
-            asset_list = ', '.join([asset.title for asset in assets])
-            return f"Here are some environments: {asset_list}. More available in our Environments category!"
-        return "Our Environments category has complete scenes and level assets!"
-    
-    elif any(word in message for word in ['help', 'how', 'what']):
-        return "I can help you find assets! Try asking about 3D models, 2D art, audio, textures, scripts, UI elements, animations, or environments. You can also browse by category or use the search bar!"
-    
-    elif any(word in message for word in ['download', 'free']):
-        return "All assets on our platform are free for educational use! Just click on any asset and hit the download button. You'll need to be logged in to download."
-    
-    elif any(word in message for word in ['upload', 'share']):
-        return "To upload assets, you need to be a verified user. Register an account and contact the administrator to get verified. Then you can share your creations with the community!"
+    # Upload information
+    elif any(word in message for word in ['upload', 'share', 'publish', 'contribute']):
+        return {
+            'response': "🎨 Love creating? We'd love to have your assets in our community!\n\n**To become a publisher:**\n1. Create an account\n2. Get verified by our team\n3. Upload your amazing creations\n4. Share with the community!\n\nContact our administrators to get verified and start sharing your work!",
+            'actions': [
+                {'label': 'Contact Admin', 'text': 'How do I contact administrators?'},
+                {'label': 'Learn More', 'text': 'Tell me more about publishing'},
+                {'label': 'Guidelines', 'text': 'What are the upload guidelines?'}
+            ]
+        }
     
     else:
-        # Default response with recent assets
+        # Context-aware default response
         recent_assets = Asset.objects.order_by('-created_at')[:3]
         if recent_assets:
             asset_list = ', '.join([asset.title for asset in recent_assets])
-            return f"Here are some of our latest assets: {asset_list}. What type of assets are you looking for? I can help you find 3D models, 2D art, audio, textures, and more!"
-        return "Welcome to GameAsset Store! I can help you find the perfect assets for your game. What are you working on? Try asking about 3D models, 2D art, audio, or any other type of asset!"
+            response = f"I'm not sure I understood that, but here are some of our latest assets: **{asset_list}**\n\nI can help you find specific types of assets! Try asking about:"
+        else:
+            response = "I'm not sure I understood that, but I'm here to help you find amazing game development assets!\n\nI can help you find:"
+        
+        return {
+            'response': response,
+            'actions': [
+                {'label': '3D Models', 'text': 'Show me 3D models'},
+                {'label': '2D Art', 'text': 'Show me 2D art'},
+                {'label': 'Audio Assets', 'text': 'Show me audio assets'}
+            ],
+            'quick_actions': [
+                {'icon': '🎮', 'label': '3D Models', 'text': 'Show me 3D models'},
+                {'icon': '🎨', 'label': '2D Art', 'text': 'Show me 2D art'},
+                {'icon': '🎵', 'label': 'Audio', 'text': 'Show me audio assets'},
+                {'icon': '🏠', 'label': 'Home', 'text': 'Take me to the homepage'}
+            ]
+        }
 
 
 # Enhanced Library Management Views
@@ -422,4 +687,29 @@ def remove_from_library(request, asset_id):
             })
     
     return JsonResponse({'success': False, 'message': 'Invalid request method.'})
+
+def asset_preview_api(request, asset_id):
+    """API endpoint for asset quick preview"""
+    try:
+        asset = get_object_or_404(Asset, id=asset_id)
+        data = {
+            'id': asset.id,
+            'title': asset.title,
+            'description': asset.description,
+            'creator': asset.creator.get_full_name() or asset.creator.username,
+            'category': asset.category.name if asset.category else 'Uncategorized',
+            'price': float(asset.price) if asset.price else 0,
+            'is_free': asset.is_free,
+            'is_featured': asset.is_featured,
+            'is_new': asset.is_new,
+            'download_count': asset.download_count,
+            'created_at': asset.created_at.strftime('%B %d, %Y'),
+            'thumbnail_url': asset.thumbnail.url if asset.thumbnail else None,
+        }
+        return JsonResponse({'success': True, 'data': data})
+    except Exception as e:
+        return JsonResponse({
+            'success': False, 
+            'error': 'Asset not found or error occurred'
+        }, status=404)
 

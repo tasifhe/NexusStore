@@ -1,124 +1,478 @@
 {% extends 'assets/base.html' %}
+{% load static %}
 
-{% block title %}{% if query %}Search: {{ query }}{% else %}Search Assets{% endif %} - GameAsset Store{% endblock %}
+{% block title %}Search Results - NexusStore{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'assets/css/search-enhanced.css' %}">
+{% endblock %}
 
 {% block content %}
+<!-- Search Hero Section -->
+<section class="search-hero">
+    <h1><i class="fas fa-search"></i> Search Results</h1>
+    <p>Discover amazing assets from our community</p>
+    
+    <!-- Enhanced Search Form -->
+    <div class="search-form-container">
+        <form method="get" class="search-form" id="searchForm" action="{% url 'assets:search_assets' %}">
+            <input 
+                type="text" 
+                name="q" 
+                value="{{ query }}" 
+                placeholder="Search for assets, creators, or categories..."
+                class="search-input"
+                id="searchInput"
+                autocomplete="off"
+            >
+            <button type="submit" class="search-btn">
+                <i class="fas fa-search"></i>
+                Search
+            </button>
+        </form>
+        
+        <!-- Search Autocomplete (initially hidden) -->
+        <div class="search-autocomplete" id="searchAutocomplete" style="display: none;">
+            <!-- Dynamic content will be populated here -->
+        </div>
+    </div>
+</section>
 
-<div class="search-hero">
-    <div class="container">
-        <h1><i class="fas fa-search"></i> Search Results</h1>
+<!-- Search Filters -->
+<section class="search-filters">
+    <div class="filters-header">
+        <h3 class="filters-title">
+            <i class="fas fa-filter"></i>
+            Filters
+        </h3>
+        <button type="button" class="filters-toggle" id="filtersToggle">
+            <i class="fas fa-sliders-h"></i>
+            Toggle Filters
+        </button>
+    </div>
+    
+    <div class="filters-content" id="filtersContent">
+        <form method="get" id="filterForm" action="{% url 'assets:search_assets' %}">
+            <input type="hidden" name="q" value="{{ query }}">
+            
+            <div class="filter-group">
+                <label class="filter-label">Category</label>
+                <select name="category" class="filter-select" onchange="submitFilters()">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}" {% if current_filters.category == category.id|stringformat:"s" %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">Price Range</label>
+                <select name="price_range" class="filter-select" onchange="submitFilters()">
+                    <option value="">Any Price</option>
+                    <option value="free" {% if current_filters.price_range == "free" %}selected{% endif %}>Free</option>
+                    <option value="0-10" {% if current_filters.price_range == "0-10" %}selected{% endif %}>$0 - $10</option>
+                    <option value="10-50" {% if current_filters.price_range == "10-50" %}selected{% endif %}>$10 - $50</option>
+                    <option value="50-100" {% if current_filters.price_range == "50-100" %}selected{% endif %}>$50 - $100</option>
+                    <option value="100+" {% if current_filters.price_range == "100+" %}selected{% endif %}>$100+</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">File Type</label>
+                <select name="file_type" class="filter-select" onchange="submitFilters()">
+                    <option value="">Any Type</option>
+                    <option value="image" {% if current_filters.file_type == "image" %}selected{% endif %}>Images</option>
+                    <option value="3d" {% if current_filters.file_type == "3d" %}selected{% endif %}>3D Models</option>
+                    <option value="audio" {% if current_filters.file_type == "audio" %}selected{% endif %}>Audio</option>
+                    <option value="video" {% if current_filters.file_type == "video" %}selected{% endif %}>Video</option>
+                    <option value="script" {% if current_filters.file_type == "script" %}selected{% endif %}>Scripts</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">Sort By</label>
+                <select name="sort" class="filter-select" onchange="submitFilters()">
+                    <option value="">Relevance</option>
+                    <option value="newest" {% if current_filters.sort == "newest" %}selected{% endif %}>Newest First</option>
+                    <option value="oldest" {% if current_filters.sort == "oldest" %}selected{% endif %}>Oldest First</option>
+                    <option value="price_low" {% if current_filters.sort == "price_low" %}selected{% endif %}>Price: Low to High</option>
+                    <option value="price_high" {% if current_filters.sort == "price_high" %}selected{% endif %}>Price: High to Low</option>
+                    <option value="name" {% if current_filters.sort == "name" %}selected{% endif %}>Name A-Z</option>
+                </select>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- Search Results Header -->
+<div class="search-results-header">
+    <div class="search-results-info">
         {% if query %}
-            <p class="search-hero-desc">Results for "{{ query }}"</p>
+        <h2 class="search-query">Results for "<span class="search-highlight">{{ query }}</span>"</h2>
         {% else %}
-            <p class="search-hero-desc">Search our asset library</p>
+        <h2 class="search-query">All Assets</h2>
         {% endif %}
-        <div class="search-container">
-            <form method="GET" action="{% url 'assets:search_assets' %}">
-                <input type="text" name="q" class="search-bar" placeholder="Search assets..." value="{{ query }}">
-                <button type="submit" class="search-btn">
-                    <i class="fas fa-search"></i>
-                </button>
-            </form>
+        <p class="search-stats">
+            {% if assets %}
+                {% if page_obj %}
+                    Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} assets
+                {% else %}
+                    {{ assets|length }} asset{{ assets|length|pluralize }} found
+                {% endif %}
+            {% else %}
+                No assets found
+            {% endif %}
+        </p>
+    </div>
+    
+    <div class="search-results-controls">
+        <div class="view-toggle">
+            <button type="button" class="view-btn active" data-view="grid" id="gridViewBtn">
+                <i class="fas fa-th"></i>
+            </button>
+            <button type="button" class="view-btn" data-view="list" id="listViewBtn">
+                <i class="fas fa-list"></i>
+            </button>
         </div>
     </div>
 </div>
 
-<div class="search-content">
-    <div class="container">
-        {% if query %}
-            <div class="search-results-info">
-                <p class="search-results-info-text">
-                    {% if assets %}
-                        Found {{ page_obj.paginator.count }} result{{ page_obj.paginator.count|pluralize }} for "{{ query }}"
-                    {% else %}
-                        No results found for "{{ query }}"
-                    {% endif %}
-                </p>
-            </div>
-        {% endif %}
-
-        {% if assets %}
-            <div class="asset-grid">
-                {% for asset in assets %}
-                <div class="asset-card" onclick="window.location.href='{% url 'assets:asset_detail' asset.id %}'">
-                    {% if asset.thumbnail %}
-                        <img src="{{ asset.thumbnail.url }}" alt="{{ asset.title }}" class="asset-image">
-                    {% else %}
-                        <div class="asset-image asset-image-empty">
-                            <i class="fas fa-image asset-image-icon-medium"></i>
-                        </div>
-                    {% endif %}
-                    <div class="asset-info">
-                        <h3 class="asset-title">{{ asset.title }}</h3>
-                        <p class="asset-creator">by {{ asset.creator.get_full_name|default:asset.creator.username }}</p>
-                        {% if asset.category %}
-                            <span class="asset-category">{{ asset.category.name }}</span>
-                        {% endif %}
-                        <p class="asset-desc-short">
-                            {{ asset.description|truncatewords:15 }}
-                        </p>
-                        <div class="asset-date-short">
-                            <i class="fas fa-calendar"></i> {{ asset.created_at|date:"M d, Y" }}
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-
-            <!-- Pagination -->
-            {% if page_obj.has_other_pages %}
-            <div class="search-pagination">
-                {% if page_obj.has_previous %}
-                    <a href="?q={{ query }}&page=1" class="btn btn-secondary">
-                        <i class="fas fa-angle-double-left"></i> First
-                    </a>
-                    <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}" class="btn btn-secondary">
-                        <i class="fas fa-angle-left"></i> Previous
-                    </a>
-                {% endif %}
-
-                <span class="search-pagination-info">
-                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-                </span>
-
-                {% if page_obj.has_next %}
-                    <a href="?q={{ query }}&page={{ page_obj.next_page_number }}" class="btn btn-secondary">
-                        Next <i class="fas fa-angle-right"></i>
-                    </a>
-                    <a href="?q={{ query }}&page={{ page_obj.paginator.num_pages }}" class="btn btn-secondary">
-                        Last <i class="fas fa-angle-double-right"></i>
-                    </a>
-                {% endif %}
+<!-- Search Results -->
+{% if assets %}
+    <!-- Grid View (default) -->
+    <div class="search-results-grid" id="gridView">
+        {% for asset in assets %}
+        <div class="search-asset-card" onclick="window.location.href='{% url 'assets:asset_detail' asset.id %}'">
+            {% if asset.is_featured %}
+            <div class="featured-badge">
+                <i class="fas fa-star"></i> Featured
             </div>
             {% endif %}
-        {% else %}
-            <div class="search-empty">
-                {% if query %}
-                    <i class="fas fa-search search-empty-icon"></i>
-                    <h2>No Results Found</h2>
-                    <p class="search-empty-desc">Try different keywords or browse our categories</p>
-                    <div class="search-empty-btns">
-                        <a href="{% url 'assets:asset_list' %}" class="btn btn-secondary">
-                            <i class="fas fa-th-large"></i> Browse All Assets
-                        </a>
-                        <a href="{% url 'assets:home' %}" class="btn btn-primary">
-                            <i class="fas fa-home"></i> Back to Home
-                        </a>
-                    </div>
-                {% else %}
-                    <i class="fas fa-search search-empty-icon"></i>
-                    <h2>Search Our Asset Library</h2>
-                    <p class="search-empty-desc">Enter keywords to find the perfect assets for your project</p>
-                    <a href="{% url 'assets:asset_list' %}" class="btn btn-primary">
-                        <i class="fas fa-th-large"></i> Browse All Assets
-                    </a>
-                {% endif %}
+            
+            {% if asset.thumbnail %}
+            <img src="{{ asset.thumbnail.url }}" alt="{{ asset.title }}" class="asset-thumbnail">
+            {% else %}
+            <div class="asset-thumbnail" style="background: linear-gradient(135deg, rgba(140,82,255,0.3), rgba(0,245,255,0.2)); display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-image" style="font-size: 2rem; color: rgba(255,255,255,0.5);"></i>
             </div>
+            {% endif %}
+            
+            <div class="asset-info">
+                <h3 class="asset-title">{{ asset.title }}</h3>
+                <p class="asset-description">{{ asset.description|truncatechars:100 }}</p>
+                
+                {% if asset.category %}
+                <div class="asset-category-tag">
+                    {{ asset.category.name }}
+                </div>
+                {% endif %}
+                
+                <div class="asset-meta">
+                    <div class="asset-creator">
+                        <i class="fas fa-user"></i>
+                        {{ asset.creator.get_full_name|default:asset.creator.username }}
+                    </div>
+                    <div class="asset-price {% if asset.price == 0 %}price-free{% endif %}">
+                        {% if asset.price == 0 %}
+                            FREE
+                        {% else %}
+                            ${{ asset.price }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- List View (initially hidden) -->
+    <div class="search-results-list" id="listView" style="display: none;">
+        {% for asset in assets %}
+        <div class="search-asset-list-item" onclick="window.location.href='{% url 'assets:asset_detail' asset.id %}'">
+            {% if asset.thumbnail %}
+            <img src="{{ asset.thumbnail.url }}" alt="{{ asset.title }}" class="list-thumbnail">
+            {% else %}
+            <div class="list-thumbnail" style="background: linear-gradient(135deg, rgba(140,82,255,0.3), rgba(0,245,255,0.2)); display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-image" style="font-size: 1.5rem; color: rgba(255,255,255,0.5);"></i>
+            </div>
+            {% endif %}
+            
+            <div class="list-info">
+                <h3 class="asset-title">{{ asset.title }}</h3>
+                <p class="asset-description">{{ asset.description|truncatechars:150 }}</p>
+                
+                <div class="list-meta">
+                    {% if asset.category %}
+                    <div class="asset-category-tag">{{ asset.category.name }}</div>
+                    {% endif %}
+                    <div class="asset-creator">
+                        <i class="fas fa-user"></i>
+                        {{ asset.creator.get_full_name|default:asset.creator.username }}
+                    </div>
+                    <div class="asset-price {% if asset.price == 0 %}price-free{% endif %}">
+                        {% if asset.price == 0 %}
+                            FREE
+                        {% else %}
+                            ${{ asset.price }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Enhanced Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="search-pagination">
+        {% if page_obj.has_previous %}
+            <a href="?{% if query %}q={{ query }}&{% endif %}{% if current_filters.category %}category={{ current_filters.category }}&{% endif %}{% if current_filters.price_range %}price_range={{ current_filters.price_range }}&{% endif %}{% if current_filters.file_type %}file_type={{ current_filters.file_type }}&{% endif %}{% if current_filters.sort %}sort={{ current_filters.sort }}&{% endif %}page=1" class="pagination-btn">
+                <i class="fas fa-angle-double-left"></i>
+            </a>
+            <a href="?{% if query %}q={{ query }}&{% endif %}{% if current_filters.category %}category={{ current_filters.category }}&{% endif %}{% if current_filters.price_range %}price_range={{ current_filters.price_range }}&{% endif %}{% if current_filters.file_type %}file_type={{ current_filters.file_type }}&{% endif %}{% if current_filters.sort %}sort={{ current_filters.sort }}&{% endif %}page={{ page_obj.previous_page_number }}" class="pagination-btn">
+                <i class="fas fa-angle-left"></i> Previous
+            </a>
+        {% else %}
+            <span class="pagination-btn disabled">
+                <i class="fas fa-angle-double-left"></i>
+            </span>
+            <span class="pagination-btn disabled">
+                <i class="fas fa-angle-left"></i> Previous
+            </span>
         {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}
+                <span class="pagination-btn active">{{ num }}</span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a href="?{% if query %}q={{ query }}&{% endif %}{% if current_filters.category %}category={{ current_filters.category }}&{% endif %}{% if current_filters.price_range %}price_range={{ current_filters.price_range }}&{% endif %}{% if current_filters.file_type %}file_type={{ current_filters.file_type }}&{% endif %}{% if current_filters.sort %}sort={{ current_filters.sort }}&{% endif %}page={{ num }}" class="pagination-btn">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <a href="?{% if query %}q={{ query }}&{% endif %}{% if current_filters.category %}category={{ current_filters.category }}&{% endif %}{% if current_filters.price_range %}price_range={{ current_filters.price_range }}&{% endif %}{% if current_filters.file_type %}file_type={{ current_filters.file_type }}&{% endif %}{% if current_filters.sort %}sort={{ current_filters.sort }}&{% endif %}page={{ page_obj.next_page_number }}" class="pagination-btn">
+                Next <i class="fas fa-angle-right"></i>
+            </a>
+            <a href="?{% if query %}q={{ query }}&{% endif %}{% if current_filters.category %}category={{ current_filters.category }}&{% endif %}{% if current_filters.price_range %}price_range={{ current_filters.price_range }}&{% endif %}{% if current_filters.file_type %}file_type={{ current_filters.file_type }}&{% endif %}{% if current_filters.sort %}sort={{ current_filters.sort }}&{% endif %}page={{ page_obj.paginator.num_pages }}" class="pagination-btn">
+                <i class="fas fa-angle-double-right"></i>
+            </a>
+        {% else %}
+            <span class="pagination-btn disabled">
+                Next <i class="fas fa-angle-right"></i>
+            </span>
+            <span class="pagination-btn disabled">
+                <i class="fas fa-angle-double-right"></i>
+            </span>
+        {% endif %}
+        
+        <div class="pagination-info">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </div>
     </div>
+    {% endif %}
+
+{% else %}
+    <!-- Enhanced Empty State -->
+    <div class="search-empty-state">
+        <div class="search-empty-icon">
+            <i class="fas fa-search-minus"></i>
+        </div>
+        
+        {% if query %}
+        <h2 class="search-empty-title">No results found for "{{ query }}"</h2>
+        <p class="search-empty-desc">
+            We couldn't find any assets matching your search. Try different keywords or browse our categories below.
+        </p>
+        {% else %}
+        <h2 class="search-empty-title">No assets available</h2>
+        <p class="search-empty-desc">
+            There are currently no assets in our database. Check back later for new uploads!
+        </p>
+        {% endif %}
+        
+        <div class="search-suggestions">
+            <p style="width: 100%; margin-bottom: 1rem; color: rgba(255,255,255,0.8);">
+                Try searching for these popular terms:
+            </p>
+            <a href="?q=textures" class="suggestion-tag">Textures</a>
+            <a href="?q=models" class="suggestion-tag">3D Models</a>
+            <a href="?q=scripts" class="suggestion-tag">Scripts</a>
+            <a href="?q=audio" class="suggestion-tag">Audio</a>
+            <a href="?q=animations" class="suggestion-tag">Animations</a>
+            <a href="?q=materials" class="suggestion-tag">Materials</a>
+        </div>
     </div>
-</div>
-<style>
-</style>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// View Toggle Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const gridViewBtn = document.getElementById('gridViewBtn');
+    const listViewBtn = document.getElementById('listViewBtn');
+    const gridView = document.getElementById('gridView');
+    const listView = document.getElementById('listView');
+    
+    // Load saved view preference
+    const savedView = localStorage.getItem('searchView') || 'grid';
+    if (savedView === 'list') {
+        toggleToListView();
+    }
+    
+    gridViewBtn.addEventListener('click', function() {
+        toggleToGridView();
+    });
+    
+    listViewBtn.addEventListener('click', function() {
+        toggleToListView();
+    });
+    
+    function toggleToGridView() {
+        gridViewBtn.classList.add('active');
+        listViewBtn.classList.remove('active');
+        gridView.style.display = 'grid';
+        listView.style.display = 'none';
+        localStorage.setItem('searchView', 'grid');
+    }
+    
+    function toggleToListView() {
+        listViewBtn.classList.add('active');
+        gridViewBtn.classList.remove('active');
+        gridView.style.display = 'none';
+        listView.style.display = 'flex';
+        localStorage.setItem('searchView', 'list');
+    }
+    
+    // Filters Toggle for Mobile
+    const filtersToggle = document.getElementById('filtersToggle');
+    const filtersContent = document.getElementById('filtersContent');
+    
+    if (filtersToggle && filtersContent) {
+        filtersToggle.addEventListener('click', function() {
+            filtersContent.classList.toggle('active');
+            const icon = filtersToggle.querySelector('i');
+            if (filtersContent.classList.contains('active')) {
+                icon.classList.replace('fa-sliders-h', 'fa-times');
+            } else {
+                icon.classList.replace('fa-times', 'fa-sliders-h');
+            }
+        });
+    }
+    
+    // Search Autocomplete (basic implementation)
+    const searchInput = document.getElementById('searchInput');
+    const searchAutocomplete = document.getElementById('searchAutocomplete');
+    let searchTimeout;
+    
+    if (searchInput && searchAutocomplete) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const query = this.value.trim();
+            
+            if (query.length >= 2) {
+                searchTimeout = setTimeout(() => {
+                    showSearchSuggestions(query);
+                }, 300);
+            } else {
+                hideSearchSuggestions();
+            }
+        });
+        
+        searchInput.addEventListener('blur', function() {
+            setTimeout(() => {
+                hideSearchSuggestions();
+            }, 150);
+        });
+    }
+    
+    function showSearchSuggestions(query) {
+        const suggestions = [
+            'textures', 'models', '3d assets', 'scripts', 'audio files',
+            'animations', 'materials', 'environments', 'characters', 'props'
+        ].filter(item => item.toLowerCase().includes(query.toLowerCase()));
+        
+        if (suggestions.length > 0) {
+            searchAutocomplete.innerHTML = suggestions.slice(0, 5).map(suggestion => 
+                `<div class="autocomplete-item" onclick="selectSuggestion('${suggestion}')">${suggestion}</div>`
+            ).join('');
+            searchAutocomplete.style.display = 'block';
+        } else {
+            hideSearchSuggestions();
+        }
+    }
+    
+    function hideSearchSuggestions() {
+        if (searchAutocomplete) {
+            searchAutocomplete.style.display = 'none';
+        }
+    }
+    
+    // Enhanced search form handling
+    const searchForm = document.getElementById('searchForm');
+    if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+            const searchTerm = searchInput.value.trim();
+            if (!searchTerm) {
+                e.preventDefault();
+                searchInput.focus();
+                return false;
+            }
+            
+            // Add loading state
+            const searchBtn = searchForm.querySelector('.search-btn');
+            const originalText = searchBtn.innerHTML;
+            searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+            searchBtn.disabled = true;
+            
+            setTimeout(() => {
+                searchBtn.innerHTML = originalText;
+                searchBtn.disabled = false;
+            }, 2000);
+        });
+    }
+});
+
+// Filter form submission with all parameters preserved
+function submitFilters() {
+    const filterForm = document.getElementById('filterForm');
+    if (filterForm) {
+        // Get all current filter values
+        const formData = new FormData(filterForm);
+        const params = new URLSearchParams();
+        
+        // Add all form data to params
+        for (let [key, value] of formData.entries()) {
+            if (value) {
+                params.append(key, value);
+            }
+        }
+        
+        // Redirect with all parameters
+        window.location.href = '{% url "assets:search_assets" %}?' + params.toString();
+    }
+}
+
+// Search suggestion selection
+function selectSuggestion(suggestion) {
+    const searchInput = document.getElementById('searchInput');
+    const searchForm = document.getElementById('searchForm');
+    if (searchInput && searchForm) {
+        searchInput.value = suggestion;
+        searchForm.submit();
+    }
+}
+
+// Smooth scroll to results when filters change
+function scrollToResults() {
+    const resultsHeader = document.querySelector('.search-results-header');
+    if (resultsHeader) {
+        resultsHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+</script>
 {% endblock %}
 

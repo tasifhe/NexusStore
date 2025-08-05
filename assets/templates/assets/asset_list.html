@@ -1,11 +1,20 @@
 {% extends 'assets/base.html' %}
+{% load static %}
 
 {% block title %}Browse Assets - Nexus Store{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'assets/css/browse-redesigned.css' %}">
+{% endblock %}
+
 {% block content %}
 {% csrf_token %}
-<!-- Enhanced Page Header -->
-<div class="browse-page-header">
+<!-- Modern Page Header -->
+<section class="browse-page-header">
+    <div class="hero-background">
+        <div class="hero-gradient"></div>
+        <div class="hero-pattern"></div>
+    </div>
     <div class="container">
         <div class="browse-header-content">
             <div class="browse-title-section">
@@ -15,7 +24,7 @@
                 </h1>
                 <p class="browse-subtitle">Explore our curated collection of high-quality game development resources</p>
                 
-                <!-- Stats Bar -->
+                <!-- Enhanced Stats Bar -->
                 <div class="browse-stats">
                     <div class="stat-item">
                         <span class="stat-number">{{ total_assets|default:"10K+" }}</span>
@@ -35,13 +44,13 @@
             </div>
         </div>
     </div>
-</div>
+</section>
 
-<!-- Advanced Filters & Search -->
-<div class="browse-filters-section">
+<!-- Modern Filters & Search Section -->
+<section class="browse-filters-section">
     <div class="container">
         <div class="filters-container">
-            <!-- Search Bar -->
+            <!-- Enhanced Search Bar -->
             <div class="enhanced-search-container">
                 <form method="GET" action="{% url 'assets:search_assets' %}" class="enhanced-search-form">
                     <div class="search-input-group">
@@ -57,7 +66,7 @@
                 </form>
             </div>
             
-            <!-- Filter Tabs -->
+            <!-- Modern Filter Tabs -->
             <div class="filter-tabs">
                 <button class="filter-tab {% if not current_filter or current_filter == 'all' %}active{% endif %}" 
                         onclick="updateFilter('all')">
@@ -96,21 +105,20 @@
                         <i class="fas fa-list"></i>
                     </button>
                 </div>
-                <div class="sort-dropdown">
-                    <select class="sort-select" onchange="updateSort(this.value)">
-                        <option value="recent" {% if current_sort == 'recent' %}selected{% endif %}>Most Recent</option>
-                        <option value="popular" {% if current_sort == 'popular' %}selected{% endif %}>Most Popular</option>
-                        <option value="name" {% if current_sort == 'name' %}selected{% endif %}>Name A-Z</option>
-                        <option value="category" {% if current_sort == 'category' %}selected{% endif %}>Category</option>
-                    </select>
-                </div>
+                <select class="sort-select" onchange="updateSort(this.value)">
+                    <option value="recent" {% if current_sort == 'recent' %}selected{% endif %}>Most Recent</option>
+                    <option value="popular" {% if current_sort == 'popular' %}selected{% endif %}>Most Popular</option>
+                    <option value="name" {% if current_sort == 'name' %}selected{% endif %}>Name A-Z</option>
+                    <option value="category" {% if current_sort == 'category' %}selected{% endif %}>Category</option>
+                </select>
             </div>
         </div>
     </div>
-</div>
+</section>
 
-<!-- Assets Content Section -->
-<div class="browse-content-section">
+
+<!-- Main Content Section -->
+<main class="browse-content-section">
     <div class="container">
         {% if assets %}
             <!-- Results Summary -->

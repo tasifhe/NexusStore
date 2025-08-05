@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from .models import Asset, Category
+import os
 
 class UserRegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -29,6 +30,18 @@ class UserRegistrationForm(UserCreationForm):
         return user
 
 class AssetUploadForm(forms.ModelForm):
+    # File size limits (in bytes)
+    MAX_ASSET_SIZE = 100 * 1024 * 1024  # 100MB
+    MAX_THUMBNAIL_SIZE = 5 * 1024 * 1024  # 5MB
+    
+    ALLOWED_ASSET_EXTENSIONS = [
+        '.zip', '.rar', '.7z', '.blend', '.fbx', '.obj', 
+        '.png', '.jpg', '.jpeg', '.wav', '.mp3', '.ogg',
+        '.cs', '.js', '.py', '.txt', '.md'
+    ]
+    
+    ALLOWED_IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.webp']
+    
     class Meta:
         model = Asset
         fields = ('title', 'description', 'category', 'asset_file', 'thumbnail')
@@ -61,6 +74,34 @@ class AssetUploadForm(forms.ModelForm):
         self.fields['category'].empty_label = "Select a category"
         
         # Add help text
-        self.fields['asset_file'].help_text = "Upload your asset file (ZIP, RAR, 7Z, Blend, FBX, OBJ, images, audio, scripts)"
-        self.fields['thumbnail'].help_text = "Upload a preview image for your asset"
+        self.fields['asset_file'].help_text = f"Upload your asset file (max {self.MAX_ASSET_SIZE // (1024*1024)}MB)"
+        self.fields['thumbnail'].help_text = f"Upload a preview image (max {self.MAX_THUMBNAIL_SIZE // (1024*1024)}MB)"
+    
+    def clean_asset_file(self):
+        file = self.cleaned_data.get('asset_file')
+        if file:
+            # Check file size
+            if file.size > self.MAX_ASSET_SIZE:
+                raise forms.ValidationError(f'Asset file too large. Maximum size is {self.MAX_ASSET_SIZE // (1024*1024)}MB.')
+            
+            # Check file extension
+            file_extension = os.path.splitext(file.name)[1].lower()
+            if file_extension not in self.ALLOWED_ASSET_EXTENSIONS:
+                raise forms.ValidationError(f'Unsupported file type. Allowed types: {", ".join(self.ALLOWED_ASSET_EXTENSIONS)}')
+        
+        return file
+    
+    def clean_thumbnail(self):
+        file = self.cleaned_data.get('thumbnail')
+        if file:
+            # Check file size
+            if file.size > self.MAX_THUMBNAIL_SIZE:
+                raise forms.ValidationError(f'Thumbnail too large. Maximum size is {self.MAX_THUMBNAIL_SIZE // (1024*1024)}MB.')
+            
+            # Check file extension
+            file_extension = os.path.splitext(file.name)[1].lower()
+            if file_extension not in self.ALLOWED_IMAGE_EXTENSIONS:
+                raise forms.ValidationError(f'Unsupported image type. Allowed types: {", ".join(self.ALLOWED_IMAGE_EXTENSIONS)}')
+        
+        return file
 

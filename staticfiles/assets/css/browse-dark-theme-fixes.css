@@ -1,0 +1,405 @@
+/* ===================================
+   BROWSE ASSETS - DARK THEME FIXES
+   Comprehensive color scheme fixes
+   ================================== */
+
+/* Override all light theme backgrounds and colors */
+
+/* Main content areas */
+.browse-main-content {
+    background: var(--browse-bg-primary) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+/* Sidebar dark theme */
+.browse-sidebar,
+.filters-sidebar,
+.category-sidebar {
+    background: var(--browse-bg-secondary) !important;
+    border-right: 1px solid var(--browse-border) !important;
+}
+
+.sidebar-section {
+    background: var(--browse-bg-card) !important;
+    border: 1px solid var(--browse-border) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+.sidebar-title {
+    color: var(--browse-text-primary) !important;
+    border-bottom: 1px solid var(--browse-border) !important;
+}
+
+/* Fix all white backgrounds */
+.asset-card,
+.enhanced-asset-card,
+.filter-group,
+.category-filter,
+.price-filter,
+.tag-filter,
+.search-result-card,
+.pagination-container,
+.load-more-btn,
+.filter-toggle,
+.sort-dropdown,
+.view-options-container {
+    background: var(--browse-bg-card) !important;
+    border: 1px solid var(--browse-border) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+/* Fix all form elements */
+input[type="text"],
+input[type="search"],
+input[type="email"],
+input[type="password"],
+select,
+textarea,
+.form-control,
+.enhanced-search-input,
+.filter-input,
+.sort-select {
+    background: var(--browse-bg-card) !important;
+    border: 2px solid var(--browse-border) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+input[type="text"]:focus,
+input[type="search"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+select:focus,
+textarea:focus,
+.form-control:focus,
+.enhanced-search-input:focus {
+    border-color: var(--browse-accent) !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--browse-text-muted) !important;
+}
+
+/* Fix all text colors */
+.asset-title,
+.asset-card-title,
+.enhanced-asset-card .card-title,
+.filter-title,
+.category-name,
+.results-title,
+.page-title,
+h1, h2, h3, h4, h5, h6 {
+    color: var(--browse-text-primary) !important;
+}
+
+.asset-description,
+.asset-card-description,
+.enhanced-asset-card .card-description,
+.filter-description,
+.results-description,
+p, span {
+    color: var(--browse-text-secondary) !important;
+}
+
+/* Fix buttons */
+.btn-primary,
+.enhanced-search-btn,
+.filter-apply-btn,
+.load-more-btn,
+.pagination-btn {
+    background: linear-gradient(135deg, var(--browse-accent), var(--browse-accent-hover)) !important;
+    border-color: var(--browse-accent) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+.btn-secondary,
+.btn-outline,
+.filter-clear-btn,
+.cancel-btn {
+    background: var(--browse-hover-bg) !important;
+    border: 2px solid var(--browse-border) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+.btn-secondary:hover,
+.btn-outline:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Fix dropdown menus */
+.dropdown-menu,
+.category-dropdown,
+.filter-dropdown,
+.sort-dropdown-menu {
+    background: var(--browse-bg-card) !important;
+    border: 1px solid var(--browse-border) !important;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+.dropdown-item,
+.category-item,
+.filter-option {
+    color: var(--browse-text-primary) !important;
+}
+
+.dropdown-item:hover,
+.category-item:hover,
+.filter-option:hover {
+    background: var(--browse-hover-bg) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+/* Fix pagination */
+.pagination .page-link {
+    background: var(--browse-bg-card) !important;
+    border: 1px solid var(--browse-border) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+.pagination .page-link:hover {
+    background: var(--browse-hover-bg) !important;
+    border-color: var(--browse-accent) !important;
+}
+
+.pagination .page-item.active .page-link {
+    background: var(--browse-accent) !important;
+    border-color: var(--browse-accent) !important;
+}
+
+/* Fix modals and overlays */
+.modal-content,
+.overlay-content,
+.tooltip-content,
+.popover-content {
+    background: var(--browse-bg-card) !important;
+    border: 1px solid var(--browse-border) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--browse-border) !important;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--browse-border) !important;
+}
+
+/* Fix alerts and notifications */
+.alert,
+.notification,
+.message {
+    background: var(--browse-bg-card) !important;
+    border: 1px solid var(--browse-border) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+.alert-info {
+    background: rgba(99, 102, 241, 0.1) !important;
+    border-color: rgba(99, 102, 241, 0.3) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+.alert-success {
+    background: rgba(16, 185, 129, 0.1) !important;
+    border-color: rgba(16, 185, 129, 0.3) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+.alert-warning {
+    background: rgba(245, 158, 11, 0.1) !important;
+    border-color: rgba(245, 158, 11, 0.3) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+.alert-danger {
+    background: rgba(239, 68, 68, 0.1) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+/* Fix tabs */
+.nav-tabs .nav-link {
+    background: var(--browse-bg-card) !important;
+    border: 1px solid var(--browse-border) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+.nav-tabs .nav-link.active {
+    background: var(--browse-accent) !important;
+    border-color: var(--browse-accent) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+/* Fix badges and labels */
+.badge,
+.label,
+.tag,
+.chip {
+    background: var(--browse-accent) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+.badge-secondary {
+    background: var(--browse-bg-card) !important;
+    border: 1px solid var(--browse-border) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+/* Fix progress bars */
+.progress {
+    background: var(--browse-bg-card) !important;
+    border: 1px solid var(--browse-border) !important;
+}
+
+.progress-bar {
+    background: var(--browse-accent) !important;
+}
+
+/* Fix cards and panels */
+.card,
+.panel,
+.well {
+    background: var(--browse-bg-card) !important;
+    border: 1px solid var(--browse-border) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+.card-header,
+.panel-header {
+    background: var(--browse-bg-secondary) !important;
+    border-bottom: 1px solid var(--browse-border) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+/* Fix list groups */
+.list-group-item {
+    background: var(--browse-bg-card) !important;
+    border: 1px solid var(--browse-border) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+.list-group-item:hover {
+    background: var(--browse-hover-bg) !important;
+}
+
+.list-group-item.active {
+    background: var(--browse-accent) !important;
+    border-color: var(--browse-accent) !important;
+}
+
+/* Fix breadcrumbs */
+.breadcrumb {
+    background: var(--browse-bg-card) !important;
+    border: 1px solid var(--browse-border) !important;
+}
+
+.breadcrumb-item a {
+    color: var(--browse-accent) !important;
+}
+
+.breadcrumb-item.active {
+    color: var(--browse-text-primary) !important;
+}
+
+/* Fix tables */
+.table {
+    color: var(--browse-text-primary) !important;
+}
+
+.table th {
+    background: var(--browse-bg-secondary) !important;
+    border-bottom: 1px solid var(--browse-border) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+.table td {
+    border-top: 1px solid var(--browse-border) !important;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background: var(--browse-hover-bg) !important;
+}
+
+/* Fix specific browse page elements */
+.asset-grid-container {
+    background: var(--browse-bg-primary) !important;
+}
+
+.filter-sidebar-content {
+    background: var(--browse-bg-secondary) !important;
+}
+
+.search-results-header {
+    background: var(--browse-bg-card) !important;
+    border: 1px solid var(--browse-border) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+.no-results-message {
+    background: var(--browse-bg-card) !important;
+    border: 1px solid var(--browse-border) !important;
+    color: var(--browse-text-primary) !important;
+}
+
+.loading-spinner {
+    border-top-color: var(--browse-accent) !important;
+}
+
+/* Fix any remaining light theme elements */
+.bg-white {
+    background: var(--browse-bg-card) !important;
+}
+
+.bg-light {
+    background: var(--browse-bg-secondary) !important;
+}
+
+.text-dark {
+    color: var(--browse-text-primary) !important;
+}
+
+.text-muted {
+    color: var(--browse-text-muted) !important;
+}
+
+.border {
+    border-color: var(--browse-border) !important;
+}
+
+/* Enhanced focus states for accessibility */
+*:focus {
+    outline: 2px solid var(--browse-accent) !important;
+    outline-offset: 2px !important;
+}
+
+/* Scrollbar styling for dark theme */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--browse-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--browse-border);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--browse-text-muted);
+}
+
+/* Selection styling */
+::selection {
+    background: rgba(99, 102, 241, 0.3);
+    color: var(--browse-text-primary);
+}
+
+::-moz-selection {
+    background: rgba(99, 102, 241, 0.3);
+    color: var(--browse-text-primary);
+}
