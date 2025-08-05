@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -131,5 +135,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# OpenAI API Configuration
+# AI API Configuration
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
+HUGGINGFACE_API_KEY = os.environ.get('HUGGINGFACE_API_KEY', '') 
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
+COHERE_API_KEY = os.environ.get('COHERE_API_KEY', '')

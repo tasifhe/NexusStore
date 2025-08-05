@@ -50,6 +50,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
 from .models import Asset, Category, UserProfile
 from .forms import AssetUploadForm, UserRegistrationForm
+from .ai_service import ai_service
 import json
 import os
 from django.contrib.auth.decorators import login_required
@@ -367,15 +368,26 @@ def chatbot_api(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            user_message = data.get('message', '').lower().strip()
+            user_message = data.get('message', '').strip()
             conversation_history = data.get('conversation_history', [])
             request_id = data.get('request_id', '')
             
             if not user_message:
                 return JsonResponse({'error': 'Message cannot be empty'}, status=400)
             
-            # Generate enhanced chatbot response
-            response_data = generate_enhanced_chatbot_response(user_message, conversation_history)
+            # Get asset context for AI
+            asset_context = _build_asset_context()
+            
+            # Try AI-powered response first
+            if ai_service.is_available():
+                response_data = ai_service.generate_chat_response(
+                    user_message, 
+                    conversation_history, 
+                    asset_context
+                )
+            else:
+                # Fallback to enhanced rule-based response
+                response_data = generate_enhanced_chatbot_response(user_message, conversation_history)
             
             return JsonResponse(response_data)
         except json.JSONDecodeError:
@@ -384,6 +396,32 @@ def chatbot_api(request):
             return JsonResponse({'error': f'Server error: {str(e)}'}, status=500)
     
     return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+def _build_asset_context():
+    """Build context about available assets for AI"""
+    try:
+        # Get statistics about assets
+        total_assets = Asset.objects.count()
+        categories = Category.objects.all()
+        recent_assets = Asset.objects.order_by('-created_at')[:5]
+        featured_assets = Asset.objects.filter(is_featured=True)[:3]
+        
+        context_parts = [
+            f"Total assets available: {total_assets}",
+            f"Categories: {', '.join([cat.name for cat in categories])}",
+        ]
+        
+        if recent_assets.exists():
+            recent_titles = [asset.title for asset in recent_assets]
+            context_parts.append(f"Recent assets: {', '.join(recent_titles)}")
+        
+        if featured_assets.exists():
+            featured_titles = [asset.title for asset in featured_assets]
+            context_parts.append(f"Featured assets: {', '.join(featured_titles)}")
+        
+        return " | ".join(context_parts)
+    except Exception:
+        return "Game development assets platform with 3D models, 2D art, audio, and more."
 
 def generate_enhanced_chatbot_response(message, conversation_history=None):
     """Generate enhanced chatbot response with actions and context awareness"""
